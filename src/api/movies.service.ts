@@ -52,7 +52,7 @@ export const getMovieDetails = async (id: number) => {
   return response.data;
 };
 export const getMovieCredits = async (id: number) => {
-  const response = await api.get(`/movie/${id}/credits`, {
+  const response = await api.get(`${ENDPOINTS.CREDITS(id.toString())}`, {
     params: {
       include_adult: false,
       include_video: false,
@@ -79,6 +79,19 @@ export const getPopularMovies = async () => {
 
 export const getTrendingMovies = async () => {
   const response = await api.get(ENDPOINTS.TRENDING, {
+    params: {
+      include_adult: false,
+      include_video: false,
+      language: "en-US",
+      sort_by: "popularity.desc",
+    },
+  });
+
+  return response.data;
+};
+
+export const getPersonDetails = async (id: number) => {
+  const response = await api.get(`${ENDPOINTS.PERSONDETAILS(id.toString())}`, {
     params: {
       include_adult: false,
       include_video: false,

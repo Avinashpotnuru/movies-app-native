@@ -1,3 +1,4 @@
+import { CastContainer, MovieOverview, MovieTitleCard } from "@/src/components";
 import Entypo from "@expo/vector-icons/Entypo";
 import { router } from "expo-router";
 import React from "react";
@@ -6,7 +7,6 @@ import { ScrollView } from "react-native-gesture-handler";
 import { getMovieDetails } from "../api/movies.service";
 import { useFetch } from "../hooks/useFetch";
 import { Colors } from "../theme";
-
 const { width, height } = Dimensions.get("window");
 export default function MoviesDetailsContainer({ id }: { id: number }) {
   const { data, loading } = useFetch({
@@ -26,6 +26,11 @@ export default function MoviesDetailsContainer({ id }: { id: number }) {
           onPress={() => router.back()}
         />
         <View style={styles.backdropImageContainer}>
+          <MovieTitleCard
+            movieTitle={data?.title || ""}
+            movieGenre={data?.genres || []}
+            runTime={data?.runtime || 0}
+          />
           <Image
             style={styles.backdropImage}
             source={
@@ -39,18 +44,10 @@ export default function MoviesDetailsContainer({ id }: { id: number }) {
 
           <View style={styles.blurContainer} />
         </View>
-
-        <Text
-          style={{
-            color: "white",
-            fontSize: 20,
-            fontWeight: "bold",
-            padding: 16,
-          }}
-        >
-          MoviesDetails {id} {data?.title}
-        </Text>
-        <Text style={{ color: "white", padding: 16 }}>{data?.overview}</Text>
+        <View style={styles.contentContainer}>
+          <MovieOverview content={data?.overview || ""} />
+          <CastContainer id={id} />
+        </View>
       </ScrollView>
     </View>
   );
@@ -98,5 +95,8 @@ const styles = StyleSheet.create({
     top: 16,
     left: 16,
     zIndex: 1,
+  },
+  contentContainer: {
+    padding: 16,
   },
 });
