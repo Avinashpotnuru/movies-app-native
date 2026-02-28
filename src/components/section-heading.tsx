@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
     color: Colors.sectionHeading,
     fontSize: 18,
     fontWeight: "bold",
-    margin: 10,
+    marginVertical: 10,
     textAlign: "left",
   },
 });

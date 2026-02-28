@@ -5,3 +5,7 @@ export {default as MoviesDetailsContainer} from "./movies-details-container";
 export {default as MovieTitleCard} from "./movie-title-card";
 export {default as MoviesCard} from "./movies-card";
 export {default as SectionHeading} from "./section-heading";
+export {default as MovieOverview} from "./movie-overview";
+export {default as CastContainer} from "./cast-container";
+export {default as CastDisplayCard} from "./cast-display-card";
+export {default as CastOverView} from "./cast-overview";

@@ -20,3 +20,29 @@ export type MoviesCardType = Pick<Movie, "id" | "title" | "poster_path"> & {
   height?: number;
   width?: number;
 };
+
+export interface Genre {
+  id: number;
+  name: string;
+}
+
+export interface MovieTitleCardProps {
+  movieTitle: string;
+  movieGenre: Genre[];
+  runTime: number;
+}
+
+export interface MovieCastProps {
+  adult: boolean;
+  gender: number;
+  id: number;
+  known_for_department: string;
+  name: string;
+  original_name: string;
+  popularity: number;
+  profile_path: string | null;
+  cast_id: number;
+  character: string;
+  credit_id: string;
+  order: number;
+}
