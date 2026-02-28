@@ -1,13 +1,62 @@
-import { getMovies } from "@/src/api/movies.service";
+import {
+  getPopularMovies,
+  getTrendingMovies,
+  getUpComingMovies,
+} from "@/src/api/movies.service";
+import {
+  MoviesCarousel,
+  MoviesListContainer,
+  SectionHeading,
+} from "@/src/components";
 import { useFetch } from "@/src/hooks/useFetch";
 import { Colors } from "@/src/theme/colors";
-import { FlatList, Image, StyleSheet, Text, View } from "react-native";
+import { Movie, MoviesCardType } from "@/src/types";
+import { useMemo } from "react";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function HomeScreen() {
   const { data, loading, error } = useFetch({
-    fetchFunction: getMovies,
+    fetchFunction: getTrendingMovies,
   });
-  console.log("Movies Screen Rendered", data);
+  const { data: popularMoviesData } = useFetch({
+    fetchFunction: getPopularMovies,
+  });
+
+  const { data: upcomingMoviesData } = useFetch({
+    fetchFunction: getUpComingMovies,
+  });
+
+  const treadingMoviePosters: MoviesCardType[] = useMemo(
+    () =>
+      data?.results.map((movie: Movie) => ({
+        id: movie.id,
+        title: movie.title,
+        poster_path: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+      })) || [],
+
+    [data],
+  );
+
+  const popularMoviePosters: MoviesCardType[] = useMemo(
+    () =>
+      popularMoviesData?.results.map((movie: Movie) => ({
+        id: movie.id,
+        title: movie.title,
+        poster_path: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+      })) || [],
+
+    [popularMoviesData],
+  );
+  const upcomingMoviePosters: MoviesCardType[] = useMemo(
+    () =>
+      upcomingMoviesData?.results.map((movie: Movie) => ({
+        id: movie.id,
+        title: movie.title,
+        poster_path: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+      })) || [],
+
+    [upcomingMoviesData],
+  );
 
   if (loading) {
     return (
@@ -27,22 +76,19 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        numColumns={2}
-        data={data?.results || []}
-        keyExtractor={(item: any) => item.id.toString()}
-        renderItem={({ item }: any) => (
-          <View style={styles.movieCard}>
-            <Text style={styles.movieTitle}>{item.title}</Text>
-            <Image
-              source={{
-                uri: `https://image.tmdb.org/t/p/w500${item.poster_path}`,
-              }}
-              style={styles.movieImage}
-            />
-          </View>
-        )}
-      />
+      <ScrollView>
+        <SectionHeading title="Trending Movies" />
+        <MoviesCarousel moviePosters={treadingMoviePosters} />
+
+        <MoviesListContainer
+          sectionHeading={"Popular Movies"}
+          moviePosters={popularMoviePosters}
+        />
+        <MoviesListContainer
+          sectionHeading={"Upcoming Movies"}
+          moviePosters={upcomingMoviePosters}
+        />
+      </ScrollView>
     </View>
   );
 }

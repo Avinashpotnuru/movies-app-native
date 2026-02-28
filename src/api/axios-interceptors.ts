@@ -10,6 +10,4 @@ export const api = axios.create({
 api.interceptors.request.use((config) => {
   config.headers.Authorization = `Bearer ${process.env.EXPO_PUBLIC_ACCESS_TOKEN}`;
   return config;
-});   
-
-export default api;
+});

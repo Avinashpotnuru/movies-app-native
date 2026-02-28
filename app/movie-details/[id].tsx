@@ -1,12 +1,12 @@
+import { MoviesDetailsContainer } from "@/src/components";
+import { useLocalSearchParams } from "expo-router";
 import React from "react";
-import { Text, View } from "react-native";
 
 const MoviesDetails = () => {
-  return (
-    <View>
-      <Text>MoviesDetails</Text>
-    </View>
-  );
+  const { id } = useLocalSearchParams();
+  const movieId = Number(id);
+
+  return <MoviesDetailsContainer id={movieId} />;
 };
 
 export default MoviesDetails;
