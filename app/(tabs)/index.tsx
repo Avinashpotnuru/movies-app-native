@@ -31,7 +31,7 @@ export default function HomeScreen() {
       data?.results.map((movie: Movie) => ({
         id: movie.id,
         title: movie.title,
-        poster_path: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+        poster_path: movie.poster_path,
       })) || [],
 
     [data],
@@ -42,7 +42,7 @@ export default function HomeScreen() {
       popularMoviesData?.results.map((movie: Movie) => ({
         id: movie.id,
         title: movie.title,
-        poster_path: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+        poster_path: movie.poster_path,
       })) || [],
 
     [popularMoviesData],
@@ -52,7 +52,7 @@ export default function HomeScreen() {
       upcomingMoviesData?.results.map((movie: Movie) => ({
         id: movie.id,
         title: movie.title,
-        poster_path: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+        poster_path: movie.poster_path,
       })) || [],
 
     [upcomingMoviesData],

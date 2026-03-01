@@ -1,17 +1,35 @@
-import { CastContainer, MovieOverview, MovieTitleCard } from "@/src/components";
+import {
+  CastContainer,
+  MovieOverview,
+  MovieTitleCard,
+  MoviesListContainer,
+} from "@/src/components";
 import Entypo from "@expo/vector-icons/Entypo";
 import { router } from "expo-router";
-import React from "react";
+import React, { useMemo } from "react";
 import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { getMovieDetails } from "../api/movies.service";
 import { useFetch } from "../hooks/useFetch";
 import { Colors } from "../theme";
+import { Movie, MoviesCardType } from "../types";
 const { width, height } = Dimensions.get("window");
 export default function MoviesDetailsContainer({ id }: { id: number }) {
   const { data, loading } = useFetch({
     fetchFunction: () => getMovieDetails(id),
   });
+
+  const similarMoviesPosters: MoviesCardType[] = useMemo(() => {
+    return (
+      data?.similar?.results?.map((movie: Movie) => ({
+        id: movie.id,
+        title: movie.title,
+        poster_path: movie.poster_path,
+      })) || []
+    );
+  }, [data]);
+
+  console.log(similarMoviesPosters);
 
   if (loading) return <Text>Loading...</Text>;
 
@@ -47,6 +65,11 @@ export default function MoviesDetailsContainer({ id }: { id: number }) {
         <View style={styles.contentContainer}>
           <MovieOverview content={data?.overview || ""} />
           <CastContainer id={id} />
+
+          <MoviesListContainer
+            sectionHeading={"Similar movies"}
+            moviePosters={similarMoviesPosters}
+          />
         </View>
       </ScrollView>
     </View>
@@ -76,9 +99,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   backdropImage: {
-    width: "100%",
-    height: "100%",
+    width: width,
+    height: height / 2,
+
     borderRadius: 8,
+    resizeMode: "cover",
   },
   blurContainer: {
     position: "absolute",

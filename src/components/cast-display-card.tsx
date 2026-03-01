@@ -51,6 +51,6 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     overflow: "hidden",
-    borderRadius: "50%",
+    borderRadius: 60,
   },
 });

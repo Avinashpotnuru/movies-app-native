@@ -17,8 +17,6 @@ export interface Movie {
 
 export type MoviesCardType = Pick<Movie, "id" | "title" | "poster_path"> & {
   enableTitle?: boolean;
-  height?: number;
-  width?: number;
 };
 
 export interface Genre {
@@ -45,4 +43,10 @@ export interface MovieCastProps {
   character: string;
   credit_id: string;
   order: number;
+}
+
+export interface SocialMediaLinks {
+  facebook: string;
+  instagram: string;
+  twitter: string;
 }

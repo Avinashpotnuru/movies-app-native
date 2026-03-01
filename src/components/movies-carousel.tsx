@@ -1,7 +1,7 @@
-import { MoviesCard } from "@/src/components";
 import { MoviesCardType } from "@/src/types";
+import { router } from "expo-router";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 
 interface MoviesCarouselProps {
@@ -9,6 +9,11 @@ interface MoviesCarouselProps {
 }
 
 const MoviesCarousel = ({ moviePosters }: MoviesCarouselProps) => {
+  const handleNavigation = (id: number | null) => {
+    if (!id) return;
+    router.push(`/movie-details/${id}`);
+  };
+
   return (
     <View style={styles.container}>
       <Carousel
@@ -26,14 +31,23 @@ const MoviesCarousel = ({ moviePosters }: MoviesCarouselProps) => {
         scrollAnimationDuration={1000}
         renderItem={({ item }) => {
           return (
-            <MoviesCard
-              moviesDetails={{
-                ...item,
-                enableTitle: true,
-                height: 380,
-                width: 250,
-              }}
-            />
+            <TouchableOpacity
+              onPress={() => handleNavigation(item?.id || null)}
+            >
+              <Image
+                source={{
+                  uri: item.poster_path
+                    ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
+                    : require("@/assets/images/placeholder.jpg"),
+                }}
+                style={{
+                  width: 250,
+                  height: 380,
+                  marginRight: 15,
+                  borderRadius: 12,
+                }}
+              />
+            </TouchableOpacity>
           );
         }}
       />
