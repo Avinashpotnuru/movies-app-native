@@ -1,18 +1,5 @@
-import { Colors } from "@/src/theme/colors";
-import { Text, View } from "react-native";
+import { MoviesFilterContainer } from "@/src/components/";
 
 export default function MoviesScreen() {
- 
-  return (
-    <View style={styles.container}>
-      <Text style={{ color: "white" }}>Movies Screen 🎬</Text>
-    </View>
-  );
+  return <MoviesFilterContainer />;
 }
-
-const styles = {
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-};

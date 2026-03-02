@@ -1,5 +1,6 @@
 import {
   BiographySection,
+  Loading,
   MoviesListContainer,
   SocialMediaSection,
 } from "@/src/components";
@@ -28,7 +29,7 @@ const CastOverView = ({ castId }: { castId: number }) => {
   const popularMoviePosters: MoviesCardType[] = useMemo(
     () =>
       data?.combined_credits?.cast?.map((movie: Movie, index: number) => ({
-        id: index,
+        id: movie.id,
         title: movie.original_title,
         poster_path: movie.poster_path,
       })) || [],
@@ -45,7 +46,10 @@ const CastOverView = ({ castId }: { castId: number }) => {
     return socialMediaLinks;
   }, [data]);
 
-  if (loading) return <Text>Loading...</Text>;
+  if (loading) {
+    return <Loading />;
+  }
+
   const placeHolderImage =
     data?.gender === 1
       ? require(`@/assets/images/female.jpg`)

@@ -17,6 +17,7 @@ export interface Movie {
 
 export type MoviesCardType = Pick<Movie, "id" | "title" | "poster_path"> & {
   enableTitle?: boolean;
+  style?: React.CSSProperties;
 };
 
 export interface Genre {

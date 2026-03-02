@@ -1,9 +1,11 @@
 import {
   getPopularMovies,
   getTrendingMovies,
+  getTvShows,
   getUpComingMovies,
 } from "@/src/api/movies.service";
 import {
+  Loading,
   MoviesCarousel,
   MoviesListContainer,
   SectionHeading,
@@ -24,6 +26,10 @@ export default function HomeScreen() {
 
   const { data: upcomingMoviesData } = useFetch({
     fetchFunction: getUpComingMovies,
+  });
+
+  const { data: tvShows } = useFetch({
+    fetchFunction: getTvShows,
   });
 
   const treadingMoviePosters: MoviesCardType[] = useMemo(
@@ -58,12 +64,19 @@ export default function HomeScreen() {
     [upcomingMoviesData],
   );
 
+  const tvShowPosters: MoviesCardType[] = useMemo(
+    () =>
+      tvShows?.results.map((movie: Movie) => ({
+        id: movie.id,
+        title: movie.title,
+        poster_path: movie.poster_path,
+      })) || [],
+
+    [tvShows],
+  );
+
   if (loading) {
-    return (
-      <View style={styles.container}>
-        <Text>Loading...</Text>
-      </View>
-    );
+    return <Loading />;
   }
 
   if (error) {
@@ -83,6 +96,10 @@ export default function HomeScreen() {
         <MoviesListContainer
           sectionHeading={"Popular Movies"}
           moviePosters={popularMoviePosters}
+        />
+        <MoviesListContainer
+          sectionHeading={"Popular Tv Shows"}
+          moviePosters={tvShowPosters}
         />
         <MoviesListContainer
           sectionHeading={"Upcoming Movies"}

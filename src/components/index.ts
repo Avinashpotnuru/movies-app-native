@@ -11,4 +11,7 @@ export { default as MoviesDetailsContainer } from "./movies-details-container";
 export { default as SectionHeading } from "./section-heading";
 export { default as BiographySection } from "./biography-section";
 export { default as SocialMediaSection } from "./social-media-section";
+export { default as MoviesFilterContainer } from "./movies-filter-container";
+export { default as CustomDropdown } from "./custom-dropdown";
+export { default as TvShowsFilterContainer } from "./tv-shows-filter-container";
 

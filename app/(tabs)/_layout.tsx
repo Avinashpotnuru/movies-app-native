@@ -36,17 +36,17 @@ export default function TabLayout() {
         }}
       />
 
-      {/* <Tabs.Screen
-        name="series"
+      <Tabs.Screen
+        name="tvshows"
         options={{
-          title: "Series",
+          title: "TV Shows",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="tv" size={size} color={color} />
+             <Ionicons name="tv" size={size} color={color} />
           ),
         }}
       />
 
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="profile"
         options={{
           title: "Profile",
