@@ -1,13 +1,18 @@
 export const ENDPOINTS = {
   MOVIES: "/discover/movie",
+  TV_SHOWS: "/discover/tv",
   TRENDING: "/trending/movie/day",
   POPULAR: "/movie/popular",
   SEARCH: "/search/movie",
-  ONPLAYING: "/movie/now_playing",
-  UPCOMING: "/movie/upcoming",
+  ON_PLAYING: "/movie/now_playing",
+  UP_COMING: "/movie/upcoming",
+  LANGUAGES: "/configuration/languages",
+  SEARCH_MOVIES: (query: string) => `/search/movie?query=${query}`,
+  SEARCH_TV_SHOWS: (query: string) => `/search/tv?query=${query}`,
   DETAILS: (id: string) =>
     `/movie/${id}?append_to_response=similar,videos,images,credits`,
   CREDITS: (id: string) => `/movie/${id}/credits`,
   PERSONDETAILS: (id: string) =>
     `/person/${id}?append_to_response=combined_credits,external_ids,images`,
+  GENRES: "/genre/movie/list",
 };

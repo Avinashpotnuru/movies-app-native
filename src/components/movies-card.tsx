@@ -19,7 +19,7 @@ const MoviesCard = ({
 
   return (
     <TouchableOpacity
-      style={styles.container}
+      style={[styles.container,{margin:10}]}
       onPress={() => handleNavigation(moviesDetails?.id || null)}
     >
       <Image source={imageSource} style={styles.image} />
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: 110,
-    height: 160,
+    height: 150,
     overflow: "hidden",
     resizeMode: "cover",
   },

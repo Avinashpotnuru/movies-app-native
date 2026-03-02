@@ -1,9 +1,9 @@
 import React from "react";
-import { StyleSheet, Text, View ,Dimensions} from "react-native";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { Colors } from "../theme";
 import { MovieTitleCardProps } from "../types";
 
-const { width} = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 export default function MovieTitleCard({
   movieTitle,
   movieGenre,
@@ -40,8 +40,8 @@ const styles = StyleSheet.create({
     zIndex: 1,
     bottom: 10,
     left: 10,
-    right: 0,
-    textAlign: "left",
+    right: 10,
+    maxWidth: width - 40,
   },
   movieTitle: {
     color: Colors.primary,

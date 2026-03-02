@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     color: Colors.secondaryText,
   },
   overview: {
-    fontSize: 16,
+    fontSize: 15,
     color: Colors.secondaryText,
   },
 });

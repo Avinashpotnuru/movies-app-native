@@ -1,5 +1,6 @@
 import {
   CastContainer,
+  Loading,
   MovieOverview,
   MovieTitleCard,
   MoviesListContainer,
@@ -7,7 +8,7 @@ import {
 import Entypo from "@expo/vector-icons/Entypo";
 import { router } from "expo-router";
 import React, { useMemo } from "react";
-import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Image, StyleSheet, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { getMovieDetails } from "../api/movies.service";
 import { useFetch } from "../hooks/useFetch";
@@ -31,7 +32,7 @@ export default function MoviesDetailsContainer({ id }: { id: number }) {
 
   console.log(similarMoviesPosters);
 
-  if (loading) return <Text>Loading...</Text>;
+  if (loading) return <Loading />;
 
   return (
     <View style={styles.container}>
@@ -101,9 +102,9 @@ const styles = StyleSheet.create({
   backdropImage: {
     width: width,
     height: height / 2,
-
     borderRadius: 8,
     resizeMode: "cover",
+    
   },
   blurContainer: {
     position: "absolute",
