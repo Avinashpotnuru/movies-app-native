@@ -17,8 +17,8 @@ import {
 import {
   getGenres,
   getLanguages,
-  getSearchTvShows,
-  getTvShows,
+  getMovies,
+  getSearchMovies,
 } from "../api/movies.service";
 import { useFetch } from "../hooks/useFetch";
 import { Colors } from "../theme";
@@ -26,7 +26,7 @@ import { Movie, MoviesCardType } from "../types";
 
 const { width } = Dimensions.get("window");
 
-export default function TvShowFilterContainer() {
+export default function MoviesFilterContainer() {
   const [page, setPage] = useState(1);
   const [language, setLanguage] = useState("");
   const [genre, setGenre] = useState("");
@@ -35,7 +35,7 @@ export default function TvShowFilterContainer() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data, loading } = useFetch({
-    fetchFunction: () => getSearchTvShows(searchQuery),
+    fetchFunction: () => getSearchMovies(searchQuery),
   });
 
   const { data: languages } = useFetch({
@@ -45,9 +45,9 @@ export default function TvShowFilterContainer() {
     fetchFunction: () => getGenres(),
   });
 
-  const { data: tvShowData } = useFetch({
+  const { data: movieData } = useFetch({
     fetchFunction: () =>
-      getTvShows({
+      getMovies({
         with_original_language: language,
         page,
         with_genres: genre,
@@ -61,7 +61,6 @@ export default function TvShowFilterContainer() {
       value: language?.["iso_639_1"],
     }));
   }, [languages]);
-  console.log(languageOptions);
 
   const genreOptions = useMemo(() => {
     return genreData?.genres.map((genre: { id: number; name: string }) => ({
@@ -83,12 +82,12 @@ export default function TvShowFilterContainer() {
 
   const moviePosters: MoviesCardType[] = useMemo(
     () =>
-      tvShowData?.results.map((movie: Movie) => ({
+      movieData?.results.map((movie: Movie) => ({
         id: movie.id,
         title: movie.title,
         poster_path: movie.poster_path,
       })) || [],
-    [tvShowData],
+    [movieData],
   );
 
   const handleLanguage = (value: string) => {
@@ -128,29 +127,29 @@ export default function TvShowFilterContainer() {
               placeholder="Genre"
               options={genreOptions}
             />
+            <CustomDropdown
+              value={sort}
+              placeholder="Sort By"
+              onValueChange={handleSort}
+              options={sortOptions}
+            />
+            <TouchableOpacity
+              style={styles.clearButton}
+              onPress={() => {
+                setSearchQuery("");
+                setPage(1);
+                setSort("");
+                setLanguage("");
+                setGenre("");
+              }}
+            >
+              <AntDesign name="clear" size={20} color={Colors.primary} />
+            </TouchableOpacity>
           </View>
-          <CustomDropdown
-            value={sort}
-            placeholder="Sort By"
-            onValueChange={handleSort}
-            options={sortOptions}
-          />
-          <TouchableOpacity
-            style={styles.clearButton}
-            onPress={() => {
-              setSearchQuery("");
-              setPage(1);
-              setSort("");
-              setLanguage("");
-              setGenre("");
-            }}
-          >
-            <AntDesign name="clear" size={20} color={Colors.primary} />
-          </TouchableOpacity>
         </ScrollView>
       </View>
 
-      <Text style={styles.title}>Tv Shows</Text>
+      <Text style={styles.title}>Movies</Text>
 
       {loading ? (
         <Loading />
@@ -225,5 +224,8 @@ const styles = StyleSheet.create({
   filterContainer: {
     flexDirection: "row",
     justifyContent: "flex-start",
+
+    borderRadius: 8,
+    width: "100%",
   },
 });

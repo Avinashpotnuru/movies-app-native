@@ -1,4 +1,5 @@
 import {
+  BackdropImagesContainer,
   CastContainer,
   Loading,
   MovieOverview,
@@ -29,8 +30,6 @@ export default function MoviesDetailsContainer({ id }: { id: number }) {
       })) || []
     );
   }, [data]);
-
-  console.log(similarMoviesPosters);
 
   if (loading) return <Loading />;
 
@@ -71,6 +70,7 @@ export default function MoviesDetailsContainer({ id }: { id: number }) {
             sectionHeading={"Similar movies"}
             moviePosters={similarMoviesPosters}
           />
+          <BackdropImagesContainer data={data?.images?.backdrops || []} />
         </View>
       </ScrollView>
     </View>
@@ -104,7 +104,6 @@ const styles = StyleSheet.create({
     height: height / 2,
     borderRadius: 8,
     resizeMode: "cover",
-    
   },
   blurContainer: {
     position: "absolute",
