@@ -1,5 +1,5 @@
 
-import {TvShowsFilterContainer} from "@/src/components";
+import { TvShowsFilterContainer } from "@/src/screens";
 
 export default function TvShowScreen() {
   return <TvShowsFilterContainer />;

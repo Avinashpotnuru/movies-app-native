@@ -7,4 +7,5 @@ export const Colors = {
   accent: "#FF6B00",
   error: "#FF3B30",
   sectionHeading: "yellow",
+  modalBackground: "rgba(5, 17, 22, 0.895)",
 };
