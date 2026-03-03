@@ -1,3 +1,6 @@
+const ACCOUNT_ID = process.env.EXPO_PUBLIC_TMDB_ACCOUNT_ID ;
+console.log(ACCOUNT_ID);
+
 export const ENDPOINTS = {
   MOVIES: "/discover/movie",
   TV_SHOWS: "/discover/tv",
@@ -15,4 +18,7 @@ export const ENDPOINTS = {
   PERSONDETAILS: (id: string) =>
     `/person/${id}?append_to_response=combined_credits,external_ids,images`,
   GENRES: "/genre/movie/list",
+  ADD_TO_FAVORITES: `/account/${ACCOUNT_ID}/favorite`,
+  GET_FAVORITES: `/account/${ACCOUNT_ID}/favorite/movies`,
+  GET_FAVORITES_TV: `/account/${ACCOUNT_ID}/favorite/tv`,
 };

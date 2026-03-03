@@ -128,7 +128,7 @@ export const getSearchTvShows = async (query: string) => {
   });
 
   return response.data;
-}
+};
 
 export const getTvShows = async (params: any = {}) => {
   const response = await api.get(ENDPOINTS.TV_SHOWS, {
@@ -150,5 +150,44 @@ export const getLanguages = async () => {
 };
 export const getGenres = async () => {
   const response = await api.get(ENDPOINTS.GENRES);
+  return response.data;
+};
+
+export const sendToFavorite = async (
+  id: number,
+  favorite: boolean,
+  media_type: string,
+) => {
+  const response = await api.post(ENDPOINTS.ADD_TO_FAVORITES, {
+    media_type: media_type,
+    media_id: id,
+    favorite: favorite,
+  });
+  return response.data;
+};
+
+export const getFavorites = async (params: any = {}) => {
+  const response = await api.get(ENDPOINTS.GET_FAVORITES, {
+    params: {
+      include_adult: false,
+      include_video: false,
+      language: "en-US",
+      sort_by: "popularity.desc",
+      ...params,
+    },
+  });
+  return response.data;
+};
+
+export const getFavoritesTv = async (params: any = {}) => {
+  const response = await api.get(ENDPOINTS.GET_FAVORITES_TV, {
+    params: {
+      include_adult: false,
+      include_video: false,
+      language: "en-US",
+      sort_by: "popularity.desc",
+      ...params,
+    },
+  });
   return response.data;
 };

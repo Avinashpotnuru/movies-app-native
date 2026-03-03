@@ -4,17 +4,13 @@ import {
   getTvShows,
   getUpComingMovies,
 } from "@/src/api/movies.service";
-import {
-  Loading,
-  MoviesCarousel,
-  MoviesListContainer,
-  SectionHeading,
-} from "@/src/components";
+import { Loading, MoviesListContainer, SectionHeading } from "@/src/components";
 import { useFetch } from "@/src/hooks/useFetch";
 import { Colors } from "@/src/theme/colors";
 import { Movie, MoviesCardType } from "@/src/types";
-import { useMemo } from "react";
+import { lazy, Suspense, useMemo } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
+const MoviesCarousel = lazy(() => import("@/src/components/movies-carousel"));
 
 export default function HomeScreen() {
   const { data, loading, error } = useFetch({
@@ -91,19 +87,24 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <ScrollView>
         <SectionHeading title="Trending Movies" />
-        <MoviesCarousel moviePosters={treadingMoviePosters} />
+        <Suspense fallback={<Loading />}>
+          <MoviesCarousel moviePosters={treadingMoviePosters} />
+        </Suspense>
 
         <MoviesListContainer
           sectionHeading={"Popular Movies"}
           moviePosters={popularMoviePosters}
+          typeOfList="movies"
         />
         <MoviesListContainer
           sectionHeading={"Popular Tv Shows"}
           moviePosters={tvShowPosters}
+          typeOfList="tvShows"
         />
         <MoviesListContainer
           sectionHeading={"Upcoming Movies"}
           moviePosters={upcomingMoviePosters}
+          typeOfList="movies"
         />
       </ScrollView>
     </View>
