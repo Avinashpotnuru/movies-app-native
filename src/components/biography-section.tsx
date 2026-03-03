@@ -4,6 +4,7 @@ import { Colors } from "../theme";
 
 export default function BiographySection({ data }: any) {
   const [expanded, setExpanded] = useState(false);
+  if (!data) return null;
 
   return (
     <View>

@@ -46,15 +46,15 @@ export default function TabLayout() {
         }}
       />
 
-      {/* <Tabs.Screen
-        name="profile"
+      <Tabs.Screen
+        name="favorites"
         options={{
-          title: "Profile",
+          title: "Favorites",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person" size={size} color={color} />
+            <Ionicons name="heart" size={size} color={color} />
           ),
         }}
-      /> */}
+      />
     </Tabs>
   );
 }

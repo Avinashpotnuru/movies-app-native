@@ -12,12 +12,15 @@ const CastContainer = ({ id }: { id: number }) => {
   if (loading) return <Loading />;
 
   if (error) return <Text>{error}</Text>;
+
+  if (!data) return null;
+
   return (
     <View style={styles.castContainer}>
       <SectionHeading title="Cast" />
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        {data?.cast?.map((cast: MovieCastProps) => (
-          <CastDisplayCard key={cast.id} cast={cast} />
+        {data?.cast?.map((cast: MovieCastProps, index: number) => (
+          <CastDisplayCard key={index} cast={cast} />
         ))}
       </ScrollView>
     </View>

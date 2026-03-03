@@ -6,21 +6,29 @@ import { MoviesCardType } from "../types";
 interface MoviesListContainerProps {
   moviePosters: MoviesCardType[];
   sectionHeading: string;
+  typeOfList?: string;
 }
 export default React.memo(function MoviesListContainer({
   moviePosters,
   sectionHeading,
+  typeOfList,
 }: MoviesListContainerProps) {
+  if (!moviePosters.length) return null;
   return (
     <View>
       {sectionHeading && (
         <SectionHeading style={styles.heading} title={sectionHeading} />
       )}
+
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        {moviePosters.map((item: MoviesCardType) => (
+        {moviePosters.map((item: MoviesCardType, index: number) => (
           <MoviesCard
-            key={item.id}
-            moviesDetails={{ ...item, enableTitle: true }}
+            key={index}
+            moviesDetails={{
+              ...item,
+              enableTitle: true,
+              typeOfList: typeOfList,
+            }}
           />
         ))}
       </ScrollView>
@@ -32,5 +40,11 @@ const styles = StyleSheet.create({
   heading: {
     marginTop: 20,
     marginBottom: 10,
+  },
+  noMovies: {
+    marginTop: 20,
+    marginBottom: 10,
+    textAlign: "center",
+    color: "red",
   },
 });

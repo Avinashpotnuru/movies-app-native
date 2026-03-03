@@ -18,6 +18,7 @@ export interface Movie {
 export type MoviesCardType = Pick<Movie, "id" | "title" | "poster_path"> & {
   enableTitle?: boolean;
   style?: React.CSSProperties;
+  typeOfList?: string;
 };
 
 export interface Genre {
@@ -29,6 +30,7 @@ export interface MovieTitleCardProps {
   movieTitle: string;
   movieGenre: Genre[];
   runTime: number;
+  movieTrailerId?: string | null;
 }
 
 export interface MovieCastProps {

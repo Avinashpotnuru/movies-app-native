@@ -3,7 +3,7 @@ import { useLocalSearchParams } from "expo-router";
 import React from "react";
 
 const MoviesDetails = () => {
-  const { id } = useLocalSearchParams();
+  const { id} = useLocalSearchParams();
   const movieId = Number(id);
 
   return <MoviesDetailsContainer id={movieId} />;
