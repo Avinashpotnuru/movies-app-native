@@ -12,9 +12,9 @@ export const ENDPOINTS = {
   LANGUAGES: "/configuration/languages",
   SEARCH_MOVIES: (query: string) => `/search/movie?query=${query}`,
   SEARCH_TV_SHOWS: (query: string) => `/search/tv?query=${query}`,
-  DETAILS: (id: string) =>
-    `/movie/${id}?append_to_response=similar,videos,images,credits`,
-  CREDITS: (id: string) => `/movie/${id}/credits`,
+  DETAILS: (id: string, typeOfList: string) =>
+    `/${typeOfList}/${id}?append_to_response=similar,videos,images,credits`,
+  CREDITS: (id: string, typeOfList: string) => `/${typeOfList}/${id}/credits`,
   PERSONDETAILS: (id: string) =>
     `/person/${id}?append_to_response=combined_credits,external_ids,images`,
   GENRES: "/genre/movie/list",

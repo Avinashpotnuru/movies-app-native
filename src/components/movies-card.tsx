@@ -9,9 +9,20 @@ const MoviesCard = ({
 }: {
   moviesDetails: MoviesCardType | null;
 }) => {
+  console.log(moviesDetails, "moviesDetails");
   const handleNavigation = (id: number | null) => {
     if (!id) return;
-    router.push(`/movie-details/${id}`);
+    if (moviesDetails?.typeOfList === "movie") {
+      router.push({
+        pathname: "/movie-details/[id]",
+        params: { id, typeOfList: "movie" },
+      });
+    } else {
+      router.push({
+        pathname: "/movie-details/[id]",
+        params: { id, typeOfList: "tv" },
+      });
+    }
   };
   const imageSource = moviesDetails?.poster_path
     ? { uri: `https://image.tmdb.org/t/p/w200${moviesDetails.poster_path}` }
@@ -19,7 +30,7 @@ const MoviesCard = ({
 
   return (
     <TouchableOpacity
-      style={[styles.container,{margin:10}]}
+      style={[styles.container, { margin: 10 }]}
       onPress={() => handleNavigation(moviesDetails?.id || null)}
     >
       <Image source={imageSource} style={styles.image} />

@@ -161,7 +161,7 @@ export default function MoviesFilterContainer() {
           extraData={searchMoviePosters}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => {
-            return <MoviesCard moviesDetails={item} />;
+            return <MoviesCard moviesDetails={{ ...item, typeOfList :"movie"}} />;
           }}
           refreshControl={
             <RefreshControl

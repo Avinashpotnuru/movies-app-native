@@ -40,8 +40,8 @@ export const getUpComingMovies = async () => {
   return response.data;
 };
 
-export const getMovieDetails = async (id: number) => {
-  const response = await api.get(ENDPOINTS.DETAILS(id.toString()), {
+export const getMovieDetails = async (id: number, typeOfList: string) => {
+  const response = await api.get(ENDPOINTS.DETAILS(id.toString(), typeOfList), {
     params: {
       include_adult: false,
       include_video: false,
@@ -52,15 +52,18 @@ export const getMovieDetails = async (id: number) => {
 
   return response.data;
 };
-export const getMovieCredits = async (id: number) => {
-  const response = await api.get(`${ENDPOINTS.CREDITS(id.toString())}`, {
-    params: {
-      include_adult: false,
-      include_video: false,
-      language: "en-US",
-      sort_by: "popularity.desc",
+export const getMovieCredits = async (id: number, typeOfList: string) => {
+  const response = await api.get(
+    `${ENDPOINTS.CREDITS(id.toString(), typeOfList)}`,
+    {
+      params: {
+        include_adult: false,
+        include_video: false,
+        language: "en-US",
+        sort_by: "popularity.desc",
+      },
     },
-  });
+  );
 
   return response.data;
 };
