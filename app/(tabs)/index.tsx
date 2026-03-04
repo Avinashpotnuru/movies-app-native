@@ -94,7 +94,7 @@ export default function HomeScreen() {
         <MoviesListContainer
           sectionHeading={"Popular Movies"}
           moviePosters={popularMoviePosters}
-          typeOfList="movies"
+          typeOfList="movie"
         />
         <MoviesListContainer
           sectionHeading={"Popular Tv Shows"}
@@ -104,7 +104,7 @@ export default function HomeScreen() {
         <MoviesListContainer
           sectionHeading={"Upcoming Movies"}
           moviePosters={upcomingMoviePosters}
-          typeOfList="movies"
+          typeOfList="movie"
         />
       </ScrollView>
     </View>

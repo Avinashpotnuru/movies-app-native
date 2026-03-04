@@ -13,3 +13,4 @@ export { default as SocialMediaSection } from "./social-media-section";
 export { default as DisplayModal } from "./display-modal";
 export { default as BackdropImagesContainer } from "./backdrop-images-container";
 export { default as TrailerVideo } from "./trailer-video";
+export { default as TabsContainer } from "./tabs-container";

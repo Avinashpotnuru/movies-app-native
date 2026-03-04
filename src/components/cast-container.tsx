@@ -4,9 +4,15 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { getMovieCredits } from "../api/movies.service";
 import { useFetch } from "../hooks/useFetch";
 import { MovieCastProps } from "../types";
-const CastContainer = ({ id }: { id: number }) => {
+const CastContainer = ({
+  id,
+  typeOfList,
+}: {
+  id: number;
+  typeOfList: string;
+}) => {
   const { data, loading, error } = useFetch({
-    fetchFunction: () => getMovieCredits(id),
+    fetchFunction: () => getMovieCredits(id, typeOfList),
   });
 
   if (loading) return <Loading />;
