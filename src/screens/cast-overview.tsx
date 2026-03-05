@@ -58,7 +58,7 @@ const CastOverView = ({ castId }: { castId: number }) => {
       : require(`@/assets/images/male.jpg`);
   const imageSource =
     data?.profile_path !== null
-      ? { uri: getImage(data?.profile_path, "w720") }
+      ? { uri: getImage(data?.profile_path, "w780") }
       : placeHolderImage;
 
   return (

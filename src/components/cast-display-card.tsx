@@ -25,7 +25,7 @@ const CastDisplayCard = ({ cast }: { cast: MovieCastProps }) => {
         {profile_path ? (
           <Image
             style={styles.image}
-            source={{ uri: getImage(profile_path, "w200") }}
+            source={{ uri: getImage(profile_path, "w342") }}
           />
         ) : (
           <Image style={styles.image} source={placeHolderImage} />

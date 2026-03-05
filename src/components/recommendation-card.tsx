@@ -1,18 +1,33 @@
 import { router } from "expo-router";
 import React from "react";
-import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
+import {
+  Dimensions,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 import { Colors } from "../theme";
-import { MoviesCardType } from "../types";
+import { RecommendationCardType } from "../types";
 import { getImage } from "../utils/getImage";
 
-const MoviesCard = ({
+const { width } = Dimensions.get("window");
+
+const RecommendationCard = ({
   moviesDetails,
 }: {
-  moviesDetails: MoviesCardType | null;
+  moviesDetails: RecommendationCardType;
 }) => {
+  const imageSource = moviesDetails?.backdrop_path
+    ? {
+        uri: getImage(moviesDetails?.backdrop_path, "w780"),
+      }
+    : require("@/assets/images/placeholder.jpg");
+
   const handleNavigation = (id: number | null) => {
     if (!id) return;
-    if (moviesDetails?.typeOfList === "movie") {
+
+    if (moviesDetails?.media_type === "movie") {
       router.push({
         pathname: "/movie-details/[id]",
         params: { id, typeOfList: "movie" },
@@ -24,47 +39,37 @@ const MoviesCard = ({
       });
     }
   };
-  const imageSource = moviesDetails?.poster_path
-    ? {
-        uri: getImage(moviesDetails?.poster_path, "w342"),
-      }
-    : require("@/assets/images/placeholder.jpg");
 
   return (
     <TouchableOpacity
       style={[styles.container, { margin: 10 }]}
       onPress={() => handleNavigation(moviesDetails?.id || null)}
     >
-      <Image source={imageSource} style={styles.image} />
-      {moviesDetails?.enableTitle && moviesDetails?.title && (
-        <Text style={styles.title}>
-          {moviesDetails.title.length > 15
-            ? `${moviesDetails.title.slice(0, 15)}...`
-            : moviesDetails.title}
-        </Text>
-      )}
+      <Image style={styles.image} source={imageSource} />
+      <Text style={styles.title}>
+        {moviesDetails?.original_title || moviesDetails?.original_name}
+      </Text>
     </TouchableOpacity>
   );
 };
+
+export default RecommendationCard;
+
 const styles = StyleSheet.create({
   container: {
     overflow: "hidden",
-    alignItems: "center",
     marginHorizontal: 8,
-    justifyContent: "center",
   },
   title: {
     marginTop: 10,
     fontSize: 13,
     color: Colors.sectionHeading,
-    textAlign: "center",
+    textAlign: "left",
   },
   image: {
-    width: 110,
-    height: 150,
+    width: width-90,
+    height: 170,
     overflow: "hidden",
     resizeMode: "cover",
   },
 });
-
-export default MoviesCard;

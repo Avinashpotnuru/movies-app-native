@@ -5,6 +5,7 @@ import {
   MovieOverview,
   MovieTitleCard,
   MoviesListContainer,
+  RecommendationSection,
 } from "@/src/components";
 import Entypo from "@expo/vector-icons/Entypo";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -27,7 +28,7 @@ import {
 } from "../api/movies.service";
 import { useFetch } from "../hooks/useFetch";
 import { Colors } from "../theme";
-import { Movie, MoviesCardType } from "../types";
+import { Movie, MoviesCardType, RecommendationCardType } from "../types";
 import { getImage } from "../utils/getImage";
 
 const { width, height } = Dimensions.get("window");
@@ -39,12 +40,9 @@ export default function MoviesDetailsContainer({
   id: number;
   typeOfList: string;
 }) {
-  console.log(typeOfList, "typeOfList");
-
   const { data, loading } = useFetch({
     fetchFunction: () => getMovieDetails(id, typeOfList),
   });
-  console.log(data, "data");
 
   const { data: favorites, refetch: refetchFavorites } = useFetch({
     fetchFunction: () => getFavorites(),
@@ -123,8 +121,19 @@ export default function MoviesDetailsContainer({
     return (
       data?.similar?.results?.map((movie: Movie) => ({
         id: movie.id,
-        title: movie.title,
+        title: movie.title || movie.name,
         poster_path: movie.poster_path,
+      })) || []
+    );
+  }, [data]);
+
+  const recommendationMoviesPosters: RecommendationCardType[] = useMemo(() => {
+    return (
+      data?.recommendations?.results?.map((movie: RecommendationCardType) => ({
+        id: movie.id,
+        original_title: movie?.original_title || movie?.original_name,
+        backdrop_path: movie.backdrop_path,
+        media_type: movie.media_type,
       })) || []
     );
   }, [data]);
@@ -143,7 +152,7 @@ export default function MoviesDetailsContainer({
           name="home"
           size={24}
           color={Colors.primary}
-          onPress={() => router.back()}
+          onPress={() => router.push("/")}
         />
 
         <TouchableOpacity style={styles.favoriteIcon} onPress={handleFavorite}>
@@ -178,8 +187,12 @@ export default function MoviesDetailsContainer({
 
         <View style={styles.contentContainer}>
           <MovieOverview content={data?.overview || ""} />
-
           <CastContainer id={id} typeOfList={typeOfList} />
+          <RecommendationSection
+            sectionHeading="Recommendations"
+            moviePosters={recommendationMoviesPosters}
+            typeOfList={typeOfList}
+          />
 
           <MoviesListContainer
             sectionHeading="Similar movies"

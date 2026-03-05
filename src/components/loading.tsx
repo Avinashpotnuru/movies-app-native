@@ -1,12 +1,11 @@
 import React from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
 import { Colors } from "../theme";
 
 const LoadingImage = require("@/assets/images/loading.gif");
 
 const Loading = () => (
   <View style={styles.container}>
-    <Text>Loading...</Text>
     <Image style={styles.image} source={LoadingImage} />
   </View>
 );
