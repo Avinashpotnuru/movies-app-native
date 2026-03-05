@@ -28,6 +28,7 @@ import {
 import { useFetch } from "../hooks/useFetch";
 import { Colors } from "../theme";
 import { Movie, MoviesCardType } from "../types";
+import { getImage } from "../utils/getImage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -65,61 +66,6 @@ export default function MoviesDetailsContainer({
 
     setIsFavorite(exists);
   }, [favorites, favoritesTv, data, typeOfList]);
-
-  // const handleFavorite = async () => {
-  //   if (!data?.id) return;
-
-  //   const newState = !isFavorite;
-  //   setIsFavorite(newState);
-
-  //   try {
-  //     if (typeOfList === "movie") {
-  //       await sendToFavorite(data.id, newState, "movie");
-  //       if (isFavorite === true) {
-  //         Alert.alert(
-  //           `${data.title} added to favorites `,
-  //           "see favorites screen",
-  //           [
-  //             {
-  //               text: "Go to favorites",
-  //               onPress: () => router.push("/favorites"),
-  //             },
-  //           ],
-  //         );
-  //       } else {
-  //         Alert.alert(
-  //           `${data.title} removed from favorites got to favorites screen`,
-  //         );
-  //       }
-
-  //       refetchFavorites();
-  //     } else {
-  //       await sendToFavorite(data.id, newState, "tv");
-  //       if (isFavorite === true) {
-  //         Alert.alert(
-  //           `${data.name} added to favorites `,
-  //           "see favorites screen",
-  //           [
-  //             {
-  //               text: "Go to favorites",
-  //               onPress: () => router.push("/favorites"),
-  //             },
-  //           ],
-  //         );
-  //       } else {
-  //         Alert.alert(
-  //           `${data.name} removed from favorites got to favorites screen`,
-  //         );
-  //       }
-
-  //       refetchFavoritesTv();
-  //     }
-  //   } catch (error) {
-  //     console.log("Favorite error:", error);
-
-  //     setIsFavorite(!newState);
-  //   }
-  // };
 
   const handleFavorite = async () => {
     if (!data?.id) return;
@@ -172,7 +118,7 @@ export default function MoviesDetailsContainer({
       setIsFavorite(!newState);
     }
   };
-  
+
   const similarMoviesPosters: MoviesCardType[] = useMemo(() => {
     return (
       data?.similar?.results?.map((movie: Movie) => ({
@@ -221,7 +167,7 @@ export default function MoviesDetailsContainer({
             source={
               data?.backdrop_path
                 ? {
-                    uri: `https://image.tmdb.org/t/p/original${data.backdrop_path}`,
+                    uri: getImage(data.backdrop_path, "w780"),
                   }
                 : require("@/assets/images/placeholder.jpg")
             }

@@ -19,6 +19,7 @@ import { getPersonDetails } from "../api/movies.service";
 import { useFetch } from "../hooks/useFetch";
 import { Colors } from "../theme";
 import { Movie, MoviesCardType } from "../types";
+import { getImage } from "../utils/getImage";
 const { width, height } = Dimensions.get("window");
 
 const CastOverView = ({ castId }: { castId: number }) => {
@@ -32,6 +33,7 @@ const CastOverView = ({ castId }: { castId: number }) => {
         id: movie.id,
         title: movie.original_title,
         poster_path: movie.poster_path,
+        typeOfList: movie.media_type,
       })) || [],
     [data],
   );
@@ -56,7 +58,7 @@ const CastOverView = ({ castId }: { castId: number }) => {
       : require(`@/assets/images/male.jpg`);
   const imageSource =
     data?.profile_path !== null
-      ? { uri: `https://image.tmdb.org/t/p/w500${data?.profile_path}` }
+      ? { uri: getImage(data?.profile_path, "w720") }
       : placeHolderImage;
 
   return (
@@ -76,9 +78,11 @@ const CastOverView = ({ castId }: { castId: number }) => {
           <Text style={styles.title}>{data?.name}</Text>
           <SocialMediaSection socialMediaLinks={socialMediaLinks} />
           <BiographySection data={data} />
+
           <MoviesListContainer
             sectionHeading={"Known For"}
             moviePosters={popularMoviePosters}
+            typeOfList={"movie"}
           />
         </View>
       </ScrollView>

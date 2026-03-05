@@ -3,13 +3,13 @@ import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { Colors } from "../theme";
 import { MoviesCardType } from "../types";
+import { getImage } from "../utils/getImage";
 
 const MoviesCard = ({
   moviesDetails,
 }: {
   moviesDetails: MoviesCardType | null;
 }) => {
-  console.log(moviesDetails, "moviesDetails");
   const handleNavigation = (id: number | null) => {
     if (!id) return;
     if (moviesDetails?.typeOfList === "movie") {
@@ -25,7 +25,9 @@ const MoviesCard = ({
     }
   };
   const imageSource = moviesDetails?.poster_path
-    ? { uri: `https://image.tmdb.org/t/p/w200${moviesDetails.poster_path}` }
+    ? {
+        uri: getImage(moviesDetails?.poster_path, "w342"),
+      }
     : require("@/assets/images/placeholder.jpg");
 
   return (

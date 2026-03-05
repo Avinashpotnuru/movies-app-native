@@ -1,5 +1,4 @@
-const ACCOUNT_ID = process.env.EXPO_PUBLIC_TMDB_ACCOUNT_ID ;
-console.log(ACCOUNT_ID);
+const ACCOUNT_ID = process.env.EXPO_PUBLIC_TMDB_ACCOUNT_ID;
 
 export const ENDPOINTS = {
   MOVIES: "/discover/movie",

@@ -31,7 +31,6 @@ export default function MoviesFilterContainer() {
   const [language, setLanguage] = useState("");
   const [genre, setGenre] = useState("");
   const [sort, setSort] = useState("");
-
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data, loading } = useFetch({
@@ -161,7 +160,9 @@ export default function MoviesFilterContainer() {
           extraData={searchMoviePosters}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => {
-            return <MoviesCard moviesDetails={{ ...item, typeOfList :"movie"}} />;
+            return (
+              <MoviesCard moviesDetails={{ ...item, typeOfList: "movie" }} />
+            );
           }}
           refreshControl={
             <RefreshControl

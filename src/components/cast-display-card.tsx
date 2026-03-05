@@ -2,6 +2,7 @@ import { router } from "expo-router";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { MovieCastProps } from "../types";
+import { getImage } from "../utils/getImage";
 
 const CastDisplayCard = ({ cast }: { cast: MovieCastProps }) => {
   const { name, profile_path, gender, id } = cast;
@@ -24,7 +25,7 @@ const CastDisplayCard = ({ cast }: { cast: MovieCastProps }) => {
         {profile_path ? (
           <Image
             style={styles.image}
-            source={{ uri: `https://image.tmdb.org/t/p/w500${profile_path}` }}
+            source={{ uri: getImage(profile_path, "w200") }}
           />
         ) : (
           <Image style={styles.image} source={placeHolderImage} />

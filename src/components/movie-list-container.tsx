@@ -13,6 +13,7 @@ export default React.memo(function MoviesListContainer({
   sectionHeading,
   typeOfList,
 }: MoviesListContainerProps) {
+  console.log(typeOfList, "typeOfList");
   if (!moviePosters.length) return null;
   return (
     <View>
@@ -27,7 +28,7 @@ export default React.memo(function MoviesListContainer({
             moviesDetails={{
               ...item,
               enableTitle: true,
-              typeOfList: typeOfList,
+              typeOfList: typeOfList || item.typeOfList,
             }}
           />
         ))}
