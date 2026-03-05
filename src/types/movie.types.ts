@@ -10,6 +10,7 @@ export interface Movie {
   poster_path: string | null;
   release_date: string;
   title: string;
+  name?: string;
   video: boolean;
   vote_average: number;
   vote_count: number;
@@ -20,7 +21,16 @@ export type MoviesCardType = Pick<Movie, "id" | "title" | "poster_path"> & {
   enableTitle?: boolean;
   style?: React.CSSProperties;
   typeOfList?: string;
+  name?: string;
 };
+
+export interface RecommendationCardType {
+  id: number;
+  original_title: string;
+  original_name?: string;
+  backdrop_path: string | null;
+  media_type: string;
+}
 
 export interface Genre {
   id: number;

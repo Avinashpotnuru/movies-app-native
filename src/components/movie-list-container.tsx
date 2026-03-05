@@ -1,6 +1,10 @@
-import { MoviesCard, SectionHeading } from "@/src/components";
+import {
+  MoviesCard,
+  MoviesListWrapper,
+  SectionHeading,
+} from "@/src/components";
 import React from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { MoviesCardType } from "../types";
 
 interface MoviesListContainerProps {
@@ -21,18 +25,19 @@ export default React.memo(function MoviesListContainer({
         <SectionHeading style={styles.heading} title={sectionHeading} />
       )}
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      <MoviesListWrapper>
         {moviePosters.map((item: MoviesCardType, index: number) => (
           <MoviesCard
             key={index}
             moviesDetails={{
               ...item,
+              title: item.title || (item.name as string),
               enableTitle: true,
               typeOfList: typeOfList || item.typeOfList,
             }}
           />
         ))}
-      </ScrollView>
+      </MoviesListWrapper>
     </View>
   );
 });

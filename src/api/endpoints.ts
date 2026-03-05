@@ -12,7 +12,7 @@ export const ENDPOINTS = {
   SEARCH_MOVIES: (query: string) => `/search/movie?query=${query}`,
   SEARCH_TV_SHOWS: (query: string) => `/search/tv?query=${query}`,
   DETAILS: (id: string, typeOfList: string) =>
-    `/${typeOfList}/${id}?append_to_response=similar,videos,images,credits`,
+    `/${typeOfList}/${id}?append_to_response=similar,recommendations,videos,images,credits`,
   CREDITS: (id: string, typeOfList: string) => `/${typeOfList}/${id}/credits`,
   PERSONDETAILS: (id: string) =>
     `/person/${id}?append_to_response=combined_credits,external_ids,images`,

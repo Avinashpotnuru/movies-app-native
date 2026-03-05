@@ -64,12 +64,28 @@ export default function HomeScreenContainer() {
     () =>
       tvShows?.results.map((movie: Movie) => ({
         id: movie.id,
-        title: movie.title,
+        title: movie.title || movie.name,
         poster_path: movie.poster_path,
       })) || [],
 
     [tvShows],
   );
+
+  const displayMoviesList = useMemo(() => {
+    return [
+      {
+        title: "Popular Movies",
+        data: popularMoviePosters,
+        typeOfList: "movie",
+      },
+      { title: "Popular Tv Shows", data: tvShowPosters, typeOfList: "tvShows" },
+      {
+        title: "Upcoming Movies",
+        data: upcomingMoviePosters,
+        typeOfList: "movie",
+      },
+    ];
+  }, [popularMoviePosters, tvShowPosters, upcomingMoviePosters]);
 
   if (loading) {
     return <Loading />;
@@ -91,21 +107,14 @@ export default function HomeScreenContainer() {
           <MoviesCarousel moviePosters={treadingMoviePosters} />
         </Suspense>
 
-        <MoviesListContainer
-          sectionHeading={"Popular Movies"}
-          moviePosters={popularMoviePosters}
-          typeOfList="movie"
-        />
-        <MoviesListContainer
-          sectionHeading={"Popular Tv Shows"}
-          moviePosters={tvShowPosters}
-          typeOfList="tvShows"
-        />
-        <MoviesListContainer
-          sectionHeading={"Upcoming Movies"}
-          moviePosters={upcomingMoviePosters}
-          typeOfList="movie"
-        />
+        {displayMoviesList.map((item, index) => (
+          <MoviesListContainer
+            key={index}
+            sectionHeading={item.title}
+            moviePosters={item.data}
+            typeOfList={item.typeOfList}
+          />
+        ))}
       </ScrollView>
     </View>
   );

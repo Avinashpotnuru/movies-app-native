@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   biographyText: {
-    fontSize: 16,
+    fontSize: 15,
     color: Colors.secondaryText,
   },
   readMore: {
