@@ -11,7 +11,10 @@ interface MoviesCarouselProps {
 const MoviesCarousel = ({ moviePosters }: MoviesCarouselProps) => {
   const handleNavigation = (id: number | null) => {
     if (!id) return;
-    router.push(`/movie-details/${id}`);
+    router.push({
+      pathname: "/movie-details/[id]",
+      params: { id, typeOfList: "movie" },
+    });
   };
 
   return (

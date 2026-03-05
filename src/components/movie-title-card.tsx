@@ -1,5 +1,11 @@
 import React, { lazy, Suspense } from "react";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Dimensions,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { Colors } from "../theme";
 import { MovieTitleCardProps } from "../types";
 
@@ -27,13 +33,11 @@ export default function MovieTitleCard({
           <Text style={styles.movieGenre}>{convertRuntime(runTime)}</Text>
           <Text style={styles.separator}>|</Text>
           <Text style={styles.movieGenre}>
-            {genreText.length > 30
-              ? genreText.slice(0, 32) + "..."
-              : genreText}
+            {genreText.length > 30 ? genreText.slice(0, 32) + "..." : genreText}
           </Text>
         </View>
       </View>
-      <Suspense fallback={<Text>Loading...</Text>}>
+      <Suspense fallback={<ActivityIndicator size="large" color={Colors.primary} />}>
         <TrailerVideo movieTrailerId={movieTrailerId || ""} />
       </Suspense>
     </View>
