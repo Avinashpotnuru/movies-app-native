@@ -1,50 +1,259 @@
-# Welcome to your Expo app 👋
+# 🎬 Movies Explorer App (React Native + Expo)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A modern **Movies & TV Shows Explorer App** built using **React Native
+(Expo)** and **TMDB API**.\
+Users can discover trending and upcoming movies, search for movies or TV
+shows, view detailed information, watch trailers, and manage favorite
+movies.
 
-## Get started
+------------------------------------------------------------------------
 
-1. Install dependencies
+## 🚀 Features
 
-   ```bash
-   npm install
+### 🔎 Search
+
+-   Search for **Movies and TV Shows**
+-   Instant results display
+
+### 🎬 Movies Discovery
+
+-   View **Trending Movies**
+-   View **Upcoming Movies**
+-   Browse popular movies
+
+### 🎛 Filters & Sorting
+
+-   Sort movies by:
+    -   Popularity (Ascending / Descending)
+    -   Rating / Vote Average (Ascending / Descending)
+    -   Release Date (Ascending / Descending)
+    -   Revenue (Ascending / Descending)
+    -   Original Title (Ascending / Descending)
+    -   Title (Ascending / Descending)
+    -   Vote Count (Ascending / Descending)
+
+-   Filter movies by **language**
+
+### 📄 Movie Details Page
+
+Each movie has a **dynamic details page** with:
+
+-   Movie Title & Poster
+-   Backdrop Images
+-   Movie Overview
+-   Cast Details
+-   Movie Trailer (YouTube)
+-   Recommended Movies
+-   Similar Movies
+
+### 🎭 Cast Details
+
+-   View cast member details
+-   Biography
+-   Social media links
+-   Movies & TV Shows they have appeared in
+
+### ⭐ Favorites
+
+-   Add movies to **Favorites**
+-   View all saved movies in a **Favorites Page**
+-   Quick access to favorite movies
+
+------------------------------------------------------------------------
+
+## 🛠 Tech Stack
+
+-   React Native
+-   Expo
+-   Expo Router
+-   Axios
+-   TMDB API
+-   TypeScript
+-   React Hooks
+-   Custom Hooks
+-   Reusable Components
+-   Responsive Design
+
+
+
+------------------------------------------------------------------------
+
+## 📁 Project Structure
+
    ```
+movies-app-native
+├─ .env
+├─ .qodo
+├─ app
+│  ├─ (tabs)
+│  │  ├─ favorites.tsx
+│  │  ├─ index.tsx
+│  │  ├─ movies.tsx
+│  │  ├─ tvshows.tsx
+│  │  └─ _layout.tsx
+│  ├─ cast-details
+│  │  └─ [id].tsx
+│  ├─ login.tsx
+│  ├─ movie-details
+│  │  └─ [id].tsx
+│  └─ _layout.tsx
+├─ app.json
+├─ assets
+│  └─ images
+│     ├─ favicon.png
+│     ├─ female.jpg
+│     ├─ icon.png
+│     ├─ loading.gif
+│     ├─ male.jpg
+│     ├─ partial-react-logo.png
+│     ├─ placeholder.jpg
+│     ├─ react-logo.png
+│     ├─ react-logo@2x.png
+│     ├─ react-logo@3x.png
+│     └─ splash-icon.png
+├─ data
+│  └─ index.ts
+├─ es.json
+├─ eslint.config.js
+├─ package-lock.json
+├─ package.json
+├─ README.md
+├─ src
+│  ├─ api
+│  │  ├─ axios-interceptors.ts
+│  │  ├─ endpoints.ts
+│  │  └─ movies.service.ts
+│  ├─ components
+│  │  ├─ backdrop-images-container.tsx
+│  │  ├─ biography-section.tsx
+│  │  ├─ cast-container.tsx
+│  │  ├─ cast-display-card.tsx
+│  │  ├─ custom-dropdown.tsx
+│  │  ├─ display-modal.tsx
+│  │  ├─ index.ts
+│  │  ├─ loading.tsx
+│  │  ├─ movie-list-container.tsx
+│  │  ├─ movie-overview.tsx
+│  │  ├─ movie-title-card.tsx
+│  │  ├─ movies-card.tsx
+│  │  ├─ movies-carousel.tsx
+│  │  ├─ movies-list-wrapper.tsx
+│  │  ├─ no-data-found.tsx
+│  │  ├─ recommendation-card.tsx
+│  │  ├─ recommendation-section.tsx
+│  │  ├─ section-heading.tsx
+│  │  ├─ social-media-section.tsx
+│  │  ├─ tabs-container.tsx
+│  │  └─ trailer-video.tsx
+│  ├─ hooks
+│  │  ├─ useDebounce.tsx
+│  │  ├─ useDimensions.tsx
+│  │  └─ useFetch.tsx
+│  ├─ screens
+│  │  ├─ cast-overview.tsx
+│  │  ├─ favorites-container.tsx
+│  │  ├─ home-container.tsx
+│  │  ├─ index.ts
+│  │  ├─ movies-details-container.tsx
+│  │  ├─ movies-filter-container.tsx
+│  │  └─ tv-shows-filter-container.tsx
+│  ├─ theme
+│  │  ├─ colors.ts
+│  │  └─ index.ts
+│  ├─ types
+│  │  ├─ index.ts
+│  │  └─ movie.types.ts
+│  └─ utils
+│     ├─ getImage.ts
+│     └─ responsive.ts
+└─ tsconfig.json
 
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+------------------------------------------------------------------------
 
-## Learn more
+## 📦 Installation
 
-To learn more about developing your project with Expo, look at the following resources:
+Clone the repository:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+    git clone https://github.com/Avinashpotnuru/movies-app-native.git
 
-## Join the community
+Go to the project folder:
 
-Join our community of developers creating universal apps.
+    cd movies-app-native
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Install dependencies:
+
+    npm install
+
+------------------------------------------------------------------------
+
+## ▶ Run the Project
+
+Start the development server:
+
+    npx expo start
+
+Run on Android:
+
+    npx expo start --android
+
+Run on iOS:
+
+    npx expo start --ios
+
+------------------------------------------------------------------------
+
+## 🔑 Environment Variables
+
+Create a `.env` file in the root folder.
+
+    EXPO_PUBLIC_TMDB_API_KEY=your_api_key
+    EXPO_PUBLIC_BASE_URL=https://api.themoviedb.org/3
+    EXPO_PUBLIC_ACCESS_TOKEN=your_access_token
+
+------------------------------------------------------------------------
+
+## 🌐 API
+
+This project uses the **TMDB API**.
+
+https://www.themoviedb.org/documentation/api
+
+------------------------------------------------------------------------
+
+## 📱 Screens
+
+-   Home Screen
+-   Movies Page
+-   Movie Details Page
+-   Cast Details Page
+-   Favorites Page
+-   Search Page
+
+------------------------------------------------------------------------
+
+## ⭐ Future Improvements
+
+-   Authentication
+-   Watchlist
+-   Offline Favorites
+-   Pagination
+-   Better animations
+-   Dark / Light theme support
+
+------------------------------------------------------------------------
+## 🚀 Live Demo
+
+- Expo Build: https://expo.dev/accounts/avinash343/projects/movies-app-native/builds/25a9e72c-1202-4846-9281-86a768d459d6
+
+------------------------------------------------------------------------------
+
+## 👨‍💻 Author
+
+**Avinash Potnuru**
+
+- GitHub: https://github.com/Avinashpotnuru
+
+Built with ❤️ using **React Native + Expo**.*React Native + Expo**.
+
