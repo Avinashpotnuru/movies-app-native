@@ -48,10 +48,6 @@ const CastOverView = ({ castId }: { castId: number }) => {
     return socialMediaLinks;
   }, [data]);
 
-  if (loading) {
-    return <Loading />;
-  }
-
   const placeHolderImage =
     data?.gender === 1
       ? require(`@/assets/images/female.jpg`)
@@ -60,6 +56,10 @@ const CastOverView = ({ castId }: { castId: number }) => {
     data?.profile_path !== null
       ? { uri: getImage(data?.profile_path, "w780") }
       : placeHolderImage;
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <View style={styles.container}>

@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import React from "react";
+import React, { memo, useMemo } from "react";
 import {
   Dimensions,
   Image,
@@ -18,31 +18,30 @@ const RecommendationCard = ({
 }: {
   moviesDetails: RecommendationCardType;
 }) => {
-  const imageSource = moviesDetails?.backdrop_path
-    ? {
-        uri: getImage(moviesDetails?.backdrop_path, "w780"),
-      }
-    : require("@/assets/images/placeholder.jpg");
+  const imageSource = useMemo(() => {
+    return moviesDetails?.backdrop_path
+      ? {
+          uri: getImage(moviesDetails?.backdrop_path, "w780"),
+        }
+      : require("@/assets/images/placeholder.jpg");
+  }, [moviesDetails?.backdrop_path]);
 
-  const handleNavigation = (id: number | null) => {
-    if (!id) return;
+  const handleNavigation = React.useCallback(
+    (id: number | null) => {
+      if (!id) return;
 
-    if (moviesDetails?.media_type === "movie") {
-      router.push({
-        pathname: "/movie-details/[id]",
-        params: { id, typeOfList: "movie" },
-      });
-    } else {
-      router.push({
-        pathname: "/movie-details/[id]",
-        params: { id, typeOfList: "tv" },
-      });
-    }
-  };
+      const params =
+        moviesDetails?.media_type === "movie"
+          ? { id, typeOfList: "movie" }
+          : { id, typeOfList: "tv" };
+      router.replace({ pathname: "/movie-details/[id]", params });
+    },
+    [moviesDetails],
+  );
 
   return (
     <TouchableOpacity
-      style={[styles.container, { margin: 10 }]}
+      style={styles.container}
       onPress={() => handleNavigation(moviesDetails?.id || null)}
     >
       <Image style={styles.image} source={imageSource} />
@@ -53,12 +52,13 @@ const RecommendationCard = ({
   );
 };
 
-export default RecommendationCard;
+export default memo(RecommendationCard);
 
 const styles = StyleSheet.create({
   container: {
     overflow: "hidden",
     marginHorizontal: 8,
+    margin: 10,
   },
   title: {
     marginTop: 10,
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     textAlign: "left",
   },
   image: {
-    width: width-90,
+    width: width - 90,
     height: 170,
     overflow: "hidden",
     resizeMode: "cover",

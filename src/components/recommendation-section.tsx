@@ -5,7 +5,7 @@ import {
   RecommendationCard,
   SectionHeading,
 } from "@/src/components";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 import { RecommendationCardType } from "../types";
 interface RecommendationProps {
   moviePosters: RecommendationCardType[];
@@ -31,5 +31,3 @@ const RecommendationSection = ({
 };
 
 export default RecommendationSection;
-
-

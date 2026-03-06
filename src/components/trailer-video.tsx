@@ -8,17 +8,24 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import YoutubePlayer from "react-native-youtube-iframe";
+import YoutubePlayer, { YoutubeIframeRef } from "react-native-youtube-iframe";
 import { Colors } from "../theme";
 
 const { width } = Dimensions.get("window");
+const videoHeight = Math.round((width * 0.9 * 9) / 16);
 
 const TrailerVideo = ({ movieTrailerId }: { movieTrailerId: string }) => {
   const [isVisible, setIsVisible] = React.useState(false);
+  const playerRef = React.useRef<YoutubeIframeRef>(null);
   if (!movieTrailerId) return null;
   return (
     <View>
-      <TouchableOpacity onPress={() => setIsVisible(true)}>
+      <TouchableOpacity
+        onPress={() => setIsVisible(true)}
+        accessibilityRole="button"
+        accessibilityLabel="Play trailer"
+        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      >
         <AntDesign name="play-circle" size={40} color={Colors.primary} />
       </TouchableOpacity>
 
@@ -27,16 +34,27 @@ const TrailerVideo = ({ movieTrailerId }: { movieTrailerId: string }) => {
         modalHeight={220}
         animationType="fade"
         visible={isVisible}
-        onClose={() => setIsVisible(false)}
+        onClose={() => {
+          playerRef.current?.seekTo(0, true);
+          setIsVisible(false);
+        }}
       >
         <View style={styles.container}>
           <View style={styles.videoPlayer}>
-            {Platform.OS !== "web" && (
-              <View style={{ width: width * 0.9, height: 200 }}>
+            {Platform.OS !== "web" && isVisible && (
+              <View style={{ width: width * 0.9, height: videoHeight }}>
                 <YoutubePlayer
+                  ref={playerRef}
                   width="100%"
-                  height={300}
+                  height={videoHeight}
                   videoId={movieTrailerId}
+                  play={isVisible}
+                  forceAndroidAutoplay={false}
+                  onChangeState={(state: string) => {
+                    if (state === "ended") {
+                      setIsVisible(false);
+                    }
+                  }}
                 />
               </View>
             )}

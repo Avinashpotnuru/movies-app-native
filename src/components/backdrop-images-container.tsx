@@ -21,7 +21,11 @@ const BackdropImagesContainer = ({ data }: { data: MovieBackDropImage[] }) => {
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         {data.map((item, index) => (
           <View key={index}>
-            <TouchableOpacity onPress={() => setSelectedImage(item.file_path)}>
+            <TouchableOpacity
+              accessibilityRole="imagebutton"
+              accessibilityLabel={`Open backdrop image ${index + 1}`}
+              onPress={() => setSelectedImage(item.file_path)}
+            >
               <Image
                 key={item.file_path}
                 source={{

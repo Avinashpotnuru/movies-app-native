@@ -1,5 +1,5 @@
-import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { memo, useCallback } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Colors } from "../theme";
 
 type TabType = "movie" | "tv";
@@ -9,26 +9,58 @@ interface TabsProps {
   onChange: (value: TabType) => void;
 }
 
+const TabButton = memo(function TabButton({
+  label,
+  value,
+  selected,
+  onPress,
+}: {
+  label: string;
+  value: TabType;
+  selected: TabType;
+  onPress: (value: TabType) => void;
+}) {
+  const isActive = selected === value;
+  const handlePress = useCallback(() => {
+    if (!isActive) onPress(value);
+  }, [isActive, onPress, value]);
+
+  return (
+    <Pressable
+      style={[styles.tab, isActive && styles.activeTab]}
+      onPress={handlePress}
+      android_ripple={{ color: Colors.primary, borderless: false }}
+      accessibilityRole="tab"
+      accessibilityState={{ selected: isActive }}
+    >
+      <Text style={[styles.text, isActive && styles.activeText]}>{label}</Text>
+    </Pressable>
+  );
+});
+
 export default function TabsContainer({ selected, onChange }: TabsProps) {
+  const onPressMovie = useCallback(() => {
+    if (selected !== `movie`) onChange(`movie`);
+  }, [selected, onChange]);
+
+  const onPressTv = useCallback(() => {
+    if (selected !== `tv`) onChange(`tv`);
+  }, [selected, onChange]);
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={[styles.tab, selected === "movie" && styles.activeTab]}
-        onPress={() => onChange("movie")}
-      >
-        <Text style={[styles.text, selected === "movie" && styles.activeText]}>
-          Movies
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={[styles.tab, selected === "tv" && styles.activeTab]}
-        onPress={() => onChange("tv")}
-      >
-        <Text style={[styles.text, selected === "tv" && styles.activeText]}>
-          TV Shows
-        </Text>
-      </TouchableOpacity>
+      <TabButton
+        label={`Movies`}
+        value={`movie`}
+        selected={selected}
+        onPress={() => onPressMovie()}
+      />
+      <TabButton
+        label={`TV Shows`}
+        value={`tv`}
+        selected={selected}
+        onPress={() => onPressTv()}
+      />
     </View>
   );
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { ScrollView } from "react-native";
 
 const MoviesListWrapper = ({ children }: { children: React.ReactNode }) => {
@@ -9,4 +9,4 @@ const MoviesListWrapper = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export default MoviesListWrapper;
+export default memo(MoviesListWrapper);

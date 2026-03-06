@@ -1,4 +1,9 @@
-import { Loading, MoviesCard, TabsContainer } from "@/src/components";
+import {
+  Loading,
+  MoviesCard,
+  TabsContainer,
+  NoDataFound,
+} from "@/src/components";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
@@ -50,11 +55,7 @@ const FavoritesContainer = () => {
               }}
             />
           }
-          ListEmptyComponent={
-            <View style={{ marginTop: 50 }}>
-              <Loading />
-            </View>
-          }
+          ListEmptyComponent={<NoDataFound />}
         />
       )}
     </View>

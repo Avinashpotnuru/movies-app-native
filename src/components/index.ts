@@ -17,3 +17,4 @@ export { default as TabsContainer } from "./tabs-container";
 export { default as TrailerVideo } from "./trailer-video";
 export { default as RecommendationCard } from "./recommendation-card"
 export { default as RecommendationSection } from "./recommendation-section"
+export { default as NoDataFound } from "./no-data-found"
