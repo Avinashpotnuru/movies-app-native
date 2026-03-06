@@ -1,9 +1,17 @@
-import { CastDisplayCard, Loading, SectionHeading } from "@/src/components";
-import React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { CastDisplayCard, SectionHeading } from "@/src/components";
+import React, { memo } from "react";
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { getMovieCredits } from "../api/movies.service";
 import { useFetch } from "../hooks/useFetch";
+import { Colors } from "../theme";
 import { MovieCastProps } from "../types";
+
 const CastContainer = ({
   id,
   typeOfList,
@@ -11,30 +19,48 @@ const CastContainer = ({
   id: number;
   typeOfList: string;
 }) => {
+  const fetchCredits = React.useCallback(
+    () => getMovieCredits(id, typeOfList),
+    [id, typeOfList],
+  );
   const { data, loading, error } = useFetch({
-    fetchFunction: () => getMovieCredits(id, typeOfList),
+    fetchFunction: fetchCredits,
   });
 
-  if (loading) return <Loading />;
+  if (loading)
+    return <ActivityIndicator size={"large"} color={Colors.primary} />;
 
-  if (error) return <Text>{error}</Text>;
+  if (error) return <Text style={styles.error}>{error}</Text>;
 
   if (!data) return null;
 
   return (
-    <View style={styles.castContainer}>
+    <View>
       <SectionHeading title="Cast" />
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        {data?.cast?.map((cast: MovieCastProps, index: number) => (
-          <CastDisplayCard key={index} cast={cast} />
-        ))}
-      </ScrollView>
+      {Array.isArray(data?.cast) && data.cast.length === 0 ? (
+        <Text style={styles.noCast}>No cast available</Text>
+      ) : (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {data?.cast?.map((cast: MovieCastProps, index: number) => (
+            <CastDisplayCard key={index} cast={cast} />
+          ))}
+        </ScrollView>
+      )}
     </View>
   );
 };
 
-export default CastContainer;
+export default memo(CastContainer);
 
 const styles = StyleSheet.create({
-  castContainer: {},
+  error: {
+    color: "red",
+    textAlign: "center",
+    fontSize: 16,
+  },
+  noCast: {
+    textAlign: "center",
+    fontSize: 16,
+    color: Colors.primary,
+  },
 });

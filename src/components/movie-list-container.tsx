@@ -1,6 +1,7 @@
 import {
   MoviesCard,
   MoviesListWrapper,
+  NoDataFound,
   SectionHeading,
 } from "@/src/components";
 import React from "react";
@@ -26,17 +27,22 @@ export default React.memo(function MoviesListContainer({
       )}
 
       <MoviesListWrapper>
-        {moviePosters.map((item: MoviesCardType, index: number) => (
-          <MoviesCard
-            key={index}
-            moviesDetails={{
-              ...item,
-              title: item.title || (item.name as string),
-              enableTitle: true,
-              typeOfList: typeOfList || item.typeOfList,
-            }}
-          />
-        ))}
+        {moviePosters.length === 0 ? (
+          <NoDataFound />
+        ) : (
+          moviePosters.map((item: MoviesCardType, index: number) => (
+            <MoviesCard
+              key={index}
+              moviesDetails={{
+                ...item,
+                title: item.title || (item.name as string),
+                enableTitle: true,
+                typeOfList: typeOfList || item.typeOfList,
+              }}
+            />
+          ))
+        )}
+        {}
       </MoviesListWrapper>
     </View>
   );

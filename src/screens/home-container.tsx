@@ -9,7 +9,13 @@ import { useFetch } from "@/src/hooks/useFetch";
 import { Colors } from "@/src/theme/colors";
 import { Movie, MoviesCardType } from "@/src/types";
 import { lazy, Suspense, useMemo } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 const MoviesCarousel = lazy(() => import("@/src/components/movies-carousel"));
 
 export default function HomeScreenContainer() {
@@ -103,7 +109,9 @@ export default function HomeScreenContainer() {
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <SectionHeading title="Trending Movies" />
-        <Suspense fallback={<Loading />}>
+        <Suspense
+          fallback={<ActivityIndicator color={Colors.primary} size={"large"} />}
+        >
           <MoviesCarousel moviePosters={treadingMoviePosters} />
         </Suspense>
 

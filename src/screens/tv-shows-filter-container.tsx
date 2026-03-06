@@ -1,4 +1,9 @@
-import { CustomDropdown, Loading, MoviesCard } from "@/src/components";
+import {
+  CustomDropdown,
+  Loading,
+  MoviesCard,
+  NoDataFound,
+} from "@/src/components";
 import React, { useMemo, useState } from "react";
 
 import { sortOptions } from "@/data";
@@ -161,10 +166,9 @@ export default function TvShowFilterContainer() {
           extraData={searchMoviePosters}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => {
-            return (
-              <MoviesCard moviesDetails={{ ...item, typeOfList: "tv" }} />
-            );
+            return <MoviesCard moviesDetails={{ ...item, typeOfList: "tv" }} />;
           }}
+          ListEmptyComponent={<NoDataFound />}
           refreshControl={
             <RefreshControl
               refreshing={loading}

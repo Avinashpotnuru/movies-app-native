@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Dimensions, Modal, Pressable, StyleSheet, View } from "react-native";
 import { Colors } from "../theme";
 
@@ -7,7 +7,7 @@ interface ModalProps {
   modalHeight?: number;
   modalWidth?: number;
   title?: string;
-  onClose: () => void;
+  onClose?: () => void;
   visible?: boolean;
   onRequestClose?: () => void;
   animationType?: "fade" | "slide";
@@ -25,23 +25,37 @@ const DisplayModal = ({
   onRequestClose,
   animationType,
 }: ModalProps) => {
+  const containerStyle = useMemo(
+    () => [
+      styles.modalContainer,
+      {
+        width: modalWidth ?? width * 0.9,
+        height: modalHeight ?? height * 0.8,
+      },
+    ],
+    [modalWidth, modalHeight],
+  );
+
   return (
     <View>
       <Modal
-        visible={visible}
+        visible={visible ?? false}
         transparent
-        animationType={animationType === "fade" ? "fade" : "slide"}
-        onRequestClose={onRequestClose}
+        accessibilityViewIsModal
+        animationType={animationType ?? `slide`}
+        onRequestClose={onRequestClose ?? onClose}
       >
-        <Pressable style={styles.overlay} onPress={() => onClose()}>
+        <Pressable
+          style={styles.overlay}
+          onPress={() => onClose?.()}
+          accessibilityRole="button"
+          accessibilityLabel="Close modal"
+        >
           <Pressable
-            style={[
-              styles.modalContainer,
-              {
-                width: modalWidth ?? width * 0.9,
-                height: modalHeight ?? height * 0.8,
-              },
-            ]}
+            pointerEvents="box-none"
+            style={containerStyle}
+            onPress={() => {}}
+            accessible
           >
             {children}
           </Pressable>

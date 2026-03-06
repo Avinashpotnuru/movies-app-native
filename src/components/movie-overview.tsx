@@ -3,15 +3,18 @@ import { StyleSheet, Text, View } from "react-native";
 import { Colors } from "../theme";
 
 const MovieOverview = ({ content }: { content: string }) => {
+  const safeContent = typeof content === "string" ? content.trim() : "";
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Overview</Text>
-      <Text style={styles.overview}>{content}</Text>
+      <Text style={styles.overview}>
+        {safeContent || `No overview available.`}
+      </Text>
     </View>
   );
 };
 
-export default MovieOverview;
+export default React.memo(MovieOverview);
 
 const styles = StyleSheet.create({
   container: {

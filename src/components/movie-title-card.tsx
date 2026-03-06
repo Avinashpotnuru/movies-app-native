@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from "react";
+import React, { lazy, memo, Suspense } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -12,18 +12,28 @@ import { MovieTitleCardProps } from "../types";
 const TrailerVideo = lazy(() => import("@/src/components/trailer-video"));
 
 const { width } = Dimensions.get("window");
-export default function MovieTitleCard({
+
+function MovieTitleCard({
   movieTitle,
   movieGenre,
   runTime,
   movieTrailerId,
 }: MovieTitleCardProps) {
-  const convertRuntime = (runtime: number) => {
-    const hours = Math.floor(runtime / 60);
-    const minutes = runtime % 60;
+  const convertRuntime = React.useCallback((runtime: number) => {
+    if (!Number.isFinite(runtime)) return "-";
+    const safe = Math.max(0, Math.floor(runtime));
+    const hours = Math.floor(safe / 60);
+    const minutes = safe % 60;
     return `${hours}h ${minutes}m`;
-  };
-  const genreText = movieGenre?.map((genre) => genre.name).join("/");
+  }, []);
+  const genreText = React.useMemo(
+    () =>
+      movieGenre
+        ?.map((g) => g?.name)
+        .filter(Boolean)
+        .join("/") || "N/A",
+    [movieGenre],
+  );
 
   return (
     <View style={styles.container}>
@@ -33,16 +43,26 @@ export default function MovieTitleCard({
           <Text style={styles.movieGenre}>{convertRuntime(runTime)}</Text>
           <Text style={styles.separator}>|</Text>
           <Text style={styles.movieGenre}>
-            {genreText.length > 30 ? genreText.slice(0, 32) + "..." : genreText}
+            {genreText && genreText.length > 30
+              ? `${genreText.slice(0, 27)}...`
+              : genreText || ""}
           </Text>
         </View>
       </View>
-      <Suspense fallback={<ActivityIndicator size="large" color={Colors.primary} />}>
-        <TrailerVideo movieTrailerId={movieTrailerId || ""} />
-      </Suspense>
+      <View style={styles.trailerCard}>
+        {!!movieTrailerId && (
+          <Suspense
+            fallback={<ActivityIndicator size="large" color={Colors.primary} />}
+          >
+            <TrailerVideo movieTrailerId={movieTrailerId} />
+          </Suspense>
+        )}
+      </View>
     </View>
   );
 }
+
+export default memo(MovieTitleCard);
 
 const styles = StyleSheet.create({
   container: {
@@ -77,6 +97,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     gap: 10,
     paddingTop: 5,
+    width: "85%",
   },
   separator: {
     color: Colors.text,
@@ -88,5 +109,10 @@ const styles = StyleSheet.create({
   movieGenreContainer: {
     flexDirection: "row",
     gap: 5,
+},
+  trailerCard: {
+    width: "15%",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

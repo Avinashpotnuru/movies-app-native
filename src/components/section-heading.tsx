@@ -1,22 +1,33 @@
-import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import React, { memo } from "react";
+import {
+  StyleProp,
+  StyleSheet,
+  Text,
+  TextStyle,
+  View,
+  ViewStyle,
+} from "react-native";
 import { Colors } from "../theme";
 
 const SectionHeading = ({
   title = "section heading",
   style,
+  textStyle,
 }: {
   title: string;
-  style?: any;
+  style?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
 }) => {
   return (
-    <View style={[style]}>
-      <Text style={styles.text}>{title}</Text>
+    <View accessible accessibilityRole="header" style={style}>
+      <Text maxFontSizeMultiplier={2} style={[styles.text, textStyle]}>
+        {String(title).trim()}
+      </Text>
     </View>
   );
 };
 
-export default SectionHeading;
+export default memo(SectionHeading);
 
 const styles = StyleSheet.create({
   text: {
