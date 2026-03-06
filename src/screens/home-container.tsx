@@ -101,7 +101,7 @@ export default function HomeScreenContainer() {
 
   return (
     <View style={styles.container}>
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <SectionHeading title="Trending Movies" />
         <Suspense fallback={<Loading />}>
           <MoviesCarousel moviePosters={treadingMoviePosters} />
