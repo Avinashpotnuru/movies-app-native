@@ -1,4 +1,3 @@
-import { DisplayModal, SectionHeading } from "@/src/components";
 import React from "react";
 import {
   Dimensions,
@@ -9,6 +8,8 @@ import {
   View,
 } from "react-native";
 import { MovieBackDropImage } from "../types";
+import DisplayModal from "./display-modal";
+import SectionHeading from "./section-heading";
 
 const { width } = Dimensions.get("window");
 

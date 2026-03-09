@@ -112,7 +112,7 @@ export default function MoviesDetailsContainer({
         refetchFavoritesTv();
       }
     } catch (error) {
-      console.log("Favorite error:", error);
+      console.error("Favorite error:", error);
       setIsFavorite(!newState);
     }
   };

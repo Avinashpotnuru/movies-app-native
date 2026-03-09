@@ -1,11 +1,11 @@
 import {
   Loading,
   MoviesCard,
-  TabsContainer,
   NoDataFound,
+  TabsContainer,
 } from "@/src/components";
 import { useFocusEffect } from "expo-router";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
 import { getFavorites, getFavoritesTv } from "../api/movies.service";
 import { useFetch } from "../hooks/useFetch";
@@ -13,8 +13,17 @@ import { Colors } from "../theme";
 
 const FavoritesContainer = () => {
   const [selectType, setSelectType] = useState<"movie" | "tv">("movie");
+
+  const [moviePage, setMoviePage] = useState(1);
+  const [tvPage, setTvPage] = useState(1);
+
+  const [movies, setMovies] = useState<any[]>([]);
+  const [tvShows, setTvShows] = useState<any[]>([]);
+
+  const [loadingMore, setLoadingMore] = useState(false);
+
   const { data, loading, refetch } = useFetch({
-    fetchFunction: () => getFavorites(),
+    fetchFunction: () => getFavorites({ page: moviePage }),
   });
 
   const {
@@ -22,7 +31,7 @@ const FavoritesContainer = () => {
     loading: loadingTv,
     refetch: refetchTv,
   } = useFetch({
-    fetchFunction: () => getFavoritesTv({ page: 1 }),
+    fetchFunction: () => getFavoritesTv({ page: tvPage }),
   });
 
   useFocusEffect(
@@ -32,30 +41,74 @@ const FavoritesContainer = () => {
     }, [refetch, refetchTv]),
   );
 
+  useEffect(() => {
+    if (data?.results) {
+      if (moviePage === 1) {
+        setMovies(data.results);
+      } else {
+        setMovies((prev) => [...prev, ...data.results]);
+      }
+    }
+    setLoadingMore(false);
+  }, [data, moviePage]);
+
+  useEffect(() => {
+    if (dataTv?.results) {
+      if (tvPage === 1) {
+        setTvShows(dataTv.results);
+      } else {
+        setTvShows((prev) => [...prev, ...dataTv.results]);
+      }
+    }
+    setLoadingMore(false);
+  }, [dataTv, tvPage]);
+
+  const currentData = selectType === "movie" ? movies : tvShows;
+  const isLoading = selectType === "movie" ? loading : loadingTv;
+
   return (
     <View style={styles.container}>
       <TabsContainer selected={selectType} onChange={setSelectType} />
-      {loading ? (
+
+      {isLoading && currentData.length === 0 ? (
         <Loading />
       ) : (
         <FlatList
           numColumns={3}
           contentContainerStyle={{ padding: 8 }}
-          data={selectType === "movie" ? data?.results : dataTv?.results}
-          keyExtractor={(item) => item.id.toString()}
+          data={currentData}
+          keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => (
             <MoviesCard moviesDetails={{ ...item, typeOfList: selectType }} />
           )}
+          ListEmptyComponent={<NoDataFound />}
+          ListFooterComponent={loadingMore ? <Loading /> : null}
+          onEndReached={() => {
+            if (!loadingMore) {
+              setLoadingMore(true);
+
+              if (selectType === "movie") {
+                setMoviePage((prev) => prev + 1);
+              } else {
+                setTvPage((prev) => prev + 1);
+              }
+            }
+          }}
+          onEndReachedThreshold={0.5}
           refreshControl={
             <RefreshControl
               refreshing={loading || loadingTv}
               onRefresh={() => {
+                setMoviePage(1);
+                setTvPage(1);
+                setMovies([]);
+                setTvShows([]);
                 refetch();
                 refetchTv();
               }}
             />
           }
-          ListEmptyComponent={<NoDataFound />}
+          showsVerticalScrollIndicator={false}
         />
       )}
     </View>

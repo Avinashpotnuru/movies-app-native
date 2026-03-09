@@ -1,4 +1,3 @@
-import { CastDisplayCard, SectionHeading } from "@/src/components";
 import React, { memo } from "react";
 import {
   ActivityIndicator,
@@ -11,6 +10,8 @@ import { getMovieCredits } from "../api/movies.service";
 import { useFetch } from "../hooks/useFetch";
 import { Colors } from "../theme";
 import { MovieCastProps } from "../types";
+import CastDisplayCard from "./cast-display-card";
+import SectionHeading from "./section-heading";
 
 const CastContainer = ({
   id,

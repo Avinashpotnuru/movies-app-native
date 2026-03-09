@@ -4,14 +4,13 @@ import {
   MoviesCard,
   NoDataFound,
 } from "@/src/components";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import { sortOptions } from "@/data";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import {
   Dimensions,
   FlatList,
-  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -37,19 +36,24 @@ export default function MoviesFilterContainer() {
   const [genre, setGenre] = useState("");
   const [sort, setSort] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [loadingMore, setLoadingMore] = useState(false);
 
-  const { data, loading } = useFetch({
+  const [movies, setMovies] = useState<MoviesCardType[]>([]);
+
+  const { data: searchData } = useFetch({
     fetchFunction: () => getSearchMovies(searchQuery),
+    dependencies: [searchQuery],
   });
 
   const { data: languages } = useFetch({
     fetchFunction: () => getLanguages(),
   });
+
   const { data: genreData } = useFetch({
     fetchFunction: () => getGenres(),
   });
 
-  const { data: movieData } = useFetch({
+  const { data: movieData, loading } = useFetch({
     fetchFunction: () =>
       getMovies({
         with_original_language: language,
@@ -57,57 +61,83 @@ export default function MoviesFilterContainer() {
         with_genres: genre,
         sort_by: sort,
       }),
+    dependencies: [page, language, genre, sort],
   });
 
   const languageOptions = useMemo(() => {
     return languages?.map((language: any) => ({
-      label: language?.["english_name"],
-      value: language?.["iso_639_1"],
+      label: language?.english_name,
+      value: language?.iso_639_1,
     }));
   }, [languages]);
 
   const genreOptions = useMemo(() => {
-    return genreData?.genres.map((genre: { id: number; name: string }) => ({
-      label: genre?.name,
-      value: genre?.id,
+    return genreData?.genres?.map((genre: { id: number; name: string }) => ({
+      label: genre.name,
+      value: genre.id,
     }));
   }, [genreData]);
 
   const searchMoviePosters: MoviesCardType[] = useMemo(
     () =>
-      data?.results.map((movie: Movie) => ({
+      searchData?.results?.map((movie: Movie) => ({
         id: movie.id,
         title: movie.title,
         poster_path: movie.poster_path,
       })) || [],
-
-    [data],
+    [searchData],
   );
 
-  const moviePosters: MoviesCardType[] = useMemo(
-    () =>
-      movieData?.results.map((movie: Movie) => ({
-        id: movie.id,
-        title: movie.title,
-        poster_path: movie.poster_path,
-      })) || [],
-    [movieData],
-  );
+  useEffect(() => {
+    if (!movieData?.results) return;
+
+    const newMovies = movieData.results.map((movie: Movie) => ({
+      id: movie.id,
+      title: movie.title,
+      poster_path: movie.poster_path,
+    }));
+
+    if (page === 1) {
+      setMovies(newMovies);
+    } else {
+      setMovies((prev) => [...prev, ...newMovies]);
+    }
+
+    setLoadingMore(false);
+  }, [movieData, page]);
+
 
   const handleLanguage = (value: string) => {
-    setLanguage(value);
+    setLanguage((prev) => (prev === value ? "" : value));
+    setPage(1);
+    setMovies([]);
   };
 
   const handleGenre = (value: string) => {
     setGenre(value);
+    setPage(1);
+    setMovies([]);
   };
 
   const handleSort = (value: string) => {
     setSort(value);
+    setPage(1);
+    setMovies([]);
+  };
+
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setLanguage("");
+    setGenre("");
+    setSort("");
+    setPage(1);
+    setMovies([]);
   };
 
   return (
     <View style={styles.container}>
+
       <TextInput
         placeholder="Search movies..."
         placeholderTextColor="#888"
@@ -116,6 +146,8 @@ export default function MoviesFilterContainer() {
         style={styles.searchInput}
         autoCorrect={false}
       />
+
+
       <View style={styles.filterView}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View style={styles.filterContainer}>
@@ -125,64 +157,63 @@ export default function MoviesFilterContainer() {
               placeholder="Language"
               options={languageOptions}
             />
+
             <CustomDropdown
               value={genre}
               onValueChange={handleGenre}
               placeholder="Genre"
               options={genreOptions}
             />
+
             <CustomDropdown
               value={sort}
               placeholder="Sort By"
               onValueChange={handleSort}
               options={sortOptions}
             />
-            <TouchableOpacity
-              style={styles.clearButton}
-              onPress={() => {
-                setSearchQuery("");
-                setPage(1);
-                setSort("");
-                setLanguage("");
-                setGenre("");
-              }}
-            >
+
+            <TouchableOpacity style={styles.clearButton} onPress={clearFilters}>
               <AntDesign name="clear" size={20} color={Colors.primary} />
             </TouchableOpacity>
           </View>
         </ScrollView>
       </View>
 
+
       <Text style={styles.title}>Movies</Text>
 
-      {loading ? (
+
+      {loading && page === 1 ? (
         <Loading />
       ) : (
         <FlatList
           numColumns={3}
           contentContainerStyle={{ flexGrow: 1 }}
-          data={searchQuery ? searchMoviePosters : moviePosters || []}
-          extraData={searchMoviePosters}
+          data={searchQuery ? searchMoviePosters : movies}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => {
-            return (
-              <MoviesCard moviesDetails={{ ...item, typeOfList: "movie" }} />
-            );
-          }}
+          renderItem={({ item }) => (
+            <MoviesCard moviesDetails={{ ...item, typeOfList: "movie" }} />
+          )}
           ListEmptyComponent={<NoDataFound />}
-          refreshControl={
-            <RefreshControl
-              refreshing={loading}
-              onRefresh={() => {
-                setPage((pre) => pre + 1);
-              }}
-            />
-          }
+          showsVerticalScrollIndicator={false}
+          onEndReached={() => {
+            if (
+              !loadingMore &&
+              !searchQuery &&
+              movieData?.page < movieData?.total_pages
+            ) {
+              setLoadingMore(true);
+              setPage((prev) => prev + 1);
+            }
+          }}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={loadingMore ? <Loading /> : null}
         />
       )}
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -197,9 +228,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginHorizontal: 12,
   },
-
   searchInput: {
-    position: "relative",
     backgroundColor: "#222",
     padding: 10,
     borderRadius: 8,
@@ -221,17 +250,9 @@ const styles = StyleSheet.create({
     width: width - 50,
     alignSelf: "center",
   },
-  genre: {
-    color: Colors.primary,
-    fontSize: 18,
-    fontWeight: "bold",
-    marginVertical: 10,
-    marginHorizontal: 10,
-  },
   filterContainer: {
     flexDirection: "row",
     justifyContent: "flex-start",
-
     borderRadius: 8,
     width: "100%",
   },

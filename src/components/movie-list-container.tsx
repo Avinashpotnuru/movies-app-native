@@ -1,12 +1,10 @@
-import {
-  MoviesCard,
-  MoviesListWrapper,
-  NoDataFound,
-  SectionHeading,
-} from "@/src/components";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { MoviesCardType } from "../types";
+import SectionHeading from "./section-heading";
+import MoviesListWrapper from "./movies-list-wrapper";
+import NoDataFound from "./no-data-found";
+import MoviesCard from "./movies-card";
 
 interface MoviesListContainerProps {
   moviePosters: MoviesCardType[];
@@ -18,7 +16,6 @@ export default React.memo(function MoviesListContainer({
   sectionHeading,
   typeOfList,
 }: MoviesListContainerProps) {
-  console.log(typeOfList, "typeOfList");
   if (!moviePosters.length) return null;
   return (
     <View>

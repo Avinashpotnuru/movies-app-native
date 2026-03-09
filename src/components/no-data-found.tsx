@@ -5,7 +5,7 @@ import { Colors } from "../theme";
 const NoDataFound = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>NoDataFound</Text>
+      <Text style={styles.text}>No data found</Text>
     </View>
   );
 };

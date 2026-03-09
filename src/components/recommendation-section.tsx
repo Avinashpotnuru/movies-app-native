@@ -1,12 +1,9 @@
 import React from "react";
-
-import {
-  MoviesListWrapper,
-  RecommendationCard,
-  SectionHeading,
-} from "@/src/components";
 import { View } from "react-native";
 import { RecommendationCardType } from "../types";
+import SectionHeading from "./section-heading";
+import MoviesListWrapper from "./movies-list-wrapper";
+import RecommendationCard from "./recommendation-card";
 interface RecommendationProps {
   moviePosters: RecommendationCardType[];
   sectionHeading: string;
