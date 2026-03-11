@@ -11,10 +11,11 @@ export { default as MovieTitleCard } from "./movie-title-card";
 export { default as MoviesCard } from "./movies-card";
 export { default as MoviesCarousel } from "./movies-carousel";
 export { default as MoviesListWrapper } from "./movies-list-wrapper";
+export { default as NoDataFound } from "./no-data-found";
+export { default as RecommendationCard } from "./recommendation-card";
+export { default as RecommendationSection } from "./recommendation-section";
 export { default as SectionHeading } from "./section-heading";
 export { default as SocialMediaSection } from "./social-media-section";
+export { default as TabHeader } from "./tab-header";
 export { default as TabsContainer } from "./tabs-container";
 export { default as TrailerVideo } from "./trailer-video";
-export { default as RecommendationCard } from "./recommendation-card"
-export { default as RecommendationSection } from "./recommendation-section"
-export { default as NoDataFound } from "./no-data-found"

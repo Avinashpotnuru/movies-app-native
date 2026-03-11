@@ -24,8 +24,8 @@ import {
   getMovies,
   getSearchMovies,
 } from "../api/movies.service";
-import { useFetch } from "../hooks/useFetch";
 import { Colors } from "../theme";
+import { useFetch } from "@/src/hooks";
 import { Movie, MoviesCardType } from "../types";
 
 const { width } = Dimensions.get("window");

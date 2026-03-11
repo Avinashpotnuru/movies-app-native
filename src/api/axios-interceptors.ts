@@ -7,7 +7,7 @@ export const api = axios.create({
   },
 });
 
-//HOW TO SEND ACCOUNT ID QUERY
+
 api.interceptors.request.use((config) => {
   config.headers.Authorization = `Bearer ${process.env.EXPO_PUBLIC_ACCESS_TOKEN}`;
 

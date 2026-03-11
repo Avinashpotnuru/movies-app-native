@@ -8,7 +8,7 @@ import { useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
 import { getFavorites, getFavoritesTv } from "../api/movies.service";
-import { useFetch } from "../hooks/useFetch";
+import { useFetch } from "@/src/hooks";
 import { Colors } from "../theme";
 
 const FavoritesContainer = () => {

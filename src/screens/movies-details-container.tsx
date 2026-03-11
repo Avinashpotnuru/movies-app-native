@@ -26,7 +26,7 @@ import {
   getMovieDetails,
   sendToFavorite,
 } from "../api/movies.service";
-import { useFetch } from "../hooks/useFetch";
+import { useFetch } from "@/src/hooks";
 import { Colors } from "../theme";
 import { Movie, MoviesCardType, RecommendationCardType } from "../types";
 import { getImage } from "../utils/getImage";
