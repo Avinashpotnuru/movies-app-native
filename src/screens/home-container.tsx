@@ -5,7 +5,7 @@ import {
   getUpComingMovies,
 } from "@/src/api/movies.service";
 import { Loading, MoviesListContainer, SectionHeading } from "@/src/components";
-import { useFetch } from "@/src/hooks/useFetch";
+import { useFetch } from "@/src/hooks";
 import { Colors } from "@/src/theme/colors";
 import { Movie, MoviesCardType } from "@/src/types";
 import { lazy, Suspense, useMemo } from "react";

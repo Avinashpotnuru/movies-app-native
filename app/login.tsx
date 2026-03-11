@@ -1,4 +1,4 @@
-import { loginUser } from "@/src/services/authService";
+import { loginUser } from "@/src/api/authService";
 import { Colors } from "@/src/theme";
 import { getFirebaseErrorMessage } from "@/src/utils/errorMessages";
 import { router } from "expo-router";
@@ -6,6 +6,7 @@ import React, { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -28,11 +29,19 @@ export default function LoginScreen() {
 
     try {
       setLoading(true);
-      const user = await loginUser(email, password);
-      Alert.alert("Success", "Login successful");
-      router.replace("/(tabs)");
-      console.log("Logged in:", user.user.email);
+      const response = await loginUser(email.trim(), password.trim());
+      console.log(response, "response");
+      if (response?.user) {
+        Alert.alert(
+          "Login Success",
+          `Welcome to CineWave ${response.user.displayName}, Enjoy your movie experience!`,
+        );
+        router.replace("/(tabs)");
+      } else {
+        Alert.alert("Login Failed", "User authentication failed");
+      }
     } catch (error: any) {
+      console.log(error.message, "message");
       const message = getFirebaseErrorMessage(error);
       Alert.alert("Login Failed", message);
     } finally {
@@ -43,8 +52,14 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
+      <Image
+        source={require("@/assets/images/cineWaveLogo.png")}
+        style={styles.logo}
+        resizeMode="contain"
+        accessibilityIgnoresInvertColors
+      />
       <View style={styles.card}>
         <Text style={styles.title}>Login</Text>
 
@@ -106,8 +121,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 15,
     padding: 25,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
+    shadowColor: Colors.primary,
+    shadowOpacity: 0.6,
     shadowRadius: 10,
     elevation: 5,
   },
@@ -159,5 +174,12 @@ const styles = StyleSheet.create({
   registerLink: {
     color: Colors.primary,
     fontWeight: "bold",
+  },
+
+  logo: {
+    width: 100,
+    height: 100,
+    alignSelf: "center",
+    marginBottom: 60,
   },
 });

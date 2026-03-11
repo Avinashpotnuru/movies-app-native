@@ -1,7 +1,10 @@
-import { registerUser } from "@/src/services/authService";
+import { registerUser } from "@/src/api/authService";
 import { Colors } from "@/src/theme";
+import { getFirebaseErrorMessage } from "@/src/utils/errorMessages";
+import { updateProfile } from "firebase/auth";
 import React, { useState } from "react";
 import {
+  Alert,
   StyleSheet,
   Text,
   TextInput,
@@ -10,21 +13,52 @@ import {
 } from "react-native";
 
 export default function RegisterScreen() {
+  const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleRegister = async () => {
+    if (!name.trim() || !email.trim() || !password.trim()) {
+      Alert.alert("Validation Error", "Please fill all fields");
+      return;
+    }
+
     try {
-      const user = await registerUser(email, password);
-      console.log("Registered:", user.user.email);
-    } catch (error) {
-      console.log(error);
+      setLoading(true);
+
+      const response = await registerUser(
+        name.trim(),
+        email.trim(),
+        password.trim(),
+      );
+
+      if (response?.user) {
+        await updateProfile(response.user, {
+          displayName: name.trim(),
+        });
+
+        Alert.alert("Registration Success", `Account created for ${name}`);
+      } else {
+        Alert.alert("Registration Failed", "Unable to create account");
+      }
+    } catch (error: any) {
+      const message = getFirebaseErrorMessage(error);
+      Alert.alert("Registration Failed", message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Create Account</Text>
+      <TextInput
+        placeholder="Enter Name"
+        placeholderTextColor="#999"
+        style={styles.input}
+        onChangeText={setName}
+      />
 
       <TextInput
         placeholder="Enter Email"
@@ -42,7 +76,9 @@ export default function RegisterScreen() {
       />
 
       <TouchableOpacity style={styles.button} onPress={handleRegister}>
-        <Text style={styles.buttonText}>Register</Text>
+        <Text style={styles.buttonText}>
+          {loading ? "Loading..." : "Register"}
+        </Text>
       </TouchableOpacity>
     </View>
   );

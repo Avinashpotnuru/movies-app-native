@@ -24,7 +24,7 @@ import {
   getSearchTvShows,
   getTvShows,
 } from "../api/movies.service";
-import { useFetch } from "../hooks/useFetch";
+import { useFetch } from "@/src/hooks";
 import { Colors } from "../theme";
 import { Movie, MoviesCardType } from "../types";
 
