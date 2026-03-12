@@ -15,26 +15,26 @@ Users can discover trending and upcoming movies, search for movies or TV shows, 
 
 ## 🔎 Search
 
-* Search for **Movies and TV Shows**
-* Instant search results
+- Search for **Movies and TV Shows**
+- Instant search results
 
 ## 🎬 Movies Discovery
 
-* View **Trending Movies**
-* View **Upcoming Movies**
-* Browse **Popular Movies**
+- View **Trending Movies**
+- View **Upcoming Movies**
+- Browse **Popular Movies**
 
 ## 🎛 Filters & Sorting
 
 Sort movies by:
 
-* Popularity
-* Rating / Vote Average
-* Release Date
-* Revenue
-* Title
-* Original Title
-* Vote Count
+- Popularity
+- Rating / Vote Average
+- Release Date
+- Revenue
+- Title
+- Original Title
+- Vote Count
 
 Filter movies by **language**
 
@@ -42,59 +42,57 @@ Filter movies by **language**
 
 Each movie has a **dynamic details page** with:
 
-* Movie Title & Poster
-* Backdrop Images
-* Movie Overview
-* Cast Details
-* Movie Trailer (YouTube)
-* Recommended Movies
-* Similar Movies
+- Movie Title & Poster
+- Backdrop Images
+- Movie Overview
+- Cast Details
+- Movie Trailer (YouTube)
+- Recommended Movies
+- Similar Movies
 
 ## 🎭 Cast Details
 
-* Cast biography
-* Social media links
-* Movies & TV Shows they appeared in
+- Cast biography
+- Social media links
+- Movies & TV Shows they appeared in
 
 ## ⭐ Favorites
 
-* Add movies to **Favorites**
-* View saved movies
-* Quick access to favorite movies
+- Add movies to **Favorites**
+- View saved movies
+- Quick access to favorite movies
 
 ---
 
 # 🛠 Tech Stack
 
-* React Native
-* Expo
-* Expo Router
-* TypeScript
-* Axios
-* TMDB API
-* Firebase Authentication
-* React Hooks
-* Custom Hooks
-* Reusable Components
+- React Native
+- Expo
+- Expo Router
+- TypeScript
+- Axios
+- TMDB API
+- Firebase Authentication
+- React Hooks
+- Custom Hooks
+- Reusable Components
 
 ---
 
 # 📱 Screenshots
 
-<p align="center">
-<img src="./screenshots/loginPageImage.jpeg" width="200"/>
-<img src="./screenshots/RegisterPageImage.jpeg" width="200"/>
-<img src="./screenshots/landingPageImage.jpeg" width="200"/>
+<p>
+<img src="./screenshots/loginPageImage.jpeg" height="500" width="200" />
+<img src="./screenshots/RegisterPageImage.jpeg" height="500" width="200"/>
+<img src="./screenshots/landingPageImage.jpeg" height="500" width="200"/>
+<img src="./screenshots/moviesPageImage.jpeg" height="500" width="200"/>
 </p>
 
-<p align="center">
-<img src="./screenshots/moviesPageImage.jpeg" width="200"/>
-<img src="./screenshots/movieDetailsPageImage.jpeg" width="200"/>
-<img src="./screenshots/castDetailPageImage.jpeg" width="200"/>
-</p>
+<p>
 
-<p align="center">
-<img src="./screenshots/favouritePageImage.jpeg" width="200"/>
+<img src="./screenshots/movieDetailsPageImage.jpeg" height="500" width="200"/>
+<img src="./screenshots/castDetailPageImage.jpeg" height="500" width="200"/>
+<img src="./screenshots/favouritePageImage.jpeg" height="500" width="200"/>
 </p>
 
 ---
@@ -193,24 +191,24 @@ https://www.themoviedb.org/documentation/api
 
 # 📱 Screens
 
-* Home Screen
-* Movies Page
-* Movie Details Page
-* Cast Details Page
-* Favorites Page
-* Search Page
-* Login Page
-* Register Page
+- Home Screen
+- Movies Page
+- Movie Details Page
+- Cast Details Page
+- Favorites Page
+- Search Page
+- Login Page
+- Register Page
 
 ---
 
 # ⭐ Future Improvements
 
-* Watchlist
-* Offline Favorites
-* Pagination
-* Better animations
-* Dark / Light theme support
+- Watchlist
+- Offline Favorites
+- Pagination
+- Better animations
+- Dark / Light theme support
 
 ---
 
