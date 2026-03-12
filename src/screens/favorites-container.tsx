@@ -4,11 +4,10 @@ import {
   NoDataFound,
   TabsContainer,
 } from "@/src/components";
+import { useGetFavoriteMovies, useGetFavoriteTvShows } from "@/src/hooks";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
-import { getFavorites, getFavoritesTv } from "../api/movies.service";
-import { useFetch } from "@/src/hooks";
 import { Colors } from "../theme";
 
 const FavoritesContainer = () => {
@@ -22,17 +21,17 @@ const FavoritesContainer = () => {
 
   const [loadingMore, setLoadingMore] = useState(false);
 
-  const { data, loading, refetch } = useFetch({
-    fetchFunction: () => getFavorites({ page: moviePage }),
-  });
+  const {
+    data,
+    isLoading: isLoadingMovies,
+    refetch,
+  } = useGetFavoriteMovies(moviePage);
 
   const {
     data: dataTv,
-    loading: loadingTv,
+    isLoading: isLoadingTv,
     refetch: refetchTv,
-  } = useFetch({
-    fetchFunction: () => getFavoritesTv({ page: tvPage }),
-  });
+  } = useGetFavoriteTvShows(tvPage);
 
   useFocusEffect(
     useCallback(() => {
@@ -64,7 +63,7 @@ const FavoritesContainer = () => {
   }, [dataTv, tvPage]);
 
   const currentData = selectType === "movie" ? movies : tvShows;
-  const isLoading = selectType === "movie" ? loading : loadingTv;
+  const isLoading = selectType === "movie" ? isLoadingMovies : isLoadingTv;
 
   return (
     <View style={styles.container}>
@@ -97,7 +96,7 @@ const FavoritesContainer = () => {
           onEndReachedThreshold={0.5}
           refreshControl={
             <RefreshControl
-              refreshing={loading || loadingTv}
+              refreshing={isLoadingMovies || isLoadingTv}
               onRefresh={() => {
                 setMoviePage(1);
                 setTvPage(1);

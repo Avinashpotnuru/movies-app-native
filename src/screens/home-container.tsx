@@ -1,11 +1,10 @@
-import {
-  getPopularMovies,
-  getTrendingMovies,
-  getTvShows,
-  getUpComingMovies,
-} from "@/src/api/movies.service";
 import { Loading, MoviesListContainer, SectionHeading } from "@/src/components";
-import { useFetch } from "@/src/hooks";
+import {
+  usePopularMovies,
+  useTrendingMovies,
+  useTvShows,
+  useUpcomingMovies,
+} from "@/src/hooks";
 import { Colors } from "@/src/theme/colors";
 import { Movie, MoviesCardType } from "@/src/types";
 import { lazy, Suspense, useMemo } from "react";
@@ -19,20 +18,13 @@ import {
 const MoviesCarousel = lazy(() => import("@/src/components/movies-carousel"));
 
 export default function HomeScreenContainer() {
-  const { data, loading, error } = useFetch({
-    fetchFunction: getTrendingMovies,
-  });
-  const { data: popularMoviesData } = useFetch({
-    fetchFunction: getPopularMovies,
-  });
+  const { data, isLoading, error } = useTrendingMovies();
 
-  const { data: upcomingMoviesData } = useFetch({
-    fetchFunction: getUpComingMovies,
-  });
+  const { data: popularMoviesData } = usePopularMovies();
 
-  const { data: tvShows } = useFetch({
-    fetchFunction: getTvShows,
-  });
+  const { data: upcomingMoviesData } = useUpcomingMovies();
+
+  const { data: tvShows } = useTvShows();
 
   const treadingMoviePosters: MoviesCardType[] = useMemo(
     () =>
@@ -93,14 +85,15 @@ export default function HomeScreenContainer() {
     ];
   }, [popularMoviePosters, tvShowPosters, upcomingMoviePosters]);
 
-  if (loading) {
+  if (isLoading) {
     return <Loading />;
   }
-
   if (error) {
     return (
       <View style={styles.container}>
-        <Text style={styles.error}>{error}</Text>
+        <Text style={styles.error}>
+          {error instanceof Error ? error.message : String(error)}
+        </Text>
       </View>
     );
   }
