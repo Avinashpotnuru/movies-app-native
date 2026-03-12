@@ -1,259 +1,232 @@
 # 🎬 Movies Explorer App (React Native + Expo)
 
-A modern **Movies & TV Shows Explorer App** built using **React Native
-(Expo)** and **TMDB API**.\
-Users can discover trending and upcoming movies, search for movies or TV
-shows, view detailed information, watch trailers, and manage favorite
-movies.
+![React Native](https://img.shields.io/badge/React%20Native-Expo-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
+![Firebase](https://img.shields.io/badge/Firebase-Auth-orange)
+![TMDB](https://img.shields.io/badge/API-TMDB-green)
 
-------------------------------------------------------------------------
+A modern **Movies & TV Shows Explorer App** built using **React Native (Expo)** and **TMDB API**.
 
-## 🚀 Features
+Users can discover trending and upcoming movies, search for movies or TV shows, view detailed information, watch trailers, and manage favorite movies with **Firebase Authentication**.
 
-### 🔎 Search
+---
 
--   Search for **Movies and TV Shows**
--   Instant results display
+# 🚀 Features
 
-### 🎬 Movies Discovery
+## 🔎 Search
 
--   View **Trending Movies**
--   View **Upcoming Movies**
--   Browse popular movies
+* Search for **Movies and TV Shows**
+* Instant search results
 
-### 🎛 Filters & Sorting
+## 🎬 Movies Discovery
 
--   Sort movies by:
-    -   Popularity (Ascending / Descending)
-    -   Rating / Vote Average (Ascending / Descending)
-    -   Release Date (Ascending / Descending)
-    -   Revenue (Ascending / Descending)
-    -   Original Title (Ascending / Descending)
-    -   Title (Ascending / Descending)
-    -   Vote Count (Ascending / Descending)
+* View **Trending Movies**
+* View **Upcoming Movies**
+* Browse **Popular Movies**
 
--   Filter movies by **language**
+## 🎛 Filters & Sorting
 
-### 📄 Movie Details Page
+Sort movies by:
+
+* Popularity
+* Rating / Vote Average
+* Release Date
+* Revenue
+* Title
+* Original Title
+* Vote Count
+
+Filter movies by **language**
+
+## 📄 Movie Details Page
 
 Each movie has a **dynamic details page** with:
 
--   Movie Title & Poster
--   Backdrop Images
--   Movie Overview
--   Cast Details
--   Movie Trailer (YouTube)
--   Recommended Movies
--   Similar Movies
+* Movie Title & Poster
+* Backdrop Images
+* Movie Overview
+* Cast Details
+* Movie Trailer (YouTube)
+* Recommended Movies
+* Similar Movies
 
-### 🎭 Cast Details
+## 🎭 Cast Details
 
--   View cast member details
--   Biography
--   Social media links
--   Movies & TV Shows they have appeared in
+* Cast biography
+* Social media links
+* Movies & TV Shows they appeared in
 
-### ⭐ Favorites
+## ⭐ Favorites
 
--   Add movies to **Favorites**
--   View all saved movies in a **Favorites Page**
--   Quick access to favorite movies
+* Add movies to **Favorites**
+* View saved movies
+* Quick access to favorite movies
 
-------------------------------------------------------------------------
+---
 
-## 🛠 Tech Stack
+# 🛠 Tech Stack
 
--   React Native
--   Expo
--   Expo Router
--   Axios
--   TMDB API
--   TypeScript
--   React Hooks
--   Custom Hooks
--   Reusable Components
--   Responsive Design
+* React Native
+* Expo
+* Expo Router
+* TypeScript
+* Axios
+* TMDB API
+* Firebase Authentication
+* React Hooks
+* Custom Hooks
+* Reusable Components
 
+---
 
+# 📱 Screenshots
 
-------------------------------------------------------------------------
+<p align="center">
+<img src="./screenshots/loginPageImage.jpeg" width="200"/>
+<img src="./screenshots/RegisterPageImage.jpeg" width="200"/>
+<img src="./screenshots/landingPageImage.jpeg" width="200"/>
+</p>
 
-## 📁 Project Structure
+<p align="center">
+<img src="./screenshots/moviesPageImage.jpeg" width="200"/>
+<img src="./screenshots/movieDetailsPageImage.jpeg" width="200"/>
+<img src="./screenshots/castDetailPageImage.jpeg" width="200"/>
+</p>
 
-   ```
-movies-app-native
-├─ .env
-├─ .qodo
-├─ app
-│  ├─ (tabs)
-│  │  ├─ favorites.tsx
-│  │  ├─ index.tsx
-│  │  ├─ movies.tsx
-│  │  ├─ tvshows.tsx
-│  │  └─ _layout.tsx
-│  ├─ cast-details
-│  │  └─ [id].tsx
-│  ├─ login.tsx
-│  ├─ movie-details
-│  │  └─ [id].tsx
-│  └─ _layout.tsx
-├─ app.json
-├─ assets
-│  └─ images
-│     ├─ favicon.png
-│     ├─ female.jpg
-│     ├─ icon.png
-│     ├─ loading.gif
-│     ├─ male.jpg
-│     ├─ partial-react-logo.png
-│     ├─ placeholder.jpg
-│     ├─ react-logo.png
-│     ├─ react-logo@2x.png
-│     ├─ react-logo@3x.png
-│     └─ splash-icon.png
-├─ data
-│  └─ index.ts
-├─ es.json
-├─ eslint.config.js
-├─ package-lock.json
-├─ package.json
-├─ README.md
-├─ src
-│  ├─ api
-│  │  ├─ axios-interceptors.ts
-│  │  ├─ endpoints.ts
-│  │  └─ movies.service.ts
-│  ├─ components
-│  │  ├─ backdrop-images-container.tsx
-│  │  ├─ biography-section.tsx
-│  │  ├─ cast-container.tsx
-│  │  ├─ cast-display-card.tsx
-│  │  ├─ custom-dropdown.tsx
-│  │  ├─ display-modal.tsx
-│  │  ├─ index.ts
-│  │  ├─ loading.tsx
-│  │  ├─ movie-list-container.tsx
-│  │  ├─ movie-overview.tsx
-│  │  ├─ movie-title-card.tsx
-│  │  ├─ movies-card.tsx
-│  │  ├─ movies-carousel.tsx
-│  │  ├─ movies-list-wrapper.tsx
-│  │  ├─ no-data-found.tsx
-│  │  ├─ recommendation-card.tsx
-│  │  ├─ recommendation-section.tsx
-│  │  ├─ section-heading.tsx
-│  │  ├─ social-media-section.tsx
-│  │  ├─ tabs-container.tsx
-│  │  └─ trailer-video.tsx
-│  ├─ hooks
-│  │  ├─ useDebounce.tsx
-│  │  ├─ useDimensions.tsx
-│  │  └─ useFetch.tsx
-│  ├─ screens
-│  │  ├─ cast-overview.tsx
-│  │  ├─ favorites-container.tsx
-│  │  ├─ home-container.tsx
-│  │  ├─ index.ts
-│  │  ├─ movies-details-container.tsx
-│  │  ├─ movies-filter-container.tsx
-│  │  └─ tv-shows-filter-container.tsx
-│  ├─ theme
-│  │  ├─ colors.ts
-│  │  └─ index.ts
-│  ├─ types
-│  │  ├─ index.ts
-│  │  └─ movie.types.ts
-│  └─ utils
-│     ├─ getImage.ts
-│     └─ responsive.ts
-└─ tsconfig.json
+<p align="center">
+<img src="./screenshots/favouritePageImage.jpeg" width="200"/>
+</p>
+
+---
+
+# 📁 Project Structure
 
 ```
+app
+ ├── login.tsx
+ ├── register.tsx
+ ├── movie-details
+ ├── cast-details
+ └── (tabs)
 
-------------------------------------------------------------------------
+src
+ ├── api
+ ├── components
+ ├── hooks
+ ├── screens
+ ├── theme
+ └── utils
+```
 
-## 📦 Installation
+---
 
-Clone the repository:
+# 📦 Installation
 
-    git clone https://github.com/Avinashpotnuru/movies-app-native.git
+Clone the repository
 
-Go to the project folder:
+```bash
+git clone https://github.com/Avinashpotnuru/movies-app-native.git
+```
 
-    cd movies-app-native
+Go to the project directory
 
-Install dependencies:
+```bash
+cd movies-app-native
+```
 
-    npm install
+Install dependencies
 
-------------------------------------------------------------------------
+```bash
+npm install
+```
 
-## ▶ Run the Project
+---
 
-Start the development server:
+# ▶ Run the Project
 
-    npx expo start
+Start development server
 
-Run on Android:
+```bash
+npx expo start
+```
 
-    npx expo start --android
+Run on Android
 
-Run on iOS:
+```bash
+npx expo start --android
+```
 
-    npx expo start --ios
+Run on iOS
 
-------------------------------------------------------------------------
+```bash
+npx expo start --ios
+```
 
-## 🔑 Environment Variables
+---
+
+# 🔑 Environment Variables
 
 Create a `.env` file in the root folder.
 
-    EXPO_PUBLIC_TMDB_API_KEY=your_api_key
-    EXPO_PUBLIC_BASE_URL=https://api.themoviedb.org/3
-    EXPO_PUBLIC_ACCESS_TOKEN=your_access_token
+```env
+EXPO_PUBLIC_TMDB_API_KEY=your_api_key
+EXPO_PUBLIC_BASE_URL=https://api.themoviedb.org/3
+EXPO_PUBLIC_ACCESS_TOKEN=your_access_token
 
-------------------------------------------------------------------------
+EXPO_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+EXPO_PUBLIC_FIREBASE_APP_ID=your_app_id
+```
 
-## 🌐 API
+---
 
-This project uses the **TMDB API**.
+# 🌐 API
+
+This project uses **TMDB API**
 
 https://www.themoviedb.org/documentation/api
 
-------------------------------------------------------------------------
+---
 
-## 📱 Screens
+# 📱 Screens
 
--   Home Screen
--   Movies Page
--   Movie Details Page
--   Cast Details Page
--   Favorites Page
--   Search Page
+* Home Screen
+* Movies Page
+* Movie Details Page
+* Cast Details Page
+* Favorites Page
+* Search Page
+* Login Page
+* Register Page
 
-------------------------------------------------------------------------
+---
 
-## ⭐ Future Improvements
+# ⭐ Future Improvements
 
--   Authentication
--   Watchlist
--   Offline Favorites
--   Pagination
--   Better animations
--   Dark / Light theme support
+* Watchlist
+* Offline Favorites
+* Pagination
+* Better animations
+* Dark / Light theme support
 
-------------------------------------------------------------------------
-## 🚀 Live Demo
+---
 
-- Expo Build: https://expo.dev/accounts/avinash343/projects/movies-app-native/builds/25a9e72c-1202-4846-9281-86a768d459d6
+# 🚀 Live Demo
 
-------------------------------------------------------------------------------
+Expo build
 
-## 👨‍💻 Author
+https://expo.dev/accounts/avinash343/projects/cinewave/builds/98a24a9f-b687-4d13-9f9f-35aaa4a67cc6
+
+---
+
+# 👨‍💻 Author
 
 **Avinash Potnuru**
 
-- GitHub: https://github.com/Avinashpotnuru
+GitHub
+https://github.com/Avinashpotnuru
 
-Built with ❤️ using **React Native + Expo**.*React Native + Expo**.
-
+Built with ❤️ using **React Native + Expo**
