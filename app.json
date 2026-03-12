@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/cineWaveLogo.png",
     "scheme": "moviesappnative",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
@@ -44,6 +44,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "55d5aa4f-8d3e-44bb-8de5-0eaf5342761d"
+      }
     }
   }
 }

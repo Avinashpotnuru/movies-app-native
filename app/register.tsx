@@ -1,6 +1,7 @@
 import { registerUser } from "@/src/api/authService";
 import { Colors } from "@/src/theme";
 import { getFirebaseErrorMessage } from "@/src/utils/errorMessages";
+import { Feather } from "@expo/vector-icons";
 import { updateProfile } from "firebase/auth";
 import React, { useState } from "react";
 import {
@@ -13,10 +14,11 @@ import {
 } from "react-native";
 
 export default function RegisterScreen() {
-  const [name, setName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [focusedInput, setFocusedInput] = useState<string | null>(null);
 
   const handleRegister = async () => {
     if (!name.trim() || !email.trim() || !password.trim()) {
@@ -39,8 +41,6 @@ export default function RegisterScreen() {
         });
 
         Alert.alert("Registration Success", `Account created for ${name}`);
-      } else {
-        Alert.alert("Registration Failed", "Unable to create account");
       }
     } catch (error: any) {
       const message = getFirebaseErrorMessage(error);
@@ -53,31 +53,74 @@ export default function RegisterScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Create Account</Text>
-      <TextInput
-        placeholder="Enter Name"
-        placeholderTextColor="#999"
-        style={styles.input}
-        onChangeText={setName}
-      />
 
-      <TextInput
-        placeholder="Enter Email"
-        placeholderTextColor="#999"
-        style={styles.input}
-        onChangeText={setEmail}
-      />
+      <View
+        style={[
+          styles.inputContainer,
+          {
+            borderColor: focusedInput === "fullName" ? "#2563EB" : "#D1D5DB",
+          },
+        ]}
+      >
+        <Feather name="user" size={20} color="#6B7280" />
+        <TextInput
+          placeholder="Full Name"
+          placeholderTextColor="#9CA3AF"
+          style={styles.input}
+          onChangeText={setName}
+          onFocus={() => setFocusedInput("fullName")}
+          onBlur={() => setFocusedInput(null)}
+        />
+      </View>
 
-      <TextInput
-        placeholder="Enter Password"
-        placeholderTextColor="#999"
-        secureTextEntry
-        style={styles.input}
-        onChangeText={setPassword}
-      />
+      <View
+        style={[
+          styles.inputContainer,
+          {
+            borderColor: focusedInput === "email" ? "#2563EB" : "#D1D5DB",
+          },
+        ]}
+      >
+        <Feather name="mail" size={20} color="#6B7280" />
+        <TextInput
+          placeholder="Email Address"
+          placeholderTextColor="#9CA3AF"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          style={styles.input}
+          onChangeText={setEmail}
+          onFocus={() => setFocusedInput("email")}
+          onBlur={() => setFocusedInput(null)}
+        />
+      </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleRegister}>
+      <View
+        style={[
+          styles.inputContainer,
+          {
+            borderColor: focusedInput === "password" ? "#2563EB" : "#D1D5DB",
+          },
+        ]}
+      >
+        <Feather name="lock" size={20} color="#6B7280" />
+        <TextInput
+          placeholder="Password"
+          placeholderTextColor="#9CA3AF"
+          secureTextEntry
+          style={styles.input}
+          onChangeText={setPassword}
+          onFocus={() => setFocusedInput("password")}
+          onBlur={() => setFocusedInput(null)}
+        />
+      </View>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleRegister}
+        disabled={loading}
+      >
         <Text style={styles.buttonText}>
-          {loading ? "Loading..." : "Register"}
+          {loading ? "Creating Account..." : "Register"}
         </Text>
       </TouchableOpacity>
     </View>
@@ -89,25 +132,33 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     paddingHorizontal: 25,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#F9FAFB",
   },
 
   title: {
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 40,
-    color: "#222",
+    color: "#111827",
+  },
+
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    marginBottom: 16,
+    height: 50,
   },
 
   input: {
-    height: 50,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    backgroundColor: "#fff",
-    marginBottom: 15,
+    flex: 1,
+    marginLeft: 10,
+    color: "#111827",
     fontSize: 16,
   },
 
@@ -118,10 +169,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 10,
     marginTop: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
 
   buttonText: {
-    color: "black",
+    color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "600",
   },
