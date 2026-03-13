@@ -1,13 +1,20 @@
 import { api } from "./axios-interceptors";
 import { ENDPOINTS } from "./endpoints";
-export const getMovies = async (params: any) => {
+export const getMovies = async ({
+  pageParam = 1,
+  language,
+  genre,
+  sort,
+}: any) => {
   const response = await api.get(ENDPOINTS.MOVIES, {
     params: {
+      page: pageParam,
+      with_original_language: language,
+      with_genres: genre,
+      sort_by: sort ?? "popularity.desc",
       include_adult: false,
       include_video: false,
       language: "en-US",
-      sort_by: "popularity.desc",
-      ...params,
     },
   });
 
@@ -95,7 +102,7 @@ export const getTrendingMovies = async () => {
 };
 
 export const getPersonDetails = async (id: number) => {
-  const response = await api.get(`${ENDPOINTS.PERSONDETAILS(id.toString())}`, {
+  const response = await api.get(ENDPOINTS.PERSONDETAILS(id.toString()), {
     params: {
       include_adult: false,
       include_video: false,
@@ -156,16 +163,26 @@ export const getGenres = async () => {
   return response.data;
 };
 
-export const sendToFavorite = async (
-  id: number,
-  favorite: boolean,
-  media_type: string,
-) => {
-  const response = await api.post(ENDPOINTS.ADD_TO_FAVORITES, {
-    media_type: media_type,
-    media_id: id,
-    favorite: favorite,
-  });
+// export const sendToFavorite = async (
+//   id: number,
+//   favorite: boolean,
+//   media_type: string,
+// ) => {
+//   const response = await api.post(ENDPOINTS.ADD_TO_FAVORITES, {
+//     media_type: media_type,
+//     media_id: id,
+//     favorite: favorite,
+//   });
+//   return response.data;
+// };
+type FavoritePayload = {
+  media_id: number;
+  media_type: string;
+  favorite: boolean;
+};
+
+export const sendToFavorite = async (payload: FavoritePayload) => {
+  const response = await api.post(ENDPOINTS.ADD_TO_FAVORITES, payload);
   return response.data;
 };
 

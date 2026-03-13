@@ -4,9 +4,16 @@ import {
   MoviesCard,
   NoDataFound,
 } from "@/src/components";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 
 import { sortOptions } from "@/data";
+import {
+  useGetGenres,
+  useGetLanguages,
+  useGetTvShowsInfinite,
+  useSearchTvShows,
+} from "@/src/hooks";
+
 import AntDesign from "@expo/vector-icons/AntDesign";
 import {
   Dimensions,
@@ -18,56 +25,52 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import {
-  getGenres,
-  getLanguages,
-  getSearchTvShows,
-  getTvShows,
-} from "../api/movies.service";
-import { useFetch } from "@/src/hooks";
+
 import { Colors } from "../theme";
 import { Movie, MoviesCardType } from "../types";
 
 const { width } = Dimensions.get("window");
 
 export default function TvShowFilterContainer() {
-  const [page, setPage] = useState(1);
   const [language, setLanguage] = useState("");
   const [genre, setGenre] = useState("");
   const [sort, setSort] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const [tvShows, setTvShows] = useState<MoviesCardType[]>([]);
-  const [loadingMore, setLoadingMore] = useState(false);
+  const { data: languages } = useGetLanguages();
+  const { data: genreData } = useGetGenres();
 
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    useGetTvShowsInfinite({
+      language,
+      genre,
+      sort,
+    });
 
-  const { data: searchData } = useFetch({
-    fetchFunction: () => getSearchTvShows(searchQuery),
-    dependencies: [searchQuery],
-  });
+  const { data: searchData, isLoading: searchLoading } =
+    useSearchTvShows(searchQuery);
 
+  const tvShows: MoviesCardType[] = useMemo(() => {
+    if (searchQuery) {
+      return (
+        searchData?.results?.map((tv: Movie) => ({
+          id: tv.id,
+          title: tv.title,
+          poster_path: tv.poster_path,
+        })) || []
+      );
+    }
 
-  const { data: languages } = useFetch({
-    fetchFunction: () => getLanguages(),
-  });
-
-
-  const { data: genreData } = useFetch({
-    fetchFunction: () => getGenres(),
-  });
-
-
-  const { data: tvShowData, loading } = useFetch({
-    fetchFunction: () =>
-      getTvShows({
-        with_original_language: language,
-        page,
-        with_genres: genre,
-        sort_by: sort,
-      }),
-    dependencies: [page, language, genre, sort],
-  });
-
+    return (
+      data?.pages.flatMap((page) =>
+        page.results.map((tv: Movie) => ({
+          id: tv.id,
+          title: tv.title,
+          poster_path: tv.poster_path,
+        })),
+      ) || []
+    );
+  }, [data, searchData, searchQuery]);
 
   const languageOptions = useMemo(() => {
     return languages?.map((language: any) => ({
@@ -83,69 +86,17 @@ export default function TvShowFilterContainer() {
     }));
   }, [genreData]);
 
-
-  const searchTvPosters: MoviesCardType[] = useMemo(
-    () =>
-      searchData?.results?.map((tv: Movie) => ({
-        id: tv.id,
-        title: tv.title,
-        poster_path: tv.poster_path,
-      })) || [],
-    [searchData],
-  );
-
-
-
-  useEffect(() => {
-    if (!tvShowData?.results) return;
-
-    const newTvShows = tvShowData.results.map((tv: Movie) => ({
-      id: tv.id,
-      title: tv.title,
-      poster_path: tv.poster_path,
-    }));
-
-    if (page === 1) {
-      setTvShows(newTvShows);
-    } else {
-      setTvShows((prev) => [...prev, ...newTvShows]);
-    }
-
-    setLoadingMore(false);
-  }, [tvShowData, page]);
-
-
-  const handleLanguage = (value: string) => {
-    setLanguage(value);
-    setPage(1);
-    setTvShows([]);
-  };
-
-  const handleGenre = (value: string) => {
-    setGenre(value);
-    setPage(1);
-    setTvShows([]);
-  };
-
-  const handleSort = (value: string) => {
-    setSort(value);
-    setPage(1);
-    setTvShows([]);
-  };
-
-
   const clearFilters = () => {
     setSearchQuery("");
     setLanguage("");
     setGenre("");
     setSort("");
-    setPage(1);
-    setTvShows([]);
   };
+
+  const loadingState = searchQuery ? searchLoading : isLoading;
 
   return (
     <View style={styles.container}>
-
       <TextInput
         placeholder="Search Tv Shows..."
         placeholderTextColor="#888"
@@ -155,20 +106,19 @@ export default function TvShowFilterContainer() {
         autoCorrect={false}
       />
 
-
       <View style={styles.filterView}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View style={styles.filterContainer}>
             <CustomDropdown
               value={language}
-              onValueChange={handleLanguage}
+              onValueChange={setLanguage}
               placeholder="Language"
               options={languageOptions}
             />
 
             <CustomDropdown
               value={genre}
-              onValueChange={handleGenre}
+              onValueChange={setGenre}
               placeholder="Genre"
               options={genreOptions}
             />
@@ -176,7 +126,7 @@ export default function TvShowFilterContainer() {
             <CustomDropdown
               value={sort}
               placeholder="Sort By"
-              onValueChange={handleSort}
+              onValueChange={setSort}
               options={sortOptions}
             />
 
@@ -189,13 +139,12 @@ export default function TvShowFilterContainer() {
 
       <Text style={styles.title}>Tv Shows</Text>
 
-      {loading && page === 1 ? (
+      {loadingState ? (
         <Loading />
       ) : (
         <FlatList
           numColumns={3}
-          contentContainerStyle={{ flexGrow: 1 }}
-          data={searchQuery ? searchTvPosters : tvShows}
+          data={tvShows}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <MoviesCard moviesDetails={{ ...item, typeOfList: "tv" }} />
@@ -203,24 +152,17 @@ export default function TvShowFilterContainer() {
           ListEmptyComponent={<NoDataFound />}
           showsVerticalScrollIndicator={false}
           onEndReached={() => {
-            if (
-              !loadingMore &&
-              !searchQuery &&
-              tvShowData?.page < tvShowData?.total_pages
-            ) {
-              setLoadingMore(true);
-              setPage((prev) => prev + 1);
+            if (!searchQuery && hasNextPage) {
+              fetchNextPage();
             }
           }}
           onEndReachedThreshold={0.5}
-          ListFooterComponent={loadingMore ? <Loading /> : null}
+          ListFooterComponent={isFetchingNextPage ? <Loading /> : null}
         />
       )}
     </View>
   );
 }
-
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

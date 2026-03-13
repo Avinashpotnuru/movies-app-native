@@ -4,9 +4,16 @@ import {
   MoviesCard,
   NoDataFound,
 } from "@/src/components";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 
 import { sortOptions } from "@/data";
+import {
+  useGetGenres,
+  useGetLanguages,
+  useGetMovies,
+  useSearchMovies,
+} from "@/src/hooks";
+
 import AntDesign from "@expo/vector-icons/AntDesign";
 import {
   Dimensions,
@@ -18,51 +25,52 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import {
-  getGenres,
-  getLanguages,
-  getMovies,
-  getSearchMovies,
-} from "../api/movies.service";
+
 import { Colors } from "../theme";
-import { useFetch } from "@/src/hooks";
 import { Movie, MoviesCardType } from "../types";
 
 const { width } = Dimensions.get("window");
 
 export default function MoviesFilterContainer() {
-  const [page, setPage] = useState(1);
   const [language, setLanguage] = useState("");
   const [genre, setGenre] = useState("");
   const [sort, setSort] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [loadingMore, setLoadingMore] = useState(false);
 
-  const [movies, setMovies] = useState<MoviesCardType[]>([]);
+  const { data: languages } = useGetLanguages();
+  const { data: genreData } = useGetGenres();
 
-  const { data: searchData } = useFetch({
-    fetchFunction: () => getSearchMovies(searchQuery),
-    dependencies: [searchQuery],
-  });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    useGetMovies({
+      language,
+      genre,
+      sort,
+    });
 
-  const { data: languages } = useFetch({
-    fetchFunction: () => getLanguages(),
-  });
+  const { data: searchData, isLoading: searchLoading } =
+    useSearchMovies(searchQuery);
 
-  const { data: genreData } = useFetch({
-    fetchFunction: () => getGenres(),
-  });
+  const movies: MoviesCardType[] = useMemo(() => {
+    if (searchQuery) {
+      return (
+        searchData?.results?.map((movie: Movie) => ({
+          id: movie.id,
+          title: movie.title,
+          poster_path: movie.poster_path,
+        })) || []
+      );
+    }
 
-  const { data: movieData, loading } = useFetch({
-    fetchFunction: () =>
-      getMovies({
-        with_original_language: language,
-        page,
-        with_genres: genre,
-        sort_by: sort,
-      }),
-    dependencies: [page, language, genre, sort],
-  });
+    return (
+      data?.pages.flatMap((page) =>
+        page.results.map((movie: Movie) => ({
+          id: movie.id,
+          title: movie.title,
+          poster_path: movie.poster_path,
+        })),
+      ) || []
+    );
+  }, [data, searchData, searchQuery]);
 
   const languageOptions = useMemo(() => {
     return languages?.map((language: any) => ({
@@ -78,66 +86,29 @@ export default function MoviesFilterContainer() {
     }));
   }, [genreData]);
 
-  const searchMoviePosters: MoviesCardType[] = useMemo(
-    () =>
-      searchData?.results?.map((movie: Movie) => ({
-        id: movie.id,
-        title: movie.title,
-        poster_path: movie.poster_path,
-      })) || [],
-    [searchData],
-  );
-
-  useEffect(() => {
-    if (!movieData?.results) return;
-
-    const newMovies = movieData.results.map((movie: Movie) => ({
-      id: movie.id,
-      title: movie.title,
-      poster_path: movie.poster_path,
-    }));
-
-    if (page === 1) {
-      setMovies(newMovies);
-    } else {
-      setMovies((prev) => [...prev, ...newMovies]);
-    }
-
-    setLoadingMore(false);
-  }, [movieData, page]);
-
-
   const handleLanguage = (value: string) => {
     setLanguage((prev) => (prev === value ? "" : value));
-    setPage(1);
-    setMovies([]);
   };
 
   const handleGenre = (value: string) => {
     setGenre(value);
-    setPage(1);
-    setMovies([]);
   };
 
   const handleSort = (value: string) => {
     setSort(value);
-    setPage(1);
-    setMovies([]);
   };
-
 
   const clearFilters = () => {
     setSearchQuery("");
     setLanguage("");
     setGenre("");
     setSort("");
-    setPage(1);
-    setMovies([]);
   };
+
+  const loadingState = searchQuery ? searchLoading : isLoading;
 
   return (
     <View style={styles.container}>
-
       <TextInput
         placeholder="Search movies..."
         placeholderTextColor="#888"
@@ -146,7 +117,6 @@ export default function MoviesFilterContainer() {
         style={styles.searchInput}
         autoCorrect={false}
       />
-
 
       <View style={styles.filterView}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -179,17 +149,15 @@ export default function MoviesFilterContainer() {
         </ScrollView>
       </View>
 
-
       <Text style={styles.title}>Movies</Text>
 
-
-      {loading && page === 1 ? (
+      {loadingState ? (
         <Loading />
       ) : (
         <FlatList
           numColumns={3}
           contentContainerStyle={{ flexGrow: 1 }}
-          data={searchQuery ? searchMoviePosters : movies}
+          data={movies}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <MoviesCard moviesDetails={{ ...item, typeOfList: "movie" }} />
@@ -197,23 +165,17 @@ export default function MoviesFilterContainer() {
           ListEmptyComponent={<NoDataFound />}
           showsVerticalScrollIndicator={false}
           onEndReached={() => {
-            if (
-              !loadingMore &&
-              !searchQuery &&
-              movieData?.page < movieData?.total_pages
-            ) {
-              setLoadingMore(true);
-              setPage((prev) => prev + 1);
+            if (!searchQuery && hasNextPage) {
+              fetchNextPage();
             }
           }}
           onEndReachedThreshold={0.5}
-          ListFooterComponent={loadingMore ? <Loading /> : null}
+          ListFooterComponent={isFetchingNextPage ? <Loading /> : null}
         />
       )}
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {

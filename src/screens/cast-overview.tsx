@@ -4,6 +4,7 @@ import {
   MoviesListContainer,
   SocialMediaSection,
 } from "@/src/components";
+import { useGetCastDetails } from "@/src/hooks";
 import { Entypo } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useMemo } from "react";
@@ -15,17 +16,13 @@ import {
   Text,
   View,
 } from "react-native";
-import { getPersonDetails } from "../api/movies.service";
-import { useFetch } from "@/src/hooks";
 import { Colors } from "../theme";
 import { Movie, MoviesCardType } from "../types";
 import { getImage } from "../utils/getImage";
 const { width, height } = Dimensions.get("window");
 
 const CastOverView = ({ castId }: { castId: number }) => {
-  const { data, loading } = useFetch({
-    fetchFunction: () => getPersonDetails(castId),
-  });
+  const { data, isLoading } = useGetCastDetails(castId);
 
   const popularMoviePosters: MoviesCardType[] = useMemo(
     () =>
@@ -57,7 +54,7 @@ const CastOverView = ({ castId }: { castId: number }) => {
       ? { uri: getImage(data?.profile_path, "w780") }
       : placeHolderImage;
 
-  if (loading) {
+  if (isLoading) {
     return <Loading />;
   }
 

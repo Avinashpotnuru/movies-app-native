@@ -7,10 +7,16 @@ import {
   MoviesListContainer,
   RecommendationSection,
 } from "@/src/components";
+import {
+  useAddFavorite,
+  useGetFavoriteMovies,
+  useGetFavoriteTvShows,
+  useGetMovieDetail,
+} from "@/src/hooks";
 import Entypo from "@expo/vector-icons/Entypo";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import {
   Alert,
   Dimensions,
@@ -20,13 +26,6 @@ import {
   View,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import {
-  getFavorites,
-  getFavoritesTv,
-  getMovieDetails,
-  sendToFavorite,
-} from "../api/movies.service";
-import { useFetch } from "@/src/hooks";
 import { Colors } from "../theme";
 import { Movie, MoviesCardType, RecommendationCardType } from "../types";
 import { getImage } from "../utils/getImage";
@@ -40,82 +39,48 @@ export default function MoviesDetailsContainer({
   id: number;
   typeOfList: string;
 }) {
-  const { data, loading } = useFetch({
-    fetchFunction: () => getMovieDetails(id, typeOfList),
-  });
+  const { data, isLoading } = useGetMovieDetail(id, typeOfList);
 
-  const { data: favorites, refetch: refetchFavorites } = useFetch({
-    fetchFunction: () => getFavorites(),
-  });
+  const { mutateAsync } = useAddFavorite();
 
-  const { data: favoritesTv, refetch: refetchFavoritesTv } = useFetch({
-    fetchFunction: () => getFavoritesTv(),
-  });
+  const { data: favorites } = useGetFavoriteMovies();
+  const { data: favoritesTv } = useGetFavoriteTvShows();
 
-  const [isFavorite, setIsFavorite] = useState(false);
+  const isFavorite = useMemo(() => {
+    const list =
+      typeOfList === "movie" ? favorites?.results : favoritesTv?.results;
 
-  useEffect(() => {
-    if (!favorites?.results || !favoritesTv?.results || !data?.id) return;
-    const filterData = typeOfList === "movie" ? favorites : favoritesTv;
+    if (!list) return false;
 
-    const exists = filterData.results.some(
-      (movie: Movie) => movie.id === data.id,
-    );
+    return list.some((item: Movie) => item.id === id);
+  }, [favorites, favoritesTv, id, typeOfList]);
 
-    setIsFavorite(exists);
-  }, [favorites, favoritesTv, data, typeOfList]);
+ const handleFavorite = async () => {
+   try {
+     await mutateAsync({
+       media_id: id,
+       media_type: typeOfList,
+       favorite: !isFavorite,
+     });
 
-  const handleFavorite = async () => {
-    if (!data?.id) return;
+     const title = data?.title || data?.name;
 
-    const newState = !isFavorite;
-    setIsFavorite(newState);
+     const message = !isFavorite
+       ? `${title} added to favorites`
+       : `${title} removed from favorites`;
 
-    try {
-      if (typeOfList === "movie") {
-        await sendToFavorite(data.id, newState, "movie");
-
-        if (newState) {
-          Alert.alert(
-            `${data.title} added to favorites`,
-            "See favorites screen",
-            [
-              {
-                text: "Go to favorites",
-                onPress: () => router.push("/favorites"),
-              },
-            ],
-          );
-        } else {
-          Alert.alert(`${data.title} removed from favorites`);
-        }
-
-        refetchFavorites();
-      } else {
-        await sendToFavorite(data.id, newState, "tv");
-
-        if (newState) {
-          Alert.alert(
-            `${data.name} added to favorites`,
-            "See favorites screen",
-            [
-              {
-                text: "Go to favorites",
-                onPress: () => router.push("/favorites"),
-              },
-            ],
-          );
-        } else {
-          Alert.alert(`${data.name} removed from favorites`);
-        }
-
-        refetchFavoritesTv();
-      }
-    } catch (error) {
-      console.error("Favorite error:", error);
-      setIsFavorite(!newState);
-    }
-  };
+     Alert.alert(message, "Do you want to see your favorites?", [
+       {
+         text: "Go to favorites",
+         onPress: () => router.replace("/favorites"),
+       },
+       { text: "OK", style: "cancel" },
+     ]);
+   } catch (error) {
+     Alert.alert("Error", "Something went wrong while updating favorites.");
+     console.log("Favorite error:", error);
+   }
+ };
 
   const similarMoviesPosters: MoviesCardType[] = useMemo(() => {
     return (
@@ -142,7 +107,7 @@ export default function MoviesDetailsContainer({
     return data?.videos?.results?.[0]?.key;
   }, [data]);
 
-  if (loading) return <Loading />;
+  if (isLoading) return <Loading />;
 
   return (
     <View style={styles.container}>
@@ -175,9 +140,7 @@ export default function MoviesDetailsContainer({
             style={styles.backdropImage}
             source={
               data?.backdrop_path
-                ? {
-                    uri: getImage(data.backdrop_path, "w780"),
-                  }
+                ? { uri: getImage(data.backdrop_path, "w780") }
                 : require("@/assets/images/placeholder.jpg")
             }
           />
@@ -187,7 +150,9 @@ export default function MoviesDetailsContainer({
 
         <View style={styles.contentContainer}>
           <MovieOverview content={data?.overview || ""} />
+
           <CastContainer id={id} typeOfList={typeOfList} />
+
           <RecommendationSection
             sectionHeading="Recommendations"
             moviePosters={recommendationMoviesPosters}
