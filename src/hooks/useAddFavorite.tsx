@@ -7,9 +7,12 @@ const useAddFavorite = () => {
   return useMutation({
     mutationFn: sendToFavorite,
 
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["favorite-movies"] });
-      queryClient.invalidateQueries({ queryKey: ["favorite-tv-shows"] });
+    onSuccess: (_, variables) => {
+      if (variables.media_type === "movie") {
+        queryClient.invalidateQueries({ queryKey: ["favorite-movies"] });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["favorite-tv-shows"] });
+      }
     },
   });
 };

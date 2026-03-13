@@ -76,6 +76,7 @@ Each movie has a **dynamic details page** with:
 - React Hooks
 - Custom Hooks
 - Reusable Components
+- Tanstack React Query
 
 ---
 
@@ -100,20 +101,130 @@ Each movie has a **dynamic details page** with:
 # 📁 Project Structure
 
 ```
-app
- ├── login.tsx
- ├── register.tsx
- ├── movie-details
- ├── cast-details
- └── (tabs)
+movies-app-native
+├─ .env
+├─ .qodo
+├─ app
+│  ├─ (tabs)
+│  │  ├─ favorites.tsx
+│  │  ├─ index.tsx
+│  │  ├─ movies.tsx
+│  │  ├─ tvshows.tsx
+│  │  └─ _layout.tsx
+│  ├─ cast-details
+│  │  └─ [id].tsx
+│  ├─ login.tsx
+│  ├─ movie-details
+│  │  └─ [id].tsx
+│  ├─ register.tsx
+│  └─ _layout.tsx
+├─ app.json
+├─ assets
+│  └─ images
+│     ├─ cineWaveLogo.png
+│     ├─ favicon.png
+│     ├─ female.jpg
+│     ├─ icon.png
+│     ├─ loading.gif
+│     ├─ male.jpg
+│     ├─ partial-react-logo.png
+│     ├─ placeholder.jpg
+│     ├─ react-logo.png
+│     ├─ react-logo@2x.png
+│     ├─ react-logo@3x.png
+│     └─ splash-icon.png
+├─ data
+│  └─ index.ts
+├─ eas.json
+├─ es.json
+├─ eslint.config.js
+├─ package-lock.json
+├─ package.json
+├─ README.md
+├─ screenshots
+│  ├─ castDetailPageImage.jpeg
+│  ├─ favouritePageImage.jpeg
+│  ├─ landingPageImage.jpeg
+│  ├─ loginPageImage.jpeg
+│  ├─ movieDetailsPageImage.jpeg
+│  ├─ moviesPageImage.jpeg
+│  └─ RegisterPageImage.jpeg
+├─ src
+│  ├─ api
+│  │  ├─ authService.ts
+│  │  ├─ axios-interceptors.ts
+│  │  ├─ endpoints.ts
+│  │  └─ movies.service.ts
+│  ├─ components
+│  │  ├─ backdrop-images-container.tsx
+│  │  ├─ biography-section.tsx
+│  │  ├─ cast-container.tsx
+│  │  ├─ cast-display-card.tsx
+│  │  ├─ custom-dropdown.tsx
+│  │  ├─ display-modal.tsx
+│  │  ├─ index.ts
+│  │  ├─ loading.tsx
+│  │  ├─ movie-list-container.tsx
+│  │  ├─ movie-overview.tsx
+│  │  ├─ movie-title-card.tsx
+│  │  ├─ movies-card.tsx
+│  │  ├─ movies-carousel.tsx
+│  │  ├─ movies-list-wrapper.tsx
+│  │  ├─ no-data-found.tsx
+│  │  ├─ recommendation-card.tsx
+│  │  ├─ recommendation-section.tsx
+│  │  ├─ section-heading.tsx
+│  │  ├─ social-media-section.tsx
+│  │  ├─ tab-header.tsx
+│  │  ├─ tabs-container.tsx
+│  │  └─ trailer-video.tsx
+│  ├─ config
+│  │  └─ firebase.ts
+│  ├─ hooks
+│  │  ├─ index.ts
+│  │  ├─ useAddFavorite.tsx
+│  │  ├─ useAuthRedirect.tsx
+│  │  ├─ useDebounce.tsx
+│  │  ├─ useDimensions.tsx
+│  │  ├─ useGetCastDetails.tsx
+│  │  ├─ useGetFavoriteMovies.tsx
+│  │  ├─ useGetFavoriteTvShows.tsx
+│  │  ├─ useGetGenres.tsx
+│  │  ├─ useGetLanguages.tsx
+│  │  ├─ useGetMovieCredits.tsx
+│  │  ├─ useGetMovieDetail.tsx
+│  │  ├─ useGetMovies.tsx
+│  │  ├─ useGetTvShowsInfinite.tsx
+│  │  ├─ usePopularMovies.tsx
+│  │  ├─ useSearchMovies.tsx
+│  │  ├─ useSearchTvShows.tsx
+│  │  ├─ useTrendingMovies.tsx
+│  │  ├─ useTvShows.tsx
+│  │  └─ useUpcomingMovies.tsx
+│  ├─ layout
+│  │  ├─ app-stack-layout.tsx
+│  │  ├─ index.ts
+│  │  └─ tabs-stack-layout.tsx
+│  ├─ screens
+│  │  ├─ cast-overview.tsx
+│  │  ├─ favorites-container.tsx
+│  │  ├─ home-container.tsx
+│  │  ├─ index.ts
+│  │  ├─ movies-details-container.tsx
+│  │  ├─ movies-filter-container.tsx
+│  │  └─ tv-shows-filter-container.tsx
+│  ├─ theme
+│  │  ├─ colors.ts
+│  │  └─ index.ts
+│  ├─ types
+│  │  ├─ index.ts
+│  │  └─ movie.types.ts
+│  └─ utils
+│     ├─ errorMessages.ts
+│     ├─ getImage.ts
+│     └─ responsive.ts
+└─ tsconfig.json
 
-src
- ├── api
- ├── components
- ├── hooks
- ├── screens
- ├── theme
- └── utils
 ```
 
 ---
@@ -228,3 +339,4 @@ GitHub
 https://github.com/Avinashpotnuru
 
 Built with ❤️ using **React Native + Expo**
+

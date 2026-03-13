@@ -16,7 +16,7 @@ import {
 import Entypo from "@expo/vector-icons/Entypo";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import {
   Alert,
   Dimensions,
@@ -46,52 +46,41 @@ export default function MoviesDetailsContainer({
   const { data: favorites } = useGetFavoriteMovies();
   const { data: favoritesTv } = useGetFavoriteTvShows();
 
-  const [isFavorite, setIsFavorite] = useState(false);
+  const isFavorite = useMemo(() => {
+    const list =
+      typeOfList === "movie" ? favorites?.results : favoritesTv?.results;
 
-  // check if movie already favorite
-  useEffect(() => {
-    if (!data?.id) return;
+    if (!list) return false;
 
-    const list = typeOfList === "movie" ? favorites : favoritesTv;
+    return list.some((item: Movie) => item.id === id);
+  }, [favorites, favoritesTv, id, typeOfList]);
 
-    if (!list?.results) return;
+ const handleFavorite = async () => {
+   try {
+     await mutateAsync({
+       media_id: id,
+       media_type: typeOfList,
+       favorite: !isFavorite,
+     });
 
-    const exists = list.results.some((item: Movie) => item.id === data.id);
+     const title = data?.title || data?.name;
 
-    setIsFavorite(exists);
-  }, [favorites, favoritesTv, data?.id, typeOfList]);
+     const message = !isFavorite
+       ? `${title} added to favorites`
+       : `${title} removed from favorites`;
 
-  const handleFavorite = async () => {
-    if (!data?.id) return;
-
-    const newState = !isFavorite;
-    setIsFavorite(newState);
-
-    try {
-      await mutateAsync({
-        media_id: id,
-        media_type: typeOfList,
-        favorite: newState,
-      });
-
-      const title = data?.title || data?.name;
-
-      if (newState) {
-        Alert.alert(`${title} added to favorites`, "See favorites screen", [
-          {
-            text: "Go to favorites",
-            onPress: () => router.push("/favorites"),
-          },
-          { text: "OK" },
-        ]);
-      } else {
-        Alert.alert(`${title} removed from favorites`);
-      }
-    } catch (error) {
-      setIsFavorite(!newState);
-      console.log("Favorite error:", error);
-    }
-  };
+     Alert.alert(message, "Do you want to see your favorites?", [
+       {
+         text: "Go to favorites",
+         onPress: () => router.replace("/favorites"),
+       },
+       { text: "OK", style: "cancel" },
+     ]);
+   } catch (error) {
+     Alert.alert("Error", "Something went wrong while updating favorites.");
+     console.log("Favorite error:", error);
+   }
+ };
 
   const similarMoviesPosters: MoviesCardType[] = useMemo(() => {
     return (

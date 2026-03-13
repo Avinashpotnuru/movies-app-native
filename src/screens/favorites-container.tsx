@@ -5,8 +5,7 @@ import {
   TabsContainer,
 } from "@/src/components";
 import { useGetFavoriteMovies, useGetFavoriteTvShows } from "@/src/hooks";
-import { useFocusEffect } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
 import { Colors } from "../theme";
 
@@ -33,13 +32,6 @@ const FavoritesContainer = () => {
     refetch: refetchTv,
   } = useGetFavoriteTvShows(tvPage);
 
-  useFocusEffect(
-    useCallback(() => {
-      refetch();
-      refetchTv();
-    }, [refetch, refetchTv]),
-  );
-
   useEffect(() => {
     if (data?.results) {
       if (moviePage === 1) {
@@ -65,6 +57,27 @@ const FavoritesContainer = () => {
   const currentData = selectType === "movie" ? movies : tvShows;
   const isLoading = selectType === "movie" ? isLoadingMovies : isLoadingTv;
 
+  const handleLoadMore = () => {
+    if (loadingMore || isLoading) return;
+
+    setLoadingMore(true);
+
+    if (selectType === "movie") {
+      setMoviePage((prev) => prev + 1);
+    } else {
+      setTvPage((prev) => prev + 1);
+    }
+  };
+
+  const handleRefresh = () => {
+    setMoviePage(1);
+    setTvPage(1);
+    setMovies([]);
+    setTvShows([]);
+    refetch();
+    refetchTv();
+  };
+
   return (
     <View style={styles.container}>
       <TabsContainer selected={selectType} onChange={setSelectType} />
@@ -76,35 +89,18 @@ const FavoritesContainer = () => {
           numColumns={3}
           contentContainerStyle={{ padding: 8 }}
           data={currentData}
-          keyExtractor={(item, index) => index.toString()}
+          keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <MoviesCard moviesDetails={{ ...item, typeOfList: selectType }} />
           )}
           ListEmptyComponent={<NoDataFound />}
           ListFooterComponent={loadingMore ? <Loading /> : null}
-          onEndReached={() => {
-            if (!loadingMore) {
-              setLoadingMore(true);
-
-              if (selectType === "movie") {
-                setMoviePage((prev) => prev + 1);
-              } else {
-                setTvPage((prev) => prev + 1);
-              }
-            }
-          }}
+          onEndReached={handleLoadMore}
           onEndReachedThreshold={0.5}
           refreshControl={
             <RefreshControl
               refreshing={isLoadingMovies || isLoadingTv}
-              onRefresh={() => {
-                setMoviePage(1);
-                setTvPage(1);
-                setMovies([]);
-                setTvShows([]);
-                refetch();
-                refetchTv();
-              }}
+              onRefresh={handleRefresh}
             />
           }
           showsVerticalScrollIndicator={false}

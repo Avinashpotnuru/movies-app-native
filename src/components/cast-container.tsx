@@ -1,3 +1,4 @@
+import { useGetMovieCredits } from "@/src/hooks";
 import React, { memo } from "react";
 import {
   ActivityIndicator,
@@ -6,8 +7,6 @@ import {
   Text,
   View,
 } from "react-native";
-import { getMovieCredits } from "../api/movies.service";
-import { useFetch } from "@/src/hooks";
 import { Colors } from "../theme";
 import { MovieCastProps } from "../types";
 import CastDisplayCard from "./cast-display-card";
@@ -20,18 +19,18 @@ const CastContainer = ({
   id: number;
   typeOfList: string;
 }) => {
-  const fetchCredits = React.useCallback(
-    () => getMovieCredits(id, typeOfList),
-    [id, typeOfList],
-  );
-  const { data, loading, error } = useFetch({
-    fetchFunction: fetchCredits,
-  });
+  const { data, isLoading, error } = useGetMovieCredits(id, typeOfList);
 
-  if (loading)
+  if (isLoading)
     return <ActivityIndicator size={"large"} color={Colors.primary} />;
 
-  if (error) return <Text style={styles.error}>{error}</Text>;
+  if (error)
+    return (
+      <Text style={styles.error}>
+        {" "}
+        {error instanceof Error ? error.message : String(error)}
+      </Text>
+    );
 
   if (!data) return null;
 
