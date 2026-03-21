@@ -1,7 +1,6 @@
-// hooks/useGetTvShowsInfinite.ts
-
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { getTvShows } from "../api/movies.service";
+import { DEFAULT_QUERY_OPTIONS } from "../api/queryOptions";
 
 const useGetTvShowsInfinite = ({
   language,
@@ -29,6 +28,7 @@ const useGetTvShowsInfinite = ({
       }
       return undefined;
     },
+    ...DEFAULT_QUERY_OPTIONS,
   });
 };
 

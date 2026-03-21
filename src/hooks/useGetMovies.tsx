@@ -1,5 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { getMovies } from "../api/movies.service";
+import { DEFAULT_QUERY_OPTIONS } from "../api/queryOptions";
 
 const useGetMovies = ({
   language,
@@ -27,6 +28,7 @@ const useGetMovies = ({
       }
       return undefined;
     },
+    ...DEFAULT_QUERY_OPTIONS,
   });
 };
 
