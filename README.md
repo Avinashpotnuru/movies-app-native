@@ -121,7 +121,9 @@ movies-app-native
 ├─ app.json
 ├─ assets
 │  └─ images
+│     ├─ adaptive-icon.png
 │     ├─ cineWaveLogo.png
+│     ├─ cineWaveLogoBg.png
 │     ├─ favicon.png
 │     ├─ female.jpg
 │     ├─ icon.png
@@ -132,7 +134,8 @@ movies-app-native
 │     ├─ react-logo.png
 │     ├─ react-logo@2x.png
 │     ├─ react-logo@3x.png
-│     └─ splash-icon.png
+│     ├─ splash-icon.png
+│     └─ splash.png
 ├─ data
 │  └─ index.ts
 ├─ eas.json
@@ -154,7 +157,8 @@ movies-app-native
 │  │  ├─ authService.ts
 │  │  ├─ axios-interceptors.ts
 │  │  ├─ endpoints.ts
-│  │  └─ movies.service.ts
+│  │  ├─ movies.service.ts
+│  │  └─ queryOptions.ts
 │  ├─ components
 │  │  ├─ backdrop-images-container.tsx
 │  │  ├─ biography-section.tsx
@@ -213,6 +217,7 @@ movies-app-native
 │  │  ├─ movies-details-container.tsx
 │  │  ├─ movies-filter-container.tsx
 │  │  └─ tv-shows-filter-container.tsx
+│  ├─ store
 │  ├─ theme
 │  │  ├─ colors.ts
 │  │  └─ index.ts
@@ -325,9 +330,9 @@ https://www.themoviedb.org/documentation/api
 
 # 🚀 Live Demo
 
-Expo build
+Expo build Download apk file below link
 
-https://expo.dev/accounts/avinash343/projects/cinewave/builds/98a24a9f-b687-4d13-9f9f-35aaa4a67cc6
+https://expo.dev/accounts/avinash343/projects/cinewave/builds/e64d23e3-0158-46bd-ada2-3ea795602d60
 
 ---
 
@@ -339,4 +344,5 @@ GitHub
 https://github.com/Avinashpotnuru
 
 Built with ❤️ using **React Native + Expo**
+
 
