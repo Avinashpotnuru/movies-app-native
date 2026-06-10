@@ -16,10 +16,10 @@ const useGetTvShowsInfinite = ({
 
     queryFn: ({ pageParam = 1 }) =>
       getTvShows({
-        page: pageParam,
-        with_original_language: language,
-        with_genres: genre,
-        sort_by: sort,
+        pageParam,
+        language,
+        genre,
+         sort,
       }),
 
     getNextPageParam: (lastPage) => {

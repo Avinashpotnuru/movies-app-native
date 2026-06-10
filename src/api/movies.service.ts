@@ -5,7 +5,6 @@ const defaultParams = {
   include_adult: false,
   include_video: false,
   language: "en-US",
-  sort_by: "popularity.desc",
 };
 
 const fetchData = async (url: string, params: Record<string, any> = {}) => {
@@ -24,26 +23,19 @@ const fetchSimpleData = async (url: string) => {
   return response.data;
 };
 
-
-
-type GetMoviesParams = {
+type GetParams = {
   pageParam?: number;
   language?: string;
   genre?: string;
   sort?: string;
 };
 
-export const getMovies = async ({
-  pageParam = 1,
-  language,
-  genre,
-  sort,
-}: GetMoviesParams) => {
+export const getMovies = ({ pageParam = 1, language, genre, sort }: GetParams) => {
   return fetchData(ENDPOINTS.MOVIES, {
     page: pageParam,
     with_original_language: language,
     with_genres: genre,
-    sort_by: sort ?? defaultParams.sort_by,
+    sort_by: sort ?? "popularity.desc",
   });
 };
 
@@ -63,8 +55,6 @@ export const getTrendingMovies = () => {
   return fetchData(ENDPOINTS.TRENDING);
 };
 
-
-
 export const getMovieDetails = (id: number, typeOfList: string) => {
   return fetchData(ENDPOINTS.DETAILS(id.toString(), typeOfList));
 };
@@ -77,8 +67,6 @@ export const getPersonDetails = (id: number) => {
   return fetchData(ENDPOINTS.PERSONDETAILS(id.toString()));
 };
 
-
-
 export const getSearchMovies = (query: string) => {
   return fetchData(ENDPOINTS.SEARCH_MOVIES(query));
 };
@@ -87,12 +75,15 @@ export const getSearchTvShows = (query: string) => {
   return fetchData(ENDPOINTS.SEARCH_TV_SHOWS(query));
 };
 
-
-export const getTvShows = (params: Record<string, any> = {}) => {
-  return fetchData(ENDPOINTS.TV_SHOWS, params);
+export const getTvShows = ({ pageParam = 1, language, genre, sort }: GetParams) => {
+  
+  return fetchData(ENDPOINTS.TV_SHOWS, {
+    page: pageParam,
+    with_original_language: language,
+    with_genres: genre,
+    sort_by: sort ?? "popularity.desc",
+  });
 };
-
-
 
 export const getLanguages = () => {
   return fetchSimpleData(ENDPOINTS.LANGUAGES);
@@ -101,8 +92,6 @@ export const getLanguages = () => {
 export const getGenres = () => {
   return fetchSimpleData(ENDPOINTS.GENRES);
 };
-
-
 
 type FavoritePayload = {
   media_id: number;

@@ -6,7 +6,7 @@ import {
 } from "@/src/components";
 import React, { useMemo, useState } from "react";
 
-import { sortOptions } from "@/data";
+import { sortTvOptions } from "@/data";
 import {
   useGetGenres,
   useGetLanguages,
@@ -127,7 +127,7 @@ export default function TvShowFilterContainer() {
               value={sort}
               placeholder="Sort By"
               onValueChange={setSort}
-              options={sortOptions}
+              options={sortTvOptions}
             />
 
             <TouchableOpacity style={styles.clearButton} onPress={clearFilters}>
