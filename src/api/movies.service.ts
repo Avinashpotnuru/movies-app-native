@@ -1,152 +1,16 @@
 import { api } from "./axios-interceptors";
 import { ENDPOINTS } from "./endpoints";
-export const getMovies = async ({
-  pageParam = 1,
-  language,
-  genre,
-  sort,
-}: any) => {
-  const response = await api.get(ENDPOINTS.MOVIES, {
-    params: {
-      page: pageParam,
-      with_original_language: language,
-      with_genres: genre,
-      sort_by: sort ?? "popularity.desc",
-      include_adult: false,
-      include_video: false,
-      language: "en-US",
-    },
-  });
 
-  return response.data;
+const defaultParams = {
+  include_adult: false,
+  include_video: false,
+  language: "en-US",
 };
 
-export const nowPlayingMovies = async () => {
-  const response = await api.get(ENDPOINTS.ON_PLAYING, {
+const fetchData = async (url: string, params: Record<string, any> = {}) => {
+  const response = await api.get(url, {
     params: {
-      include_adult: false,
-      include_video: false,
-      language: "en-US",
-      sort_by: "popularity.desc",
-    },
-  });
-
-  return response.data;
-};
-
-export const getUpComingMovies = async () => {
-  const response = await api.get(ENDPOINTS.UP_COMING, {
-    params: {
-      include_adult: false,
-      include_video: false,
-      language: "en-US",
-      sort_by: "popularity.desc",
-    },
-  });
-
-  return response.data;
-};
-
-export const getMovieDetails = async (id: number, typeOfList: string) => {
-  const response = await api.get(ENDPOINTS.DETAILS(id.toString(), typeOfList), {
-    params: {
-      include_adult: false,
-      include_video: false,
-      language: "en-US",
-      sort_by: "popularity.desc",
-    },
-  });
-
-  return response.data;
-};
-export const getMovieCredits = async (id: number, typeOfList: string) => {
-  const response = await api.get(
-    `${ENDPOINTS.CREDITS(id.toString(), typeOfList)}`,
-    {
-      params: {
-        include_adult: false,
-        include_video: false,
-        language: "en-US",
-        sort_by: "popularity.desc",
-      },
-    },
-  );
-
-  return response.data;
-};
-
-export const getPopularMovies = async () => {
-  const response = await api.get(ENDPOINTS.POPULAR, {
-    params: {
-      include_adult: false,
-      include_video: false,
-      language: "en-US",
-      sort_by: "popularity.desc",
-    },
-  });
-
-  return response.data;
-};
-
-export const getTrendingMovies = async () => {
-  const response = await api.get(ENDPOINTS.TRENDING, {
-    params: {
-      include_adult: false,
-      include_video: false,
-      language: "en-US",
-      sort_by: "popularity.desc",
-    },
-  });
-
-  return response.data;
-};
-
-export const getPersonDetails = async (id: number) => {
-  const response = await api.get(ENDPOINTS.PERSONDETAILS(id.toString()), {
-    params: {
-      include_adult: false,
-      include_video: false,
-      language: "en-US",
-      sort_by: "popularity.desc",
-    },
-  });
-
-  return response.data;
-};
-
-export const getSearchMovies = async (query: string) => {
-  const response = await api.get(ENDPOINTS.SEARCH_MOVIES(query), {
-    params: {
-      include_adult: false,
-      include_video: false,
-      language: "en-US",
-      sort_by: "popularity.desc",
-    },
-  });
-
-  return response.data;
-};
-
-export const getSearchTvShows = async (query: string) => {
-  const response = await api.get(ENDPOINTS.SEARCH_TV_SHOWS(query), {
-    params: {
-      include_adult: false,
-      include_video: false,
-      language: "en-US",
-      sort_by: "popularity.desc",
-    },
-  });
-
-  return response.data;
-};
-
-export const getTvShows = async (params: any = {}) => {
-  const response = await api.get(ENDPOINTS.TV_SHOWS, {
-    params: {
-      include_adult: false,
-      include_video: false,
-      language: "en-US",
-      sort_by: "popularity.desc",
+      ...defaultParams,
       ...params,
     },
   });
@@ -154,27 +18,81 @@ export const getTvShows = async (params: any = {}) => {
   return response.data;
 };
 
-export const getLanguages = async () => {
-  const response = await api.get(ENDPOINTS.LANGUAGES);
-  return response.data;
-};
-export const getGenres = async () => {
-  const response = await api.get(ENDPOINTS.GENRES);
+const fetchSimpleData = async (url: string) => {
+  const response = await api.get(url);
   return response.data;
 };
 
-// export const sendToFavorite = async (
-//   id: number,
-//   favorite: boolean,
-//   media_type: string,
-// ) => {
-//   const response = await api.post(ENDPOINTS.ADD_TO_FAVORITES, {
-//     media_type: media_type,
-//     media_id: id,
-//     favorite: favorite,
-//   });
-//   return response.data;
-// };
+type GetParams = {
+  pageParam?: number;
+  language?: string;
+  genre?: string;
+  sort?: string;
+};
+
+export const getMovies = ({ pageParam = 1, language, genre, sort }: GetParams) => {
+  return fetchData(ENDPOINTS.MOVIES, {
+    page: pageParam,
+    with_original_language: language,
+    with_genres: genre,
+    sort_by: sort ?? "popularity.desc",
+  });
+};
+
+export const nowPlayingMovies = () => {
+  return fetchData(ENDPOINTS.ON_PLAYING);
+};
+
+export const getUpComingMovies = () => {
+  return fetchData(ENDPOINTS.UP_COMING);
+};
+
+export const getPopularMovies = () => {
+  return fetchData(ENDPOINTS.POPULAR);
+};
+
+export const getTrendingMovies = () => {
+  return fetchData(ENDPOINTS.TRENDING);
+};
+
+export const getMovieDetails = (id: number, typeOfList: string) => {
+  return fetchData(ENDPOINTS.DETAILS(id.toString(), typeOfList));
+};
+
+export const getMovieCredits = (id: number, typeOfList: string) => {
+  return fetchData(ENDPOINTS.CREDITS(id.toString(), typeOfList));
+};
+
+export const getPersonDetails = (id: number) => {
+  return fetchData(ENDPOINTS.PERSONDETAILS(id.toString()));
+};
+
+export const getSearchMovies = (query: string) => {
+  return fetchData(ENDPOINTS.SEARCH_MOVIES(query));
+};
+
+export const getSearchTvShows = (query: string) => {
+  return fetchData(ENDPOINTS.SEARCH_TV_SHOWS(query));
+};
+
+export const getTvShows = ({ pageParam = 1, language, genre, sort }: GetParams) => {
+  
+  return fetchData(ENDPOINTS.TV_SHOWS, {
+    page: pageParam,
+    with_original_language: language,
+    with_genres: genre,
+    sort_by: sort ?? "popularity.desc",
+  });
+};
+
+export const getLanguages = () => {
+  return fetchSimpleData(ENDPOINTS.LANGUAGES);
+};
+
+export const getGenres = () => {
+  return fetchSimpleData(ENDPOINTS.GENRES);
+};
+
 type FavoritePayload = {
   media_id: number;
   media_type: string;
@@ -183,31 +101,14 @@ type FavoritePayload = {
 
 export const sendToFavorite = async (payload: FavoritePayload) => {
   const response = await api.post(ENDPOINTS.ADD_TO_FAVORITES, payload);
+
   return response.data;
 };
 
-export const getFavorites = async (params: any = {}) => {
-  const response = await api.get(ENDPOINTS.GET_FAVORITES, {
-    params: {
-      include_adult: false,
-      include_video: false,
-      language: "en-US",
-      sort_by: "popularity.desc",
-      ...params,
-    },
-  });
-  return response.data;
+export const getFavorites = (params: Record<string, any> = {}) => {
+  return fetchData(ENDPOINTS.GET_FAVORITES, params);
 };
 
-export const getFavoritesTv = async (params: any = {}) => {
-  const response = await api.get(ENDPOINTS.GET_FAVORITES_TV, {
-    params: {
-      include_adult: false,
-      include_video: false,
-      language: "en-US",
-      sort_by: "popularity.desc",
-      ...params,
-    },
-  });
-  return response.data;
+export const getFavoritesTv = (params: Record<string, any> = {}) => {
+  return fetchData(ENDPOINTS.GET_FAVORITES_TV, params);
 };
