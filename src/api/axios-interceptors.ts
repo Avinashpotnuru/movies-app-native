@@ -1,17 +1,20 @@
-import { create } from "axios";
+import axios, { AxiosHeaders } from "axios";
 
-export const api = create({
+// eslint-disable-next-line import/no-named-as-default-member
+export const api = axios.create({
   baseURL: process.env.EXPO_PUBLIC_BASE_URL,
   headers: {
-    accept: "application/json",
+    Accept: "application/json",
   },
 });
 
-
 api.interceptors.request.use((config) => {
-  config.headers = config.headers || {};
-  // ensure header key exists before assignment
-  (config.headers as any).Authorization = `Bearer ${process.env.EXPO_PUBLIC_ACCESS_TOKEN}`;
+  config.headers = config.headers || new AxiosHeaders();
+
+  config.headers.set(
+    "Authorization",
+    `Bearer ${process.env.EXPO_PUBLIC_ACCESS_TOKEN}`,
+  );
 
   return config;
 });
