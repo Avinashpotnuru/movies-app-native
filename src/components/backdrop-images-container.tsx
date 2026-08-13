@@ -1,8 +1,8 @@
-import React from "react";
+import React, { memo } from "react";
 import {
   Dimensions,
+  FlatList,
   Image,
-  ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -15,55 +15,70 @@ const { width } = Dimensions.get("window");
 
 const BackdropImagesContainer = ({ data }: { data: MovieBackDropImage[] }) => {
   const [selectedImage, setSelectedImage] = React.useState<string | null>(null);
+
   if (!data.length) return null;
-  return (
-    <View style={styles.container}>
-      <SectionHeading title="Backdrop Images" />
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        {data.map((item, index) => (
-          <View key={index}>
-            <TouchableOpacity
-              accessibilityRole="imagebutton"
-              accessibilityLabel={`Open backdrop image ${index + 1}`}
-              onPress={() => setSelectedImage(item.file_path)}
-            >
+
+  const renderItem = ({
+    item,
+    index,
+  }: {
+    item: MovieBackDropImage;
+    index: number;
+  }) => {
+    return (
+      <View>
+        <TouchableOpacity
+          accessibilityRole="imagebutton"
+          accessibilityLabel={`Open backdrop image ${index + 1}`}
+          onPress={() => setSelectedImage(item.file_path)}
+        >
+          <Image
+            source={{
+              uri: `https://image.tmdb.org/t/p/w500${item.file_path}`,
+            }}
+            style={styles.image}
+          />
+        </TouchableOpacity>
+
+        {selectedImage === item.file_path && (
+          <DisplayModal
+            visible={selectedImage !== null}
+            onClose={() => setSelectedImage(null)}
+            onRequestClose={() => setSelectedImage(null)}
+            animationType="slide"
+            modalWidth={width}
+            modalHeight={250}
+          >
+            <View style={styles.imageContainer}>
               <Image
-                key={item.file_path}
                 source={{
                   uri: `https://image.tmdb.org/t/p/w500${item.file_path}`,
                 }}
-                style={styles.image}
+                style={styles.modalImage}
               />
-            </TouchableOpacity>
+            </View>
+          </DisplayModal>
+        )}
+      </View>
+    );
+  };
 
-            {selectedImage === item.file_path && (
-              <DisplayModal
-                visible={selectedImage !== null}
-                onClose={() => setSelectedImage(null)}
-                onRequestClose={() => setSelectedImage(null)}
-                animationType="slide"
-                modalWidth={width}
-                modalHeight={250}
-              >
-                <View style={styles.imageContainer}>
-                  <Image
-                    key={item.file_path}
-                    source={{
-                      uri: `https://image.tmdb.org/t/p/w500${item.file_path}`,
-                    }}
-                    style={styles.modalImage}
-                  />
-                </View>
-              </DisplayModal>
-            )}
-          </View>
-        ))}
-      </ScrollView>
+  return (
+    <View style={styles.container}>
+      <SectionHeading title="Backdrop Images" />
+
+      <FlatList
+        data={data}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.file_path}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+      />
     </View>
   );
 };
 
-export default BackdropImagesContainer;
+export default memo(BackdropImagesContainer);
 
 const styles = StyleSheet.create({
   container: {

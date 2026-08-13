@@ -25,7 +25,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+import { FlatList } from "react-native-gesture-handler";
 import { Colors } from "../theme";
 import { Movie, MoviesCardType, RecommendationCardType } from "../types";
 import { getImage } from "../utils/getImage";
@@ -40,9 +40,7 @@ export default function MoviesDetailsContainer({
   typeOfList: string;
 }) {
   const { data, isLoading } = useGetMovieDetail(id, typeOfList);
-
   const { mutateAsync } = useAddFavorite();
-
   const { data: favorites } = useGetFavoriteMovies();
   const { data: favoritesTv } = useGetFavoriteTvShows();
 
@@ -55,32 +53,32 @@ export default function MoviesDetailsContainer({
     return list.some((item: Movie) => item.id === id);
   }, [favorites, favoritesTv, id, typeOfList]);
 
- const handleFavorite = async () => {
-   try {
-     await mutateAsync({
-       media_id: id,
-       media_type: typeOfList,
-       favorite: !isFavorite,
-     });
+  const handleFavorite = async () => {
+    try {
+      await mutateAsync({
+        media_id: id,
+        media_type: typeOfList,
+        favorite: !isFavorite,
+      });
 
-     const title = data?.title || data?.name;
+      const title = data?.title || data?.name;
 
-     const message = !isFavorite
-       ? `${title} added to favorites`
-       : `${title} removed from favorites`;
+      const message = !isFavorite
+        ? `${title} added to favorites`
+        : `${title} removed from favorites`;
 
-     Alert.alert(message, "Do you want to see your favorites?", [
-       {
-         text: "Go to favorites",
-         onPress: () => router.replace("/favorites"),
-       },
-       { text: "OK", style: "cancel" },
-     ]);
-   } catch (error) {
-     Alert.alert("Error", "Something went wrong while updating favorites.");
-     console.log("Favorite error:", error);
-   }
- };
+      Alert.alert(message, "Do you want to see your favorites?", [
+        {
+          text: "Go to favorites",
+          onPress: () => router.replace("/favorites"),
+        },
+        { text: "OK", style: "cancel" },
+      ]);
+    } catch (error) {
+      Alert.alert("Error", "Something went wrong while updating favorites.");
+      console.log("Favorite error:", error);
+    }
+  };
 
   const similarMoviesPosters: MoviesCardType[] = useMemo(() => {
     return (
@@ -111,63 +109,76 @@ export default function MoviesDetailsContainer({
 
   return (
     <View style={styles.container}>
-      <ScrollView>
-        <Entypo
-          style={styles.backIcon}
-          name="home"
-          size={24}
-          color={Colors.primary}
-          onPress={() => router.push("/")}
-        />
+      <FlatList
+        data={[]}
+        renderItem={() => null}
+        keyExtractor={() => ""}
+        ListHeaderComponent={
+          <>
+            <Entypo
+              style={styles.backIcon}
+              name="home"
+              size={24}
+              color={Colors.primary}
+              onPress={() => router.push("/")}
+            />
 
-        <TouchableOpacity style={styles.favoriteIcon} onPress={handleFavorite}>
-          <MaterialIcons
-            name={isFavorite ? "favorite" : "favorite-border"}
-            size={26}
-            color={Colors.primary}
-          />
-        </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.favoriteIcon}
+              onPress={handleFavorite}
+            >
+              <MaterialIcons
+                name={isFavorite ? "favorite" : "favorite-border"}
+                size={26}
+                color={Colors.primary}
+              />
+            </TouchableOpacity>
 
-        <View style={styles.backdropImageContainer}>
-          <MovieTitleCard
-            movieTitle={data?.title || data?.name || ""}
-            movieGenre={data?.genres || []}
-            runTime={data?.runtime || 0}
-            movieTrailerId={movieTrailerId || ""}
-          />
+            <View style={styles.backdropImageContainer}>
+              <MovieTitleCard
+                movieTitle={data?.title || data?.name || ""}
+                movieGenre={data?.genres || []}
+                runTime={data?.runtime || 0}
+                movieTrailerId={movieTrailerId || ""}
+              />
 
-          <Image
-            style={styles.backdropImage}
-            source={
-              data?.backdrop_path
-                ? { uri: getImage(data.backdrop_path, "w780") }
-                : require("@/assets/images/placeholder.jpg")
-            }
-          />
+              <Image
+                style={styles.backdropImage}
+                source={
+                  data?.backdrop_path
+                    ? { uri: getImage(data.backdrop_path, "w780") }
+                    : require("@/assets/images/placeholder.jpg")
+                }
+              />
 
-          <View style={styles.blurContainer} />
-        </View>
+              <View style={styles.blurContainer} />
+            </View>
+          </>
+        }
+        ListFooterComponent={
+          <>
+            <View style={styles.contentContainer}>
+              <MovieOverview content={data?.overview || ""} />
 
-        <View style={styles.contentContainer}>
-          <MovieOverview content={data?.overview || ""} />
+              <CastContainer id={id} typeOfList={typeOfList} />
 
-          <CastContainer id={id} typeOfList={typeOfList} />
+              <RecommendationSection
+                sectionHeading="Recommendations"
+                moviePosters={recommendationMoviesPosters}
+                typeOfList={typeOfList}
+              />
 
-          <RecommendationSection
-            sectionHeading="Recommendations"
-            moviePosters={recommendationMoviesPosters}
-            typeOfList={typeOfList}
-          />
+              <MoviesListContainer
+                sectionHeading="Similar movies"
+                moviePosters={similarMoviesPosters}
+                typeOfList={typeOfList}
+              />
 
-          <MoviesListContainer
-            sectionHeading="Similar movies"
-            moviePosters={similarMoviesPosters}
-            typeOfList={typeOfList}
-          />
-
-          <BackdropImagesContainer data={data?.images?.backdrops || []} />
-        </View>
-      </ScrollView>
+              <BackdropImagesContainer data={data?.images?.backdrops || []} />
+            </View>
+          </>
+        }
+      />
     </View>
   );
 }
@@ -187,6 +198,7 @@ const styles = StyleSheet.create({
     height: height / 2,
     resizeMode: "cover",
   },
+
   blurContainer: {
     position: "absolute",
     top: 0,

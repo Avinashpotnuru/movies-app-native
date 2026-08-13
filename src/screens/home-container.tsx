@@ -10,7 +10,7 @@ import { Movie, MoviesCardType } from "@/src/types";
 import { lazy, Suspense, useMemo } from "react";
 import {
   ActivityIndicator,
-  ScrollView,
+  FlatList,
   StyleSheet,
   Text,
   View,
@@ -100,23 +100,34 @@ export default function HomeScreenContainer() {
 
   return (
     <View style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <SectionHeading title="Trending Movies" />
-        <Suspense
-          fallback={<ActivityIndicator color={Colors.primary} size={"large"} />}
-        >
-          <MoviesCarousel moviePosters={treadingMoviePosters} />
-        </Suspense>
-
-        {displayMoviesList.map((item, index) => (
-          <MoviesListContainer
-            key={index}
-            sectionHeading={item.title}
-            moviePosters={item.data}
-            typeOfList={item.typeOfList}
-          />
-        ))}
-      </ScrollView>
+      <FlatList
+        data={[]}
+        renderItem={() => null}
+        ListHeaderComponent={
+          <>
+            <SectionHeading title="Trending Movies" />
+            <Suspense
+              fallback={
+                <ActivityIndicator color={Colors.primary} size={"large"} />
+              }
+            >
+              <MoviesCarousel moviePosters={treadingMoviePosters} />
+            </Suspense>
+          </>
+        }
+        ListFooterComponent={
+          <>
+            {displayMoviesList.map((item, index) => (
+              <MoviesListContainer
+                key={index}
+                sectionHeading={item.title}
+                moviePosters={item.data}
+                typeOfList={item.typeOfList}
+              />
+            ))}
+          </>
+        }
+      />
     </View>
   );
 }

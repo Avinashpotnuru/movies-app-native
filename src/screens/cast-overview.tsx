@@ -69,7 +69,10 @@ const CastOverView = ({ castId }: { castId: number }) => {
             color={Colors.primary}
             onPress={() => router.back()}
           />
-          <Image source={imageSource} style={styles.profileImage} />
+          {/* <Image source={imageSource} style={styles.profileImage} /> */}
+          <View style={styles.profileImageWrapper}>
+            <Image source={imageSource} style={styles.profileImage} />
+          </View>
         </View>
         <View style={styles.textContainer}>
           <Text style={styles.title}>{data?.name}</Text>
@@ -115,19 +118,31 @@ const styles = StyleSheet.create({
     margin: "auto",
     backgroundColor: Colors.background,
   },
-  profileImage: {
+  profileImageWrapper: {
     width: 300,
     height: 300,
     borderRadius: 150,
 
+    borderWidth: 0,
+    borderColor: Colors.primary,
+
     shadowColor: Colors.primary,
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 12,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.58,
+    shadowRadius: 16.0,
+
+    elevation: 20,
+    overflow: "hidden",
+  },
+
+  profileImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 150,
+    resizeMode: "cover",
   },
   backIcon: {
     position: "absolute",
