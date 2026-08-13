@@ -1,9 +1,8 @@
 import React from "react";
-import { View } from "react-native";
+import { FlatList } from "react-native";
 import { RecommendationCardType } from "../types";
-import SectionHeading from "./section-heading";
-import MoviesListWrapper from "./movies-list-wrapper";
 import RecommendationCard from "./recommendation-card";
+import SectionHeading from "./section-heading";
 interface RecommendationProps {
   moviePosters: RecommendationCardType[];
   sectionHeading: string;
@@ -16,14 +15,16 @@ const RecommendationSection = ({
 }: RecommendationProps) => {
   if (!moviePosters.length) return null;
   return (
-    <View>
+    <>
       <SectionHeading title={sectionHeading} />
-      <MoviesListWrapper>
-        {moviePosters.map((item: RecommendationCardType, index: number) => (
-          <RecommendationCard key={index} moviesDetails={item} />
-        ))}
-      </MoviesListWrapper>
-    </View>
+      <FlatList
+        data={moviePosters}
+        keyExtractor={(item, index) => index.toString()}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        renderItem={({ item }) => <RecommendationCard moviesDetails={item} />}
+      />
+    </>
   );
 };
 

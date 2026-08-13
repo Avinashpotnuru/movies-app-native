@@ -1,17 +1,9 @@
 import { router } from "expo-router";
 import React, { memo, useMemo } from "react";
-import {
-  Dimensions,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-} from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { Colors } from "../theme";
 import { RecommendationCardType } from "../types";
 import { getImage } from "../utils/getImage";
-
-const { width } = Dimensions.get("window");
 
 const RecommendationCard = ({
   moviesDetails,
@@ -67,8 +59,8 @@ const styles = StyleSheet.create({
     textAlign: "left",
   },
   image: {
-    width: width - 90,
-    height: 170,
+    width: 180,
+    height: 110,
     overflow: "hidden",
     resizeMode: "cover",
   },

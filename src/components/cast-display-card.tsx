@@ -5,6 +5,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { MovieCastProps } from "../types";
 import { getImage } from "../utils/getImage";
 
+
 const CastDisplayCard = ({ cast }: { cast: MovieCastProps }) => {
   const { name, profile_path, gender, id } = cast;
   const [hasError, setHasError] = React.useState(false);

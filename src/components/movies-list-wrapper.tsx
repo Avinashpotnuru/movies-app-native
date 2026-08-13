@@ -1,11 +1,23 @@
 import React, { memo } from "react";
-import { ScrollView } from "react-native";
+import { FlatList, ListRenderItem } from "react-native";
 
-const MoviesListWrapper = ({ children }: { children: React.ReactNode }) => {
+interface MoviesListWrapperProps<T> {
+  data: T[];
+  renderItem: ListRenderItem<T>;
+}
+
+const MoviesListWrapper = <T,>({
+  data,
+  renderItem,
+}: MoviesListWrapperProps<T>) => {
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-      {children}
-    </ScrollView>
+    <FlatList
+      data={data}
+      renderItem={renderItem}
+      keyExtractor={(_, index) => index.toString()}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+    />
   );
 };
 

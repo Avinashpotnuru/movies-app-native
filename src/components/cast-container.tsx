@@ -2,13 +2,12 @@ import { useGetMovieCredits } from "@/src/hooks";
 import React, { memo } from "react";
 import {
   ActivityIndicator,
-  ScrollView,
+  FlatList,
   StyleSheet,
   Text,
   View,
 } from "react-native";
 import { Colors } from "../theme";
-import { MovieCastProps } from "../types";
 import CastDisplayCard from "./cast-display-card";
 import SectionHeading from "./section-heading";
 
@@ -21,30 +20,36 @@ const CastContainer = ({
 }) => {
   const { data, isLoading, error } = useGetMovieCredits(id, typeOfList);
 
-  if (isLoading)
-    return <ActivityIndicator size={"large"} color={Colors.primary} />;
+  if (isLoading) {
+    return <ActivityIndicator size="large" color={Colors.primary} />;
+  }
 
-  if (error)
+  if (error) {
     return (
       <Text style={styles.error}>
-        {" "}
         {error instanceof Error ? error.message : String(error)}
       </Text>
     );
+  }
 
   if (!data) return null;
+
+  const cast = Array.isArray(data.cast) ? data.cast : [];
 
   return (
     <View>
       <SectionHeading title="Cast" />
-      {Array.isArray(data?.cast) && data.cast.length === 0 ? (
+
+      {cast.length === 0 ? (
         <Text style={styles.noCast}>No cast available</Text>
       ) : (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {data?.cast?.map((cast: MovieCastProps, index: number) => (
-            <CastDisplayCard key={index} cast={cast} />
-          ))}
-        </ScrollView>
+        <FlatList
+          data={cast}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => <CastDisplayCard cast={item} />}
+        />
       )}
     </View>
   );

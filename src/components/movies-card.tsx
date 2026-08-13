@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import React from "react";
+import React , { memo } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { Colors } from "../theme";
 import { MoviesCardType } from "../types";
@@ -68,4 +68,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MoviesCard;
+export default memo(MoviesCard);
