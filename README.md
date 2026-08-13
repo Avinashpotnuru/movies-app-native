@@ -332,7 +332,7 @@ https://www.themoviedb.org/documentation/api
 
 Expo build Download apk file below link
 
-https://expo.dev/accounts/avinash343/projects/cinewave/builds/e64d23e3-0158-46bd-ada2-3ea795602d60
+https://expo.dev/accounts/avinash343/projects/cinewave/builds/8a190587-f958-4835-8d0c-14bea762d1dd
 
 ---
 
