@@ -5,7 +5,11 @@ import { Feather } from "@expo/vector-icons";
 import { updateProfile } from "firebase/auth";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
+  ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -40,10 +44,14 @@ export default function RegisterScreen() {
           displayName: name.trim(),
         });
 
-        Alert.alert("Registration Success", `Account created for ${name}`);
+        Alert.alert(
+          "Registration Success",
+          `Account created for ${name.trim()}`,
+        );
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = getFirebaseErrorMessage(error);
+
       Alert.alert("Registration Failed", message);
     } finally {
       setLoading(false);
@@ -51,108 +59,188 @@ export default function RegisterScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Create Account</Text>
-
-      <View
-        style={[
-          styles.inputContainer,
-          {
-            borderColor: focusedInput === "fullName" ? "#2563EB" : "#D1D5DB",
-          },
-        ]}
+    <KeyboardAvoidingView
+      style={styles.keyboardContainer}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <ImageBackground
+        source={require("@/assets/images/loginBg.png")}
+        style={styles.background}
+        resizeMode="cover"
       >
-        <Feather name="user" size={20} color="#6B7280" />
-        <TextInput
-          placeholder="Full Name"
-          placeholderTextColor="#9CA3AF"
-          style={styles.input}
-          onChangeText={setName}
-          onFocus={() => setFocusedInput("fullName")}
-          onBlur={() => setFocusedInput(null)}
-        />
-      </View>
+        {/* Dark overlay */}
+        <View style={styles.overlay}>
+          <View style={styles.card}>
+            <View
+              style={[
+                styles.inputContainer,
+                focusedInput === "fullName" && styles.focusedInput,
+              ]}
+            >
+              <Feather
+                name="user"
+                size={20}
+                color={focusedInput === "fullName" ? Colors.primary : "#9CA3AF"}
+              />
 
-      <View
-        style={[
-          styles.inputContainer,
-          {
-            borderColor: focusedInput === "email" ? "#2563EB" : "#D1D5DB",
-          },
-        ]}
-      >
-        <Feather name="mail" size={20} color="#6B7280" />
-        <TextInput
-          placeholder="Email Address"
-          placeholderTextColor="#9CA3AF"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          style={styles.input}
-          onChangeText={setEmail}
-          onFocus={() => setFocusedInput("email")}
-          onBlur={() => setFocusedInput(null)}
-        />
-      </View>
+              <TextInput
+                placeholder="Full Name"
+                placeholderTextColor="#9CA3AF"
+                style={styles.input}
+                value={name}
+                autoCapitalize="words"
+                autoCorrect={false}
+                onChangeText={setName}
+                onFocus={() => setFocusedInput("fullName")}
+                onBlur={() => setFocusedInput(null)}
+              />
+            </View>
 
-      <View
-        style={[
-          styles.inputContainer,
-          {
-            borderColor: focusedInput === "password" ? "#2563EB" : "#D1D5DB",
-          },
-        ]}
-      >
-        <Feather name="lock" size={20} color="#6B7280" />
-        <TextInput
-          placeholder="Password"
-          placeholderTextColor="#9CA3AF"
-          secureTextEntry
-          style={styles.input}
-          onChangeText={setPassword}
-          onFocus={() => setFocusedInput("password")}
-          onBlur={() => setFocusedInput(null)}
-        />
-      </View>
+            <View
+              style={[
+                styles.inputContainer,
+                focusedInput === "email" && styles.focusedInput,
+              ]}
+            >
+              <Feather
+                name="mail"
+                size={20}
+                color={focusedInput === "email" ? Colors.primary : "#9CA3AF"}
+              />
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleRegister}
-        disabled={loading}
-      >
-        <Text style={styles.buttonText}>
-          {loading ? "Creating Account..." : "Register"}
-        </Text>
-      </TouchableOpacity>
-    </View>
+              <TextInput
+                placeholder="Email Address"
+                placeholderTextColor="#9CA3AF"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                autoComplete="off"
+                importantForAutofill="no"
+                style={styles.input}
+                value={email}
+                onChangeText={setEmail}
+                onFocus={() => setFocusedInput("email")}
+                onBlur={() => setFocusedInput(null)}
+              />
+            </View>
+
+            <View
+              style={[
+                styles.inputContainer,
+                focusedInput === "password" && styles.focusedInput,
+              ]}
+            >
+              <Feather
+                name="lock"
+                size={20}
+                color={focusedInput === "password" ? Colors.primary : "#9CA3AF"}
+              />
+
+              <TextInput
+                placeholder="Password"
+                placeholderTextColor="#9CA3AF"
+                secureTextEntry
+                autoCapitalize="none"
+                autoCorrect={false}
+                autoComplete="off"
+                importantForAutofill="no"
+                style={styles.input}
+                value={password}
+                onChangeText={setPassword}
+                onFocus={() => setFocusedInput("password")}
+                onBlur={() => setFocusedInput(null)}
+              />
+            </View>
+
+            <TouchableOpacity
+              style={[styles.button, loading && styles.disabledButton]}
+              onPress={handleRegister}
+              disabled={loading}
+              activeOpacity={0.8}
+            >
+              {loading ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <Text style={styles.buttonText}>Register</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ImageBackground>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  keyboardContainer: {
+    flex: 1,
+  },
+
+  background: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+  },
+
+  overlay: {
     flex: 1,
     justifyContent: "center",
-    paddingHorizontal: 25,
-    backgroundColor: "#F9FAFB",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.35)",
+    paddingHorizontal: 20,
+  },
+
+  card: {
+    width: "100%",
+    maxWidth: 420,
+    backgroundColor: "rgba(0, 0, 0, 0.72)",
+    paddingHorizontal: 24,
+    paddingVertical: 30,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.15)",
+  },
+
+  appName: {
+    color: Colors.primary,
+    fontSize: 30,
+    fontWeight: "800",
+    textAlign: "center",
+    letterSpacing: 3,
+    marginBottom: 8,
   },
 
   title: {
-    fontSize: 30,
+    fontSize: 26,
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 40,
-    color: "#111827",
+    color: "#FFFFFF",
+    marginBottom: 8,
+  },
+
+  subtitle: {
+    fontSize: 14,
+    textAlign: "center",
+    color: "#D1D5DB",
+    marginBottom: 25,
   },
 
   inputContainer: {
+    width: "100%",
+    height: 52,
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
     borderColor: "#D1D5DB",
     borderRadius: 10,
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     marginBottom: 16,
-    height: 50,
+  },
+
+  focusedInput: {
+    borderColor: Colors.primary,
+    borderWidth: 2,
   },
 
   input: {
@@ -163,21 +251,31 @@ const styles = StyleSheet.create({
   },
 
   button: {
+    width: "100%",
+    height: 52,
     backgroundColor: Colors.primary,
-    height: 50,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 10,
-    marginTop: 10,
+    marginTop: 4,
+
     shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+
+  disabledButton: {
+    backgroundColor: "#6B7280",
   },
 
   buttonText: {
     color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 17,
+    fontWeight: "700",
   },
 });

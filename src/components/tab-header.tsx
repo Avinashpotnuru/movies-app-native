@@ -21,7 +21,7 @@ const TabHeader = () => {
         accessibilityLiveRegion="polite"
         accessibilityValue={{ min: 0, max: 1, now: 0 }}
         style={style.logo}
-        source={require("@/assets/images/cineWaveLogo.png")}
+        source={require("@/assets/images/icon.png")}
       />
       <Text style={style.userName}>
         Welcome <Text style={style.name}>{auth.currentUser?.displayName}</Text>
@@ -56,8 +56,8 @@ const style = StyleSheet.create({
     paddingHorizontal: 16,
   },
   logo: {
-    width: 30,
-    height: 30,
+    width: 35,
+    height: 35,
   },
   userName: {
     color: Colors.text,
