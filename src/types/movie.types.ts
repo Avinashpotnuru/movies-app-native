@@ -22,6 +22,10 @@ export type MoviesCardType = Pick<Movie, "id" | "title" | "poster_path"> & {
   style?: React.CSSProperties;
   typeOfList?: string;
   name?: string;
+  original_title?: string;
+  original_name?: string;
+  vote_average?: number;
+  release_date?: string;
 };
 
 export interface RecommendationCardType {

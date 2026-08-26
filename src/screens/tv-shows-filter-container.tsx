@@ -1,8 +1,10 @@
 import {
   CustomDropdown,
+  ErrorState,
   Loading,
   MoviesCard,
   NoDataFound,
+  SearchBar,
 } from "@/src/components";
 import React, { useMemo, useState } from "react";
 
@@ -21,7 +23,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -40,22 +41,36 @@ export default function TvShowFilterContainer() {
   const { data: languages } = useGetLanguages();
   const { data: genreData } = useGetGenres();
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useGetTvShowsInfinite({
-      language,
-      genre,
-      sort,
-    });
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    error,
+    refetch,
+  } = useGetTvShowsInfinite({
+    language,
+    genre,
+    sort,
+  });
 
-  const { data: searchData, isLoading: searchLoading } =
-    useSearchTvShows(searchQuery);
+  const {
+    data: searchData,
+    isLoading: searchLoading,
+    error: searchError,
+    refetch: refetchSearch,
+  } = useSearchTvShows(searchQuery);
+
+  const listError = searchQuery ? searchError : error;
+  const handleRetry = () => (searchQuery ? refetchSearch() : refetch());
 
   const tvShows: MoviesCardType[] = useMemo(() => {
     if (searchQuery) {
       return (
         searchData?.results?.map((tv: Movie) => ({
           id: tv.id,
-          title: tv.title,
+          title: tv.name || tv.title,
           poster_path: tv.poster_path,
         })) || []
       );
@@ -65,7 +80,7 @@ export default function TvShowFilterContainer() {
       data?.pages.flatMap((page) =>
         page.results.map((tv: Movie) => ({
           id: tv.id,
-          title: tv.title,
+          title: tv.name || tv.title,
           poster_path: tv.poster_path,
         })),
       ) || []
@@ -97,13 +112,10 @@ export default function TvShowFilterContainer() {
 
   return (
     <View style={styles.container}>
-      <TextInput
-        placeholder="Search Tv Shows..."
-        placeholderTextColor="#888"
+      <SearchBar
         value={searchQuery}
         onChangeText={setSearchQuery}
-        style={styles.searchInput}
-        autoCorrect={false}
+        placeholder="Search Tv Shows..."
       />
 
       <View style={styles.filterView}>
@@ -141,11 +153,19 @@ export default function TvShowFilterContainer() {
 
       {loadingState ? (
         <Loading />
+      ) : listError ? (
+        <ErrorState error={listError} onRetry={handleRetry} />
       ) : (
         <FlatList
           numColumns={3}
+        contentContainerStyle={{ paddingBottom: 24 }}
           data={tvShows}
           keyExtractor={(item) => item.id.toString()}
+          initialNumToRender={12}
+          maxToRenderPerBatch={12}
+          windowSize={5}
+          removeClippedSubviews
+          updateCellsBatchingPeriod={100}
           renderItem={({ item }) => (
             <MoviesCard moviesDetails={{ ...item, typeOfList: "tv" }} />
           )}
@@ -175,15 +195,6 @@ const styles = StyleSheet.create({
     borderColor: Colors.primary,
     borderWidth: 1,
     marginHorizontal: 12,
-  },
-  searchInput: {
-    backgroundColor: "#222",
-    padding: 10,
-    borderRadius: 8,
-    color: "#fff",
-    marginVertical: 12,
-    width: width - 50,
-    alignSelf: "center",
   },
   title: {
     color: Colors.primary,

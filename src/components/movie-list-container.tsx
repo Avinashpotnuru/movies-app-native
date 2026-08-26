@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import { MoviesCardType } from "../types";
 import MoviesCard from "./movies-card";
@@ -10,6 +10,26 @@ interface MoviesListContainerProps {
   sectionHeading: string;
   typeOfList?: string;
 }
+
+const ListCard = memo(function ListCard({
+  item,
+  typeOfList,
+}: {
+  item: MoviesCardType;
+  typeOfList?: string;
+}) {
+    const moviesDetails = useMemo(
+      () => ({
+        ...item,
+        title: item.title || (item.name as string),
+        enableTitle: true,
+        typeOfList: typeOfList || item.typeOfList,
+      }),
+      [item, typeOfList],
+    );
+
+    return <MoviesCard moviesDetails={moviesDetails} />;
+  });
 
 export default React.memo(function MoviesListContainer({
   moviePosters,
@@ -26,24 +46,9 @@ export default React.memo(function MoviesListContainer({
 
       <MoviesListWrapper
         data={moviePosters}
-        renderItem={({ item }) => {
-          const {
-            title,
-            name,
-            typeOfList: itemTypeOfList,
-            ...rest
-          } = item as MoviesCardType;
-          return (
-            <MoviesCard
-              moviesDetails={{
-                ...rest,
-                title: title || (name as string),
-                enableTitle: true,
-                typeOfList: typeOfList || itemTypeOfList,
-              }}
-            />
-          );
-        }}
+        renderItem={({ item }) => (
+          <ListCard item={item} typeOfList={typeOfList} />
+        )}
       />
     </View>
   );

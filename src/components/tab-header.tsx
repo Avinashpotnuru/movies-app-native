@@ -1,6 +1,5 @@
-import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import { auth } from "../config/firebase";
 import { Colors } from "../theme";
 
@@ -26,20 +25,6 @@ const TabHeader = () => {
       <Text style={style.userName}>
         Welcome <Text style={style.name}>{auth.currentUser?.displayName}</Text>
       </Text>
-
-      <TouchableOpacity>
-        <MaterialIcons
-          name="logout"
-          size={24}
-          color={"red"}
-          accessibilityLabel="Logout"
-          accessibilityHint="This button will log you out of the app"
-          accessibilityRole="button"
-          testID="logout"
-          accessibilityIgnoresInvertColors
-          onPress={() => auth.signOut()}
-        />
-      </TouchableOpacity>
     </View>
   );
 };

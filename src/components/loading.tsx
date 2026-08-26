@@ -1,33 +1,43 @@
-import React, { memo, useState } from "react";
-import { ActivityIndicator, Image, StyleSheet, View } from "react-native";
+import React, { memo, useEffect, useRef } from "react";
+import { Animated, StyleSheet, View } from "react-native";
 import { Colors } from "../theme";
 
-const LoadingImage = require("@/assets/images/loading.gif");
+const SIZE = 76;
+const STROKE = 6;
 
 const Loading = () => {
-  const [failed, setFailed] = useState(false);
-  const hasImage = !!LoadingImage && !failed;
+  const spin = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const animation = Animated.loop(
+      Animated.timing(spin, {
+        toValue: 1,
+        duration: 900,
+        useNativeDriver: true,
+      }),
+    );
+    animation.start();
+    return () => animation.stop();
+  }, [spin]);
+
+  const rotate = spin.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "360deg"],
+  });
 
   return (
     <View
       style={styles.container}
       accessible
-      accessibilityLabel={`Loading container`}
       accessibilityRole="summary"
+      accessibilityLabel="Loading"
     >
-      {hasImage ? (
-        <Image
-          style={styles.image}
-          source={LoadingImage}
-          resizeMode="contain"
-          accessible
-          accessibilityLabel={`Loading`}
-          accessibilityRole="image"
-          onError={() => setFailed(true)}
+      <View style={styles.spinner}>
+        <Animated.View
+          style={[styles.ring, { transform: [{ rotate }] }]}
         />
-      ) : (
-        <ActivityIndicator color={Colors.primary} size="large" />
-      )}
+        <View style={styles.triangle} />
+      </View>
     </View>
   );
 };
@@ -41,8 +51,29 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: Colors.background,
   },
-  image: {
-    width: 200,
-    height: 200,
+  spinner: {
+    width: SIZE,
+    height: SIZE,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  ring: {
+    position: "absolute",
+    width: SIZE,
+    height: SIZE,
+    borderRadius: SIZE / 2,
+    borderWidth: STROKE,
+    borderColor: "rgba(255,255,255,0.12)",
+    borderTopColor: Colors.primary,
+  },
+  triangle: {
+    width: 0,
+    height: 0,
+    borderTopWidth: 10,
+    borderTopColor: "transparent",
+    borderBottomWidth: 10,
+    borderBottomColor: "transparent",
+    borderLeftWidth: 16,
+    borderLeftColor: Colors.primary,
   },
 });

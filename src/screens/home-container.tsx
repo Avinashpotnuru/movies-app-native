@@ -1,4 +1,9 @@
-import { Loading, MoviesListContainer, SectionHeading } from "@/src/components";
+import {
+  ErrorState,
+  Loading,
+  MoviesListContainer,
+  SectionHeading,
+} from "@/src/components";
 import {
   usePopularMovies,
   useTrendingMovies,
@@ -10,15 +15,13 @@ import { Movie, MoviesCardType } from "@/src/types";
 import { lazy, Suspense, useMemo } from "react";
 import {
   ActivityIndicator,
-  FlatList,
+  ScrollView,
   StyleSheet,
-  Text,
-  View,
 } from "react-native";
 const MoviesCarousel = lazy(() => import("@/src/components/movies-carousel"));
 
 export default function HomeScreenContainer() {
-  const { data, isLoading, error } = useTrendingMovies();
+  const { data, isLoading, error, refetch } = useTrendingMovies();
 
   const { data: popularMoviesData } = usePopularMovies();
 
@@ -89,55 +92,42 @@ export default function HomeScreenContainer() {
     return <Loading />;
   }
   if (error) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.error}>
-          {error instanceof Error ? error.message : String(error)}
-        </Text>
-      </View>
-    );
+    return <ErrorState error={error} onRetry={() => refetch()} />;
   }
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={[]}
-        renderItem={() => null}
-        ListHeaderComponent={
-          <>
-            <SectionHeading title="Trending Movies" />
-            <Suspense
-              fallback={
-                <ActivityIndicator color={Colors.primary} size={"large"} />
-              }
-            >
-              <MoviesCarousel moviePosters={treadingMoviePosters} />
-            </Suspense>
-          </>
-        }
-        ListFooterComponent={
-          <>
-            {displayMoviesList.map((item, index) => (
-              <MoviesListContainer
-                key={index}
-                sectionHeading={item.title}
-                moviePosters={item.data}
-                typeOfList={item.typeOfList}
-              />
-            ))}
-          </>
-        }
-      />
-    </View>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      showsVerticalScrollIndicator={false}
+    >
+      <SectionHeading title="Trending Movies" />
+      <Suspense
+        fallback={<ActivityIndicator color={Colors.primary} size={"large"} />}
+      >
+        <MoviesCarousel moviePosters={treadingMoviePosters} />
+      </Suspense>
+
+      {displayMoviesList.map((item, index) => (
+        <MoviesListContainer
+          key={index}
+          sectionHeading={item.title}
+          moviePosters={item.data}
+          typeOfList={item.typeOfList}
+        />
+      ))}
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
     backgroundColor: Colors.background,
-    justifyContent: "center",
+  },
+  content: {
+    padding: 16,
+    paddingBottom: 32,
   },
   title: {
     color: Colors.text,
@@ -149,12 +139,6 @@ const styles = StyleSheet.create({
   },
   error: {
     color: Colors.error,
-  },
-  movieCard: {
-    flex: 1,
-    margin: 8,
-    alignItems: "center",
-    gap: 8,
   },
   movieImage: {
     width: 100,

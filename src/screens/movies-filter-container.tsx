@@ -1,8 +1,10 @@
 import {
   CustomDropdown,
+  ErrorState,
   Loading,
   MoviesCard,
   NoDataFound,
+  SearchBar,
 } from "@/src/components";
 import React, { useMemo, useState } from "react";
 
@@ -21,7 +23,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -40,15 +41,29 @@ export default function MoviesFilterContainer() {
   const { data: languages } = useGetLanguages();
   const { data: genreData } = useGetGenres();
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useGetMovies({
-      language,
-      genre,
-      sort,
-    });
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    error,
+    refetch,
+  } = useGetMovies({
+    language,
+    genre,
+    sort,
+  });
 
-  const { data: searchData, isLoading: searchLoading } =
-    useSearchMovies(searchQuery);
+  const {
+    data: searchData,
+    isLoading: searchLoading,
+    error: searchError,
+    refetch: refetchSearch,
+  } = useSearchMovies(searchQuery);
+
+  const listError = searchQuery ? searchError : error;
+  const handleRetry = () => (searchQuery ? refetchSearch() : refetch());
 
   const movies: MoviesCardType[] = useMemo(() => {
     if (searchQuery) {
@@ -109,13 +124,10 @@ export default function MoviesFilterContainer() {
 
   return (
     <View style={styles.container}>
-      <TextInput
-        placeholder="Search movies..."
-        placeholderTextColor="#888"
+      <SearchBar
         value={searchQuery}
         onChangeText={setSearchQuery}
-        style={styles.searchInput}
-        autoCorrect={false}
+        placeholder="Search movies..."
       />
 
       <View style={styles.filterView}>
@@ -153,12 +165,19 @@ export default function MoviesFilterContainer() {
 
       {loadingState ? (
         <Loading />
+      ) : listError ? (
+        <ErrorState error={listError} onRetry={handleRetry} />
       ) : (
         <FlatList
           numColumns={3}
-          contentContainerStyle={{ flexGrow: 1 }}
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
           data={movies}
           keyExtractor={(item) => item.id.toString()}
+          initialNumToRender={12}
+          maxToRenderPerBatch={12}
+          windowSize={5}
+          removeClippedSubviews
+          updateCellsBatchingPeriod={100}
           renderItem={({ item }) => (
             <MoviesCard moviesDetails={{ ...item, typeOfList: "movie" }} />
           )}
@@ -189,15 +208,6 @@ const styles = StyleSheet.create({
     borderColor: Colors.primary,
     borderWidth: 1,
     marginHorizontal: 12,
-  },
-  searchInput: {
-    backgroundColor: "#222",
-    padding: 10,
-    borderRadius: 8,
-    color: "#fff",
-    marginVertical: 12,
-    width: width - 50,
-    alignSelf: "center",
   },
   title: {
     color: Colors.primary,

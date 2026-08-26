@@ -20,4 +20,7 @@ export const ENDPOINTS = {
   ADD_TO_FAVORITES: `/account/${ACCOUNT_ID}/favorite`,
   GET_FAVORITES: `/account/${ACCOUNT_ID}/favorite/movies`,
   GET_FAVORITES_TV: `/account/${ACCOUNT_ID}/favorite/tv`,
+  GET_WATCHLIST: `/account/${ACCOUNT_ID}/watchlist/movies`,
+  GET_WATCHLIST_TV: `/account/${ACCOUNT_ID}/watchlist/tv`,
+  ADD_TO_WATCHLIST: `/account/${ACCOUNT_ID}/watchlist`,
 };

@@ -2,13 +2,14 @@ import React, { memo } from "react";
 import {
   Dimensions,
   FlatList,
-  Image,
   StyleSheet,
   TouchableOpacity,
   View,
 } from "react-native";
 import { MovieBackDropImage } from "../types";
 import DisplayModal from "./display-modal";
+import RemoteImage from "./remote-image";
+import { getImage } from "../utils/getImage";
 import SectionHeading from "./section-heading";
 
 const { width } = Dimensions.get("window");
@@ -25,6 +26,7 @@ const BackdropImagesContainer = ({ data }: { data: MovieBackDropImage[] }) => {
     item: MovieBackDropImage;
     index: number;
   }) => {
+    const uri = getImage(item.file_path, "w500");
     return (
       <View>
         <TouchableOpacity
@@ -32,10 +34,10 @@ const BackdropImagesContainer = ({ data }: { data: MovieBackDropImage[] }) => {
           accessibilityLabel={`Open backdrop image ${index + 1}`}
           onPress={() => setSelectedImage(item.file_path)}
         >
-          <Image
-            source={{
-              uri: `https://image.tmdb.org/t/p/w500${item.file_path}`,
-            }}
+          <RemoteImage
+            source={{ uri }}
+            placeholder={require("@/assets/images/placeholder.jpg")}
+            contentFit="cover"
             style={styles.image}
           />
         </TouchableOpacity>
@@ -50,10 +52,10 @@ const BackdropImagesContainer = ({ data }: { data: MovieBackDropImage[] }) => {
             modalHeight={250}
           >
             <View style={styles.imageContainer}>
-              <Image
-                source={{
-                  uri: `https://image.tmdb.org/t/p/w500${item.file_path}`,
-                }}
+              <RemoteImage
+                source={{ uri }}
+                placeholder={require("@/assets/images/placeholder.jpg")}
+                contentFit="cover"
                 style={styles.modalImage}
               />
             </View>
@@ -72,6 +74,10 @@ const BackdropImagesContainer = ({ data }: { data: MovieBackDropImage[] }) => {
         renderItem={renderItem}
         keyExtractor={(item) => item.file_path}
         horizontal
+        initialNumToRender={4}
+        maxToRenderPerBatch={4}
+        windowSize={5}
+        removeClippedSubviews
         showsHorizontalScrollIndicator={false}
       />
     </View>
