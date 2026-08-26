@@ -112,3 +112,23 @@ export const getFavorites = (params: Record<string, any> = {}) => {
 export const getFavoritesTv = (params: Record<string, any> = {}) => {
   return fetchData(ENDPOINTS.GET_FAVORITES_TV, params);
 };
+
+export const getWatchlist = (params: Record<string, any> = {}) => {
+  return fetchData(ENDPOINTS.GET_WATCHLIST, params);
+};
+
+export const getWatchlistTv = (params: Record<string, any> = {}) => {
+  return fetchData(ENDPOINTS.GET_WATCHLIST_TV, params);
+};
+
+type WatchlistPayload = {
+  media_id: number;
+  media_type: string;
+  watchlist: boolean;
+};
+
+export const sendToWatchlist = async (payload: WatchlistPayload) => {
+  const response = await api.post(ENDPOINTS.ADD_TO_WATCHLIST, payload);
+
+  return response.data;
+};

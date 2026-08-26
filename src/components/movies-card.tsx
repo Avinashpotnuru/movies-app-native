@@ -1,9 +1,13 @@
 import { router } from "expo-router";
-import React , { memo } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
+import React, { memo, useMemo } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Colors } from "../theme";
 import { MoviesCardType } from "../types";
 import { getImage } from "../utils/getImage";
+import RemoteImage from "./remote-image";
+
+const POSTER_WIDTH = 108;
+const POSTER_HEIGHT = 162;
 
 const MoviesCard = ({
   moviesDetails,
@@ -19,7 +23,7 @@ const MoviesCard = ({
     });
   };
 
-  const imageSource = React.useMemo(
+  const imageSource = useMemo(
     () =>
       moviesDetails?.poster_path
         ? { uri: getImage(moviesDetails.poster_path, "w342") }
@@ -27,45 +31,116 @@ const MoviesCard = ({
     [moviesDetails?.poster_path],
   );
 
-  const displayTitle = React.useMemo(() => {
-    const t = moviesDetails?.title;
-    if (!t) return "";
-    return t.length > 15 ? `${t.slice(0, 15)}...` : t;
-  }, [moviesDetails?.title]);
+  const displayTitle = useMemo(() => {
+    const raw =
+      moviesDetails?.title ||
+      moviesDetails?.name ||
+      moviesDetails?.original_title ||
+      moviesDetails?.original_name ||
+      "";
+    if (!raw) return "";
+    return raw.length > 20 ? `${raw.slice(0, 20).trimEnd()}…` : raw;
+  }, [
+    moviesDetails?.title,
+    moviesDetails?.name,
+    moviesDetails?.original_title,
+    moviesDetails?.original_name,
+  ]);
+
+  const rating = useMemo(() => {
+    const value = moviesDetails?.vote_average;
+    if (typeof value === "number" && value > 0) {
+      return value.toFixed(1);
+    }
+    return null;
+  }, [moviesDetails?.vote_average]);
+
+  const isDisabled = !moviesDetails?.id;
 
   return (
-    <TouchableOpacity
-      disabled={!moviesDetails?.id}
-      style={[styles.container, { opacity: moviesDetails?.id ? 1 : 0.5 }]}
-      onPress={() => handleNavigation(moviesDetails?.id || null)}
+    <Pressable
+      disabled={isDisabled}
+      onPress={() => handleNavigation(moviesDetails?.id ?? null)}
+      accessibilityRole="imagebutton"
+      accessibilityLabel={displayTitle || "Movie poster"}
+      style={({ pressed }) => [styles.container, pressed && styles.pressed]}
     >
-      <Image source={imageSource} style={styles.image} />
-      {moviesDetails?.enableTitle && moviesDetails?.title && (
-        <Text style={styles.title}>{displayTitle}</Text>
-      )}
-    </TouchableOpacity>
+      <View style={styles.posterWrap}>
+        <RemoteImage
+          source={imageSource}
+          placeholder={require("@/assets/images/placeholder.jpg")}
+          contentFit="cover"
+          style={styles.poster}
+        />
+
+        {rating ? (
+          <View
+            style={styles.ratingBadge}
+            accessibilityLabel={`Rating ${rating} out of 10`}
+          >
+            <Text style={styles.ratingText}>{rating}</Text>
+          </View>
+        ) : null}
+      </View>
+
+      {displayTitle ? (
+        <Text style={styles.title} numberOfLines={1}>
+          {displayTitle}
+        </Text>
+      ) : null}
+    </Pressable>
   );
 };
-const styles = StyleSheet.create({
-  container: {
-    overflow: "hidden",
-    alignItems: "center",
-    marginHorizontal: 8,
-    justifyContent: "center",
-    margin: 10,
-  },
-  title: {
-    marginTop: 10,
-    fontSize: 13,
-    color: Colors.sectionHeading,
-    textAlign: "center",
-  },
-  image: {
-    width: 110,
-    height: 150,
-    overflow: "hidden",
-    resizeMode: "cover",
-  },
-});
 
 export default memo(MoviesCard);
+
+const styles = StyleSheet.create({
+  container: {
+    margin: 8,
+    width: POSTER_WIDTH,
+  },
+  pressed: {
+    transform: [{ scale: 0.96 }],
+    opacity: 0.9,
+  },
+  posterWrap: {
+    width: POSTER_WIDTH,
+    height: POSTER_HEIGHT,
+    borderRadius: 14,
+    overflow: "hidden",
+    backgroundColor: Colors.card,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.06)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    elevation: 6,
+  },
+  poster: {
+    width: "100%",
+    height: "100%",
+  },
+  ratingBadge: {
+    position: "absolute",
+    bottom: 8,
+    right: 8,
+    backgroundColor: Colors.primary,
+    borderRadius: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  ratingText: {
+    color: Colors.background,
+    fontSize: 11,
+    fontWeight: "800",
+    fontVariant: ["tabular-nums"],
+  },
+  title: {
+    color: Colors.text,
+    fontSize: 13,
+    fontWeight: "600",
+    marginTop: 6,
+    paddingHorizontal: 2,
+  },
+});

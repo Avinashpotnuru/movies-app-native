@@ -1,10 +1,13 @@
 export { default as useAddFavorite } from "./useAddFavorite";
+export { default as useAddWatchlist } from "./useAddWatchlist";
 export { default as useAuthRedirect } from "./useAuthRedirect";
 export { default as useDebounce } from "./useDebounce";
 export { default as useDimensions } from "./useDimensions";
 export { default as useGetCastDetails } from "./useGetCastDetails";
 export { default as useGetFavoriteMovies } from "./useGetFavoriteMovies";
 export { default as useGetFavoriteTvShows } from "./useGetFavoriteTvShows";
+export { default as useGetWatchlistMovies } from "./useGetWatchlistMovies";
+export { default as useGetWatchlistTvShows } from "./useGetWatchlistTvShows";
 export { default as useGetGenres } from "./useGetGenres";
 export { default as useGetLanguages } from "./useGetLanguages";
 export { default as useGetMovieCredits } from "./useGetMovieCredits";

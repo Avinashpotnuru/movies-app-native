@@ -2,6 +2,7 @@ import {
   BiographySection,
   Loading,
   MoviesListContainer,
+  RemoteImage,
   SocialMediaSection,
 } from "@/src/components";
 import { useGetCastDetails } from "@/src/hooks";
@@ -10,7 +11,6 @@ import { router } from "expo-router";
 import React, { useMemo } from "react";
 import {
   Dimensions,
-  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -71,7 +71,12 @@ const CastOverView = ({ castId }: { castId: number }) => {
           />
           {/* <Image source={imageSource} style={styles.profileImage} /> */}
           <View style={styles.profileImageWrapper}>
-            <Image source={imageSource} style={styles.profileImage} />
+            <RemoteImage
+              source={imageSource}
+              placeholder={placeHolderImage}
+              contentFit="cover"
+              style={styles.profileImage}
+            />
           </View>
         </View>
         <View style={styles.textContainer}>

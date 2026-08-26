@@ -1,21 +1,28 @@
 import React, { memo } from "react";
 import { FlatList, ListRenderItem } from "react-native";
+import { MoviesCardType } from "../types";
 
-interface MoviesListWrapperProps<T> {
-  data: T[];
-  renderItem: ListRenderItem<T>;
+interface MoviesListWrapperProps {
+  data: MoviesCardType[];
+  renderItem: ListRenderItem<MoviesCardType>;
 }
 
-const MoviesListWrapper = <T,>({
+const MoviesListWrapper = ({
   data,
   renderItem,
-}: MoviesListWrapperProps<T>) => {
+}: MoviesListWrapperProps) => {
   return (
     <FlatList
       data={data}
       renderItem={renderItem}
-      keyExtractor={(_, index) => index.toString()}
+      keyExtractor={(item, index) =>
+        (item?.id ?? index).toString()
+      }
       horizontal
+      initialNumToRender={5}
+      maxToRenderPerBatch={5}
+      windowSize={5}
+      removeClippedSubviews
       showsHorizontalScrollIndicator={false}
     />
   );

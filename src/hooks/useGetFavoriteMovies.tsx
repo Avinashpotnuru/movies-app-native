@@ -1,13 +1,13 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { getFavorites } from "../api/movies.service";
 import { DEFAULT_QUERY_OPTIONS } from "../api/queryOptions";
 
-const useGetFavoriteMovies = (page?: number) => {
-  const currentPage = page ?? 1;
-
-  return useQuery({
-    queryKey: ["favorite-movies", currentPage],
-    queryFn: () => getFavorites({ page: currentPage }),
+const useGetFavoriteMovies = () => {
+  return useInfiniteQuery({
+    queryKey: ["favorite-movies"],
+    queryFn: ({ pageParam = 1 }) => getFavorites({ page: pageParam }),
+    getNextPageParam: (lastPage) =>
+      lastPage?.page < lastPage?.total_pages ? lastPage.page + 1 : undefined,
     ...DEFAULT_QUERY_OPTIONS,
   });
 };

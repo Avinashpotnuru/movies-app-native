@@ -1,9 +1,10 @@
 import { router } from "expo-router";
 import React, { memo, useMemo } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { Colors } from "../theme";
 import { RecommendationCardType } from "../types";
 import { getImage } from "../utils/getImage";
+import RemoteImage from "./remote-image";
 
 const RecommendationCard = ({
   moviesDetails,
@@ -36,7 +37,12 @@ const RecommendationCard = ({
       style={styles.container}
       onPress={() => handleNavigation(moviesDetails?.id || null)}
     >
-      <Image style={styles.image} source={imageSource} />
+      <RemoteImage
+        style={styles.image}
+        source={imageSource}
+        placeholder={require("@/assets/images/placeholder.jpg")}
+        contentFit="cover"
+      />
       <Text style={styles.title}>
         {moviesDetails?.original_title || moviesDetails?.original_name}
       </Text>

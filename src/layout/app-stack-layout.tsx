@@ -35,6 +35,14 @@ export default function AppStackLayout() {
             name="cast-details/[id]"
             options={{ headerShown: false }}
           />
+          <Stack.Screen
+            name="wishlist"
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="about"
+            options={{ headerShown: false }}
+          />
         </Stack>
       </SafeAreaView>
     </GestureHandlerRootView>

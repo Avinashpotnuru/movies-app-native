@@ -46,6 +46,10 @@ const CastContainer = ({
         <FlatList
           data={cast}
           horizontal
+          initialNumToRender={6}
+          maxToRenderPerBatch={6}
+          windowSize={5}
+          removeClippedSubviews
           showsHorizontalScrollIndicator={false}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => <CastDisplayCard cast={item} />}

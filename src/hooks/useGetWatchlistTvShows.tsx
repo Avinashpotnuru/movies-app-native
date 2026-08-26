@@ -1,15 +1,15 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { getFavoritesTv } from "../api/movies.service";
+import { getWatchlistTv } from "../api/movies.service";
 import { DEFAULT_QUERY_OPTIONS } from "../api/queryOptions";
 
-const useGetFavoriteTvShows = () => {
+const useGetWatchlistTvShows = () => {
   return useInfiniteQuery({
-    queryKey: ["favorite-tv-shows"],
-    queryFn: ({ pageParam = 1 }) => getFavoritesTv({ page: pageParam }),
+    queryKey: ["watchlist-tv"],
+    queryFn: ({ pageParam = 1 }) => getWatchlistTv({ page: pageParam }),
     getNextPageParam: (lastPage) =>
       lastPage?.page < lastPage?.total_pages ? lastPage.page + 1 : undefined,
     ...DEFAULT_QUERY_OPTIONS,
   });
 };
 
-export default useGetFavoriteTvShows;
+export default useGetWatchlistTvShows;

@@ -5,13 +5,23 @@ import {
   NoDataFound,
   TabsContainer,
 } from "@/src/components";
-import { useGetFavoriteMovies, useGetFavoriteTvShows } from "@/src/hooks";
+import { useGetWatchlistMovies, useGetWatchlistTvShows } from "@/src/hooks";
+import { Colors } from "@/src/theme/colors";
+import { router } from "expo-router";
 import React, { memo, useMemo, useState } from "react";
-import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, View } from "react-native";
-import { Colors } from "../theme";
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { MoviesCardType } from "../types";
 
-const FavoriteCard = memo(function FavoriteCard({
+const WishlistCard = memo(function WishlistCard({
   item,
   typeOfList,
 }: {
@@ -26,11 +36,11 @@ const FavoriteCard = memo(function FavoriteCard({
   return <MoviesCard moviesDetails={moviesDetails} />;
 });
 
-const FavoritesContainer = () => {
+const WishlistContainer = () => {
   const [selectType, setSelectType] = useState<"movie" | "tv">("movie");
 
-  const moviesQuery = useGetFavoriteMovies();
-  const tvQuery = useGetFavoriteTvShows();
+  const moviesQuery = useGetWatchlistMovies();
+  const tvQuery = useGetWatchlistTvShows();
 
   const isMovie = selectType === "movie";
   const query = isMovie ? moviesQuery : tvQuery;
@@ -60,11 +70,23 @@ const FavoritesContainer = () => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+        >
+          <Ionicons name="arrow-back" size={24} color={Colors.text} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Wishlist</Text>
+      </View>
+
       <TabsContainer selected={selectType} onChange={setSelectType} />
 
       <FlatList
         numColumns={3}
-          contentContainerStyle={{ padding: 8, paddingBottom: 24 }}
+        contentContainerStyle={{ padding: 8, paddingBottom: 24 }}
         data={items}
         keyExtractor={(item) => item.id.toString()}
         initialNumToRender={12}
@@ -73,7 +95,7 @@ const FavoritesContainer = () => {
         removeClippedSubviews
         updateCellsBatchingPeriod={100}
         renderItem={({ item }) => (
-          <FavoriteCard item={item} typeOfList={selectType} />
+          <WishlistCard item={item} typeOfList={selectType} />
         )}
         ListEmptyComponent={<NoDataFound />}
         ListFooterComponent={
@@ -96,11 +118,27 @@ const FavoritesContainer = () => {
   );
 };
 
-export default FavoritesContainer;
+export default WishlistContainer;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingTop: 16,
+    paddingBottom: 12,
+    paddingHorizontal: 16,
+  },
+  backBtn: {
+    marginRight: 12,
+    padding: 4,
+  },
+  headerTitle: {
+    color: Colors.text,
+    fontSize: 22,
+    fontWeight: "800",
   },
 });

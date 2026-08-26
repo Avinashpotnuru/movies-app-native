@@ -17,49 +17,38 @@ const TabButton = memo(function TabButton({
 }: {
   label: string;
   value: TabType;
-  selected: TabType;
+  selected: boolean;
   onPress: (value: TabType) => void;
 }) {
-  const isActive = selected === value;
-  const handlePress = useCallback(() => {
-    if (!isActive) onPress(value);
-  }, [isActive, onPress, value]);
+  const handlePress = useCallback(() => onPress(value), [onPress, value]);
 
   return (
     <Pressable
-      style={[styles.tab, isActive && styles.activeTab]}
+      style={[styles.tab, selected && styles.activeTab]}
       onPress={handlePress}
       android_ripple={{ color: Colors.primary, borderless: false }}
       accessibilityRole="tab"
-      accessibilityState={{ selected: isActive }}
+      accessibilityState={{ selected }}
     >
-      <Text style={[styles.text, isActive && styles.activeText]}>{label}</Text>
+      <Text style={[styles.text, selected && styles.activeText]}>{label}</Text>
     </Pressable>
   );
 });
 
 export default function TabsContainer({ selected, onChange }: TabsProps) {
-  const onPressMovie = useCallback(() => {
-    if (selected !== `movie`) onChange(`movie`);
-  }, [selected, onChange]);
-
-  const onPressTv = useCallback(() => {
-    if (selected !== `tv`) onChange(`tv`);
-  }, [selected, onChange]);
-
   return (
     <View style={styles.container}>
       <TabButton
-        label={`Movies`}
-        value={`movie`}
-        selected={selected}
-        onPress={() => onPressMovie()}
+        label="Movies"
+        value="movie"
+        selected={selected === "movie"}
+        onPress={onChange}
       />
       <TabButton
-        label={`TV Shows`}
-        value={`tv`}
-        selected={selected}
-        onPress={() => onPressTv()}
+        label="TV Shows"
+        value="tv"
+        selected={selected === "tv"}
+        onPress={onChange}
       />
     </View>
   );
@@ -68,30 +57,29 @@ export default function TabsContainer({ selected, onChange }: TabsProps) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    backgroundColor: "#1e1e1e",
+    backgroundColor: Colors.background,
     borderRadius: 25,
     margin: 16,
     padding: 4,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
   },
-
   tab: {
     flex: 1,
-    paddingVertical: 8,
+    paddingVertical: 10,
     alignItems: "center",
-    borderRadius: 15,
-    color: Colors.secondaryText,
+    borderRadius: 21,
   },
-
   activeTab: {
     backgroundColor: Colors.primary,
   },
-
   text: {
-    color: "#aaa",
+    color: Colors.secondaryText,
     fontWeight: "600",
+    fontSize: 14,
   },
-
   activeText: {
-    color: "#180404",
+    color: Colors.background,
+    fontWeight: "800",
   },
 });
