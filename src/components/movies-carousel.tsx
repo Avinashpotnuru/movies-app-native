@@ -29,7 +29,7 @@ const MoviesCarousel = ({ moviePosters }: MoviesCarouselProps) => {
   const handleNavigation = useCallback((id?: number) => {
     if (!id) return;
     router.push({
-      pathname: "/movie-details/[id]",
+      pathname: "/media-details/[id]",
       params: { id, typeOfList: "movie" },
     });
   }, []);

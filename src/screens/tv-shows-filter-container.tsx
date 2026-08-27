@@ -97,7 +97,7 @@ export default function TvShowFilterContainer() {
   const genreOptions = useMemo(() => {
     return genreData?.genres?.map((genre: { id: number; name: string }) => ({
       label: genre.name,
-      value: genre.id,
+      value: String(genre.id),
     }));
   }, [genreData]);
 
@@ -143,7 +143,7 @@ export default function TvShowFilterContainer() {
             />
 
             <TouchableOpacity style={styles.clearButton} onPress={clearFilters}>
-              <AntDesign name="clear" size={20} color={Colors.primary} />
+              <AntDesign name="clear" size={18} color={Colors.primary} />
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -189,12 +189,15 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   clearButton: {
-    backgroundColor: "#222222",
-    padding: 14,
-    borderRadius: 8,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "#1a1a1a",
     borderColor: Colors.primary,
     borderWidth: 1,
-    marginHorizontal: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 10,
   },
   title: {
     color: Colors.primary,

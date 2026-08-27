@@ -27,7 +27,7 @@ const RecommendationCard = ({
         moviesDetails?.media_type === "movie"
           ? { id, typeOfList: "movie" }
           : { id, typeOfList: "tv" };
-      router.replace({ pathname: "/movie-details/[id]", params });
+      router.replace({ pathname: "/media-details/[id]", params });
     },
     [moviesDetails],
   );

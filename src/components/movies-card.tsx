@@ -18,7 +18,7 @@ const MoviesCard = ({
     if (!id) return;
     const listType = moviesDetails?.typeOfList === "movie" ? "movie" : "tv";
     router.push({
-      pathname: "/movie-details/[id]",
+      pathname: "/media-details/[id]",
       params: { id, typeOfList: listType },
     });
   };
