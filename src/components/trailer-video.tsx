@@ -84,6 +84,7 @@ import {
   Dimensions,
   Platform,
   StyleSheet,
+  Text,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -94,7 +95,15 @@ import DisplayModal from "./display-modal";
 const { width } = Dimensions.get("window");
 const videoHeight = Math.round((width * 0.9 * 9) / 16);
 
-const TrailerVideo = ({ movieTrailerId }: { movieTrailerId: string }) => {
+const TrailerVideo = ({
+  movieTrailerId,
+  variant = "icon",
+  label = "Watch Trailer",
+}: {
+  movieTrailerId: string;
+  variant?: "icon" | "button";
+  label?: string;
+}) => {
   const [isVisible, setIsVisible] = useState(false);
   const playerRef = useRef<YoutubeIframeRef | null>(null);
 
@@ -107,8 +116,19 @@ const TrailerVideo = ({ movieTrailerId }: { movieTrailerId: string }) => {
     setIsVisible(false);
   };
 
-  return (
-    <View>
+  const trigger =
+    variant === "button" ? (
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => setIsVisible(true)}
+        accessibilityRole="button"
+        accessibilityLabel={label}
+        activeOpacity={0.85}
+      >
+        <AntDesign name="play-circle" size={22} color={Colors.background} />
+        <Text style={styles.buttonText}>{label}</Text>
+      </TouchableOpacity>
+    ) : (
       <TouchableOpacity
         onPress={() => setIsVisible(true)}
         accessibilityRole="button"
@@ -117,6 +137,11 @@ const TrailerVideo = ({ movieTrailerId }: { movieTrailerId: string }) => {
       >
         <AntDesign name="play-circle" size={40} color={Colors.primary} />
       </TouchableOpacity>
+    );
+
+  return (
+    <View>
+      {trigger}
 
       <DisplayModal
         modalWidth={width - 15}
@@ -162,5 +187,20 @@ const styles = StyleSheet.create({
   videoPlayer: {
     justifyContent: "center",
     alignItems: "center",
+  },
+  button: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: Colors.primary,
+    borderRadius: 12,
+    paddingVertical: 12,
+  },
+  buttonText: {
+    color: Colors.background,
+    fontSize: 15,
+    fontWeight: "700",
+    marginLeft: 8,
   },
 });

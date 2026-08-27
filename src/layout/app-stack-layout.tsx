@@ -28,7 +28,7 @@ export default function AppStackLayout() {
           <Stack.Screen name="register" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ title: "" }} />
           <Stack.Screen
-            name="movie-details/[id]"
+            name="media-details/[id]"
             options={{ headerShown: false }}
           />
           <Stack.Screen
