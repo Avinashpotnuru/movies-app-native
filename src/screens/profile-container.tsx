@@ -1,20 +1,36 @@
 import AppAlert, { AlertAction } from "@/src/components/app-alert";
 import AuthInput from "@/src/components/auth-input";
 import RemoteImage from "@/src/components/remote-image";
+import useGetFavoriteMovies from "@/src/hooks/useGetFavoriteMovies";
+import useGetFavoriteTvShows from "@/src/hooks/useGetFavoriteTvShows";
+import useGetWatchlistMovies from "@/src/hooks/useGetWatchlistMovies";
+import useGetWatchlistTvShows from "@/src/hooks/useGetWatchlistTvShows";
 import { auth } from "@/src/config/firebase";
 import { Colors } from "@/src/theme/colors";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { updateProfile } from "firebase/auth";
 import { router } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  Linking,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
+
+const PORTFOLIO_URL = "https://avinashpotnuruportfolio.netlify.app/";
+
+const openPortfolio = async () => {
+  try {
+    const supported = await Linking.canOpenURL(PORTFOLIO_URL);
+    if (supported) await Linking.openURL(PORTFOLIO_URL);
+  } catch (e) {
+    console.error("Failed to open portfolio:", e);
+  }
+};
 
 const getInitialName = () =>
   auth.currentUser?.displayName ||
@@ -34,6 +50,18 @@ const ProfileContainer = () => {
 
   const user = auth.currentUser;
   const email = user?.email ?? "";
+
+  const favoriteMovies = useGetFavoriteMovies();
+  const favoriteTvShows = useGetFavoriteTvShows();
+  const watchlistMovies = useGetWatchlistMovies();
+  const watchlistTvShows = useGetWatchlistTvShows();
+
+  const favoritesCount =
+    (favoriteMovies.data?.pages[0]?.total_results ?? 0) +
+    (favoriteTvShows.data?.pages[0]?.total_results ?? 0);
+  const watchlistCount =
+    (watchlistMovies.data?.pages[0]?.total_results ?? 0) +
+    (watchlistTvShows.data?.pages[0]?.total_results ?? 0);
 
   const initials = useMemo(() => {
     const source = name === "CineWave User" && email ? email : name;
@@ -160,6 +188,30 @@ const ProfileContainer = () => {
         )}
       </View>
 
+      <View style={styles.statsRow}>
+        <Pressable
+          style={styles.statCard}
+          onPress={openFavorites}
+          accessibilityRole="button"
+          accessibilityLabel={`${favoritesCount} favorites`}
+        >
+          <Ionicons name="heart" size={18} color={Colors.primary} />
+          <Text style={styles.statValue}>{favoritesCount}</Text>
+          <Text style={styles.statLabel}>Favorites</Text>
+        </Pressable>
+
+        <Pressable
+          style={styles.statCard}
+          onPress={() => router.push("/wishlist")}
+          accessibilityRole="button"
+          accessibilityLabel={`${watchlistCount} watchlist items`}
+        >
+          <Ionicons name="bookmark" size={18} color={Colors.primary} />
+          <Text style={styles.statValue}>{watchlistCount}</Text>
+          <Text style={styles.statLabel}>Watchlist</Text>
+        </Pressable>
+      </View>
+
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Account</Text>
 
@@ -210,6 +262,25 @@ const ProfileContainer = () => {
             size={18}
             color={Colors.secondaryText}
           />
+        </Pressable>
+
+        <Pressable
+          style={styles.row}
+          onPress={openPortfolio}
+          accessibilityRole="link"
+          accessibilityLabel="Open Avinash Potnuru's portfolio"
+        >
+          <Ionicons
+            name="code-slash"
+            size={20}
+            color={Colors.primary}
+            style={styles.rowIcon}
+          />
+          <View style={styles.rowStack}>
+            <Text style={styles.rowLabel}>Created by Avinash Potnuru</Text>
+            <Text style={styles.rowSubtext}>View portfolio</Text>
+          </View>
+          <Ionicons name="open-outline" size={18} color={Colors.accent} />
         </Pressable>
       </View>
 
@@ -344,6 +415,35 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "800",
   },
+  statsRow: {
+    flexDirection: "row",
+    gap: 12,
+    marginBottom: 24,
+  },
+  statCard: {
+    flex: 1,
+    alignItems: "center",
+    backgroundColor: Colors.card,
+    borderRadius: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
+  },
+  statValue: {
+    color: Colors.text,
+    fontSize: 22,
+    fontWeight: "800",
+    marginTop: 6,
+    fontVariant: ["tabular-nums"],
+  },
+  statLabel: {
+    color: Colors.secondaryText,
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 0.3,
+    marginTop: 2,
+  },
   section: {
     marginBottom: 20,
   },
@@ -375,6 +475,14 @@ const styles = StyleSheet.create({
     color: Colors.text,
     fontSize: 15,
     fontWeight: "600",
+  },
+  rowStack: {
+    flex: 1,
+  },
+  rowSubtext: {
+    color: Colors.secondaryText,
+    fontSize: 12,
+    marginTop: 2,
   },
   logout: {
     flexDirection: "row",

@@ -1,12 +1,26 @@
-import RemoteImage from "@/src/components/remote-image";
-import { Colors } from "@/src/theme/colors";
-import { useTrendingMovies } from "@/src/hooks";
 import { router } from "expo-router";
 import React from "react";
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { getImage } from "../utils/getImage";
-import { Movie } from "../types";
+import {
+  Linking,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { Colors } from "@/src/theme/colors";
+
+const PORTFOLIO_URL = "https://avinashpotnuruportfolio.netlify.app/";
+
+const openPortfolio = async () => {
+  try {
+    const supported = await Linking.canOpenURL(PORTFOLIO_URL);
+    if (supported) await Linking.openURL(PORTFOLIO_URL);
+  } catch (e) {
+    console.error("Failed to open portfolio:", e);
+  }
+};
 
 const AboutContainer = () => {
   const features = [
@@ -14,21 +28,11 @@ const AboutContainer = () => {
     { icon: "heart-outline", label: "Save favorites and a wishlist" },
     { icon: "search-outline", label: "Search the entire TMDB catalog" },
     { icon: "star-outline", label: "Ratings, cast and recommendations" },
+    { icon: "play-circle-outline", label: "Watch trailers right in the app" },
+    { icon: "people-circle-outline", label: "Actor profiles, photos & filmography" },
+    { icon: "options-outline", label: "Filter movies & shows by genre" },
+    { icon: "time-outline", label: "Now Playing, Top Rated & Popular picks" },
   ];
-
-  const { data: trending } = useTrendingMovies();
-  const gallery = React.useMemo(
-    () =>
-      ((trending?.results ?? []) as Movie[])
-        .filter((item: Movie) => item.backdrop_path)
-        .slice(0, 10)
-        .map((item: Movie) => ({
-          id: item.id,
-          title: item.title || item.name || "",
-          uri: getImage(item.backdrop_path as string, "w780"),
-        })),
-    [trending],
-  );
 
   return (
     <ScrollView
@@ -75,27 +79,33 @@ const AboutContainer = () => {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Gallery</Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.gallery}
+        <Text style={styles.sectionTitle}>Created by</Text>
+        <View style={styles.creatorCard}>
+          <View style={styles.creatorAvatar}>
+            <Text style={styles.creatorInitials}>AP</Text>
+          </View>
+          <View style={styles.creatorInfo}>
+            <Text style={styles.creatorName}>Avinash Potnuru</Text>
+            <Text style={styles.creatorRole}>Developer of CineWave</Text>
+          </View>
+        </View>
+        <TouchableOpacity
+          style={styles.portfolioRow}
+          onPress={openPortfolio}
+          accessibilityRole="link"
+          accessibilityLabel="Open Avinash Potnuru's portfolio"
         >
-          {gallery.map((item) => (
-            <View key={item.id} style={styles.galleryItem}>
-              <RemoteImage
-                source={{ uri: item.uri }}
-                placeholder={require("@/assets/images/placeholder.jpg")}
-                contentFit="cover"
-                style={styles.galleryImage}
-              />
-              <View style={styles.galleryScrim} />
-              <Text style={styles.galleryTitle} numberOfLines={1}>
-                {item.title}
-              </Text>
-            </View>
-          ))}
-        </ScrollView>
+          <Ionicons
+            name="globe-outline"
+            size={20}
+            color={Colors.primary}
+            style={styles.portfolioIcon}
+          />
+          <View style={styles.portfolioInfo}>
+            <Text style={styles.portfolioLabel}>Portfolio</Text>
+          </View>
+          <Ionicons name="open-outline" size={16} color={Colors.accent} />
+        </TouchableOpacity>
       </View>
 
       <View style={styles.footer}>
@@ -204,37 +214,66 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "600",
   },
-  gallery: {
-    paddingHorizontal: 4,
-  },
-  galleryItem: {
-    width: 240,
-    height: 140,
-    borderRadius: 12,
-    marginRight: 12,
-    overflow: "hidden",
+  creatorCard: {
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: Colors.card,
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.06)",
   },
-  galleryImage: {
-    width: 240,
-    height: 140,
-  },
-  galleryScrim: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
+  creatorAvatar: {
+    width: 48,
     height: 48,
-    backgroundColor: "rgba(0,0,0,0.55)",
+    borderRadius: 24,
+    borderWidth: 2,
+    borderColor: Colors.primary,
+    backgroundColor: "rgba(215,237,47,0.15)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
   },
-  galleryTitle: {
-    position: "absolute",
-    left: 12,
-    right: 12,
-    bottom: 10,
+  creatorInitials: {
+    color: Colors.primary,
+    fontSize: 16,
+    fontWeight: "800",
+  },
+  creatorInfo: {
+    flex: 1,
+  },
+  creatorName: {
     color: Colors.text,
+    fontSize: 16,
+    fontWeight: "800",
+  },
+  creatorRole: {
+    color: Colors.secondaryText,
     fontSize: 13,
-    fontWeight: "700",
+    marginTop: 2,
+  },
+  portfolioRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: Colors.card,
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.06)",
+  },
+  portfolioIcon: {
+    marginRight: 12,
+  },
+  portfolioInfo: {
+    flex: 1,
+  },
+  portfolioLabel: {
+    color: Colors.text,
+    fontSize: 15,
+    fontWeight: "600",
   },
   footer: {
     marginTop: 8,

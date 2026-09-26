@@ -5,6 +5,7 @@ export const ENDPOINTS = {
   TV_SHOWS: "/discover/tv",
   TRENDING: "/trending/movie/day",
   POPULAR: "/movie/popular",
+  TOP_RATED: "/movie/top_rated",
   SEARCH: "/search/movie",
   ON_PLAYING: "/movie/now_playing",
   UP_COMING: "/movie/upcoming",

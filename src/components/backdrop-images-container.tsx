@@ -1,9 +1,9 @@
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 import {
-  Dimensions,
   FlatList,
   StyleSheet,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { MovieBackDropImage } from "../types";
@@ -12,58 +12,68 @@ import RemoteImage from "./remote-image";
 import { getImage } from "../utils/getImage";
 import SectionHeading from "./section-heading";
 
-const { width } = Dimensions.get("window");
+const ITEM_WIDTH = 200;
 
 const BackdropImagesContainer = ({ data }: { data: MovieBackDropImage[] }) => {
   const [selectedImage, setSelectedImage] = React.useState<string | null>(null);
+  const { width } = useWindowDimensions();
+
+  const renderItem = useCallback(
+    ({
+      item,
+      index,
+    }: {
+      item: MovieBackDropImage;
+      index: number;
+    }) => {
+      const uri = getImage(item.file_path, "w500");
+      return (
+        <View>
+          <TouchableOpacity
+            accessibilityRole="imagebutton"
+            accessibilityLabel={`Open backdrop image ${index + 1}`}
+            onPress={() => setSelectedImage(item.file_path)}
+          >
+            <RemoteImage
+              source={{ uri }}
+              placeholder={require("@/assets/images/placeholder.jpg")}
+              contentFit="cover"
+              recyclingKey={item.file_path}
+              style={styles.image}
+            />
+          </TouchableOpacity>
+
+          {selectedImage === item.file_path && (
+            <DisplayModal
+              visible={selectedImage !== null}
+              onClose={() => setSelectedImage(null)}
+              onRequestClose={() => setSelectedImage(null)}
+              animationType="slide"
+              modalWidth={width}
+              modalHeight={250}
+            >
+              <View style={styles.imageContainer}>
+                <RemoteImage
+                  source={{ uri }}
+                  placeholder={require("@/assets/images/placeholder.jpg")}
+                  contentFit="cover"
+                  style={[styles.modalImage, { width: width - 10 }]}
+                />
+              </View>
+            </DisplayModal>
+          )}
+        </View>
+      );
+    },
+    [selectedImage, width],
+  );
+
+  const keyExtractor = useCallback(
+    (item: MovieBackDropImage) => item.file_path,
+    [],
+  );
 
   if (!data.length) return null;
-
-  const renderItem = ({
-    item,
-    index,
-  }: {
-    item: MovieBackDropImage;
-    index: number;
-  }) => {
-    const uri = getImage(item.file_path, "w500");
-    return (
-      <View>
-        <TouchableOpacity
-          accessibilityRole="imagebutton"
-          accessibilityLabel={`Open backdrop image ${index + 1}`}
-          onPress={() => setSelectedImage(item.file_path)}
-        >
-          <RemoteImage
-            source={{ uri }}
-            placeholder={require("@/assets/images/placeholder.jpg")}
-            contentFit="cover"
-            style={styles.image}
-          />
-        </TouchableOpacity>
-
-        {selectedImage === item.file_path && (
-          <DisplayModal
-            visible={selectedImage !== null}
-            onClose={() => setSelectedImage(null)}
-            onRequestClose={() => setSelectedImage(null)}
-            animationType="slide"
-            modalWidth={width}
-            modalHeight={250}
-          >
-            <View style={styles.imageContainer}>
-              <RemoteImage
-                source={{ uri }}
-                placeholder={require("@/assets/images/placeholder.jpg")}
-                contentFit="cover"
-                style={styles.modalImage}
-              />
-            </View>
-          </DisplayModal>
-        )}
-      </View>
-    );
-  };
 
   return (
     <View style={styles.container}>
@@ -72,8 +82,13 @@ const BackdropImagesContainer = ({ data }: { data: MovieBackDropImage[] }) => {
       <FlatList
         data={data}
         renderItem={renderItem}
-        keyExtractor={(item) => item.file_path}
+        keyExtractor={keyExtractor}
         horizontal
+        getItemLayout={(_, index) => ({
+          length: ITEM_WIDTH,
+          offset: ITEM_WIDTH * index,
+          index,
+        })}
         initialNumToRender={4}
         maxToRenderPerBatch={4}
         windowSize={5}
@@ -103,7 +118,6 @@ const styles = StyleSheet.create({
   },
   modalImage: {
     margin: 30,
-    width: width - 10,
     height: 250,
     resizeMode: "cover",
   },

@@ -25,6 +25,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
 import {
+  Linking,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -32,10 +33,84 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import Feather from "@expo/vector-icons/Feather";
 import { Colors } from "../theme";
 import { Movie, MoviesCardType, RecommendationCardType } from "../types";
 import { getImage } from "../utils/getImage";
+
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+const formatReleaseDate = (iso: string) => {
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
+  if (!match) return iso;
+  const year = match[1];
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  if (month < 1 || month > 12) return iso;
+  return `${day} ${MONTHS[month - 1]} ${year}`;
+};
+
+const formatRuntime = (minutes: number) => {
+  if (!Number.isFinite(minutes)) return "-";
+  const safe = Math.max(0, Math.floor(minutes));
+  const hours = Math.floor(safe / 60);
+  const mins = safe % 60;
+  if (hours > 0 && mins > 0) return `${hours}h ${mins}m`;
+  if (hours > 0) return `${hours}h`;
+  return `${mins}m`;
+};
+
+const hostFromUrl = (url: string) =>
+  url?.replace(/^https?:\/\//i, "").split("/")[0] || url;
+
+const openUrl = (url: string) => {
+  Linking.openURL(url).catch(() => undefined);
+};
+
+const formatVoteCount = (count: number) =>
+  count >= 1000 ? `${(count / 1000).toFixed(1)}k` : `${count}`;
+
+const statusTone = (status: string) => {
+  const s = status.toLowerCase();
+  if (s.includes("released") || s.includes("returning")) {
+    return Colors.primary;
+  }
+  if (
+    s.includes("in production") ||
+    s.includes("post production") ||
+    s.includes("planned")
+  ) {
+    return Colors.accent;
+  }
+  return Colors.secondaryText;
+};
+
+const STAT_ICONS: Record<string, keyof typeof Feather.glyphMap> = {
+  Released: "calendar",
+  Language: "globe",
+  Status: "activity",
+  Runtime: "clock",
+  Director: "user",
+  Creators: "users",
+  Seasons: "layers",
+  Episodes: "video",
+  Production: "home",
+  Website: "link",
+};
 
 export default function MediaDetailsContainer({
   id,
@@ -178,7 +253,7 @@ export default function MediaDetailsContainer({
 
     const releaseDate = data?.release_date || data?.first_air_date;
     if (releaseDate) {
-      info.push({ label: "Released", value: releaseDate });
+      info.push({ label: "Released", value: formatReleaseDate(releaseDate) });
     }
 
     if (data?.original_language) {
@@ -192,13 +267,52 @@ export default function MediaDetailsContainer({
       info.push({ label: "Status", value: data.status });
     }
 
-    if (typeOfList === "tv") {
+    if (typeOfList === "movie") {
+      if (typeof data?.runtime === "number" && data.runtime > 0) {
+        info.push({ label: "Runtime", value: formatRuntime(data.runtime) });
+      }
+
+      const directors = data?.credits?.crew
+        ?.filter(
+          (crew: { job?: string }) =>
+            typeof crew?.job === "string" && crew.job.toLowerCase() === "director",
+        )
+        ?.map((crew: { name?: string }) => crew?.name)
+        ?.filter(Boolean);
+
+      if (directors?.length) {
+        info.push({ label: "Director", value: directors.join(" & ") });
+      }
+    } else {
+      const creators = data?.created_by
+        ?.map((creator: { name?: string }) => creator?.name)
+        ?.filter(Boolean);
+
+      if (creators?.length) {
+        info.push({ label: "Creators", value: creators.join(", ") });
+      }
+
       if (data?.number_of_seasons) {
         info.push({ label: "Seasons", value: `${data.number_of_seasons}` });
       }
       if (data?.number_of_episodes) {
         info.push({ label: "Episodes", value: `${data.number_of_episodes}` });
       }
+    }
+
+    const companies = data?.production_companies
+      ?.map((company: { name?: string }) => company?.name)
+      ?.filter(Boolean);
+
+    if (companies?.length) {
+      info.push({
+        label: "Production",
+        value: companies.slice(0, 3).join(", "),
+      });
+    }
+
+    if (typeof data?.homepage === "string" && data.homepage.length > 0) {
+      info.push({ label: "Website", value: data.homepage });
     }
 
     return info;
@@ -208,6 +322,10 @@ export default function MediaDetailsContainer({
     () => (data?.genres ? data.genres.map((g: { name: string }) => g.name) : []),
     [data],
   );
+
+  const rating = data?.vote_average ? data.vote_average.toFixed(1) : null;
+  const voteCount = data?.vote_count ?? null;
+  const specs = metaInfo.filter((item) => item.label !== "Rating");
 
   const posterSource = data?.poster_path
     ? { uri: getImage(data.poster_path, "w342") }
@@ -225,6 +343,7 @@ export default function MediaDetailsContainer({
     <View style={styles.container}>
       <ScrollView
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.content}
         refreshControl={
           <RefreshControl
             refreshing={isFetching}
@@ -305,15 +424,6 @@ export default function MediaDetailsContainer({
                   {data.tagline}
                 </Text>
               ) : null}
-              <View style={styles.ratingRow}>
-                <Ionicons name="star" size={16} color={Colors.primary} />
-                <Text style={styles.ratingText}>
-                  {data?.vote_average ? data.vote_average.toFixed(1) : "N/A"}
-                </Text>
-                {data?.vote_average ? (
-                  <Text style={styles.ratingMax}>/10</Text>
-                ) : null}
-              </View>
               {genreList.length > 0 && (
                 <View style={styles.genreRow}>
                   {genreList.slice(0, 3).map((genre: string) => (
@@ -331,22 +441,93 @@ export default function MediaDetailsContainer({
           <TrailerVideo movieTrailerId={movieTrailerId || ""} variant="button" />
         </View>
 
-        {metaInfo.length > 0 && (
-          <View style={styles.pills}>
-            {metaInfo.map((item, index) => (
-              <View
-                key={item.label}
-                style={[
-                  styles.pill,
-                  index === metaInfo.length - 1 && styles.pillFull,
-                ]}
-              >
-                <Text style={styles.pillLabel}>{item.label}</Text>
-                <Text style={styles.pillValue} numberOfLines={2}>
-                  {item.value}
-                </Text>
+        {specs.length > 0 && (
+          <View style={styles.statGrid}>
+            {rating ? (
+              <View style={[styles.statCard, styles.ratingStatCard]}>
+                <Text style={styles.statLabel}>Rating</Text>
+                <View style={styles.ratingMain}>
+                  <Text style={styles.statRatingNum}>{rating}</Text>
+                  <Text style={styles.statRatingOutOf}>/10</Text>
+                </View>
+                <View style={styles.statRatingTrack}>
+                  <View
+                    style={[
+                      styles.statRatingFill,
+                      {
+                        width: `${Math.min((Number(rating) / 10) * 100, 100)}%`,
+                      },
+                    ]}
+                  />
+                </View>
+                {voteCount ? (
+                  <Text style={styles.statRatingVotes}>
+                    {formatVoteCount(voteCount)} votes
+                  </Text>
+                ) : null}
               </View>
-            ))}
+            ) : null}
+
+            {specs.map((item) => {
+              const isWebsite = item.label === "Website";
+              const isStatus = item.label === "Status";
+              const displayValue = isWebsite
+                ? hostFromUrl(item.value)
+                : item.value;
+              const icon = STAT_ICONS[item.label];
+
+              const content = (
+                <>
+                  <View style={styles.statTopRow}>
+                    <Text style={styles.statLabel}>{item.label}</Text>
+                    {icon ? (
+                      <Feather
+                        name={icon}
+                        size={15}
+                        color={Colors.secondaryText}
+                      />
+                    ) : null}
+                  </View>
+                  <View style={styles.statValueRow}>
+                    {isStatus ? (
+                      <View
+                        style={[
+                          styles.statusDot,
+                          { backgroundColor: statusTone(item.value) },
+                        ]}
+                      />
+                    ) : null}
+                    <Text style={styles.statValue} numberOfLines={2}>
+                      {displayValue}
+                    </Text>
+                    {isWebsite ? (
+                      <Feather
+                        name="external-link"
+                        size={13}
+                        color={Colors.primary}
+                        style={styles.statLinkIcon}
+                      />
+                    ) : null}
+                  </View>
+                </>
+              );
+
+              return isWebsite ? (
+                <TouchableOpacity
+                  key={item.label}
+                  style={styles.statCard}
+                  onPress={() => openUrl(item.value)}
+                  accessibilityRole="link"
+                  accessibilityLabel={`Open website ${displayValue}`}
+                >
+                  {content}
+                </TouchableOpacity>
+              ) : (
+                <View key={item.label} style={styles.statCard}>
+                  {content}
+                </View>
+              );
+            })}
           </View>
         )}
 
@@ -354,7 +535,11 @@ export default function MediaDetailsContainer({
           <MovieOverview content={data?.overview || ""} />
         </View>
 
-        <CastContainer id={id} typeOfList={typeOfList} />
+        <CastContainer
+          id={id}
+          typeOfList={typeOfList}
+          initialData={data?.credits}
+        />
 
         <RecommendationSection
           sectionHeading="Recommendations"
@@ -386,6 +571,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
+  },
+  content: {
+    paddingBottom: 32,
   },
   hero: {
     height: 380,
@@ -454,22 +642,6 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     marginTop: 6,
   },
-  ratingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 8,
-  },
-  ratingText: {
-    color: Colors.primary,
-    fontWeight: "700",
-    fontSize: 15,
-    marginLeft: 6,
-  },
-  ratingMax: {
-    color: Colors.secondaryText,
-    fontSize: 13,
-    marginLeft: 2,
-  },
   genreRow: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -492,47 +664,103 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginTop: 14,
   },
-  pills: {
+  statGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    paddingHorizontal: 16,
-    marginTop: 12,
+    marginHorizontal: 16,
+    marginTop: 16,
+    paddingTop: 12,
+    paddingBottom: 12,
   },
-  pill: {
-    width: "48%",
+  statCard: {
+    width: "48.2%",
     backgroundColor: Colors.card,
-    borderRadius: 14,
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    marginBottom: 10,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.06)",
-    alignItems: "center",
+    borderColor: "rgba(255,255,255,0.07)",
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginBottom: 10,
   },
-  pillFull: {
+  ratingStatCard: {
     width: "100%",
+    borderColor: "rgba(215,237,47,0.35)",
   },
-  pillLabel: {
-    fontSize: 11,
+  statTopRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  statLabel: {
+    fontSize: 10,
+    fontWeight: "700",
     color: Colors.secondaryText,
     textTransform: "uppercase",
-    letterSpacing: 0.5,
-    textAlign: "center",
+    letterSpacing: 1.2,
   },
-  pillValue: {
-    fontSize: 14,
+  statValueRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  statValue: {
+    flexShrink: 1,
+    fontSize: 15,
+    fontWeight: "700",
     color: Colors.text,
+    fontVariant: ["tabular-nums"],
+  },
+  ratingMain: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    marginTop: 6,
+  },
+  statRatingNum: {
+    color: Colors.primary,
+    fontSize: 30,
+    fontWeight: "800",
+    letterSpacing: -0.5,
+    fontVariant: ["tabular-nums"],
+  },
+  statRatingOutOf: {
+    color: Colors.secondaryText,
+    fontSize: 13,
     fontWeight: "600",
-    marginTop: 4,
-    textAlign: "center",
+    marginLeft: 3,
+  },
+  statRatingTrack: {
+    marginTop: 8,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: "rgba(255,255,255,0.12)",
+    overflow: "hidden",
+  },
+  statRatingFill: {
+    height: "100%",
+    borderRadius: 2,
+    backgroundColor: Colors.primary,
+  },
+  statRatingVotes: {
+    marginTop: 8,
+    fontSize: 11,
+    color: Colors.secondaryText,
+  },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginRight: 6,
+  },
+  statLinkIcon: {
+    marginLeft: 6,
   },
   card: {
     backgroundColor: Colors.card,
     borderRadius: 14,
     padding: 16,
     marginHorizontal: 16,
-    marginTop: 4,
+    marginTop: 14,
     marginBottom: 8,
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.06)",

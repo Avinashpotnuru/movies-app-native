@@ -1,8 +1,9 @@
 import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { MoviesCardType } from "@/src/types";
 import { router } from "expo-router";
-import React, { useCallback, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import React, { memo, useCallback, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -10,10 +11,21 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import Carousel from "react-native-reanimated-carousel";
+import Carousel, {
+  type ICarouselInstance,
+} from "react-native-reanimated-carousel";
+import Animated, {
+  Extrapolation,
+  SharedValue,
+  interpolate,
+  useAnimatedStyle,
+} from "react-native-reanimated";
 import RemoteImage from "./remote-image";
 import { getImage } from "../utils/getImage";
 import { Colors } from "../theme";
+import { prefetchMovieDetail } from "../hooks/useGetMovieDetail";
+
+const HERO_HEIGHT = 240;
 
 interface MoviesCarouselProps {
   moviePosters: MoviesCardType[];
@@ -22,42 +34,99 @@ interface MoviesCarouselProps {
 const resolveTitle = (item: MoviesCardType) =>
   item?.title || item?.name || item?.original_title || item?.original_name || "";
 
-const MoviesCarousel = ({ moviePosters }: MoviesCarouselProps) => {
-  const { width } = useWindowDimensions();
-  const [activeIndex, setActiveIndex] = useState(0);
+const resolveYear = (item: MoviesCardType) =>
+  item?.release_date ? item.release_date.slice(0, 4) : "";
 
-  const handleNavigation = useCallback((id?: number) => {
-    if (!id) return;
-    router.push({
-      pathname: "/media-details/[id]",
-      params: { id, typeOfList: "movie" },
+const HeroCard = memo(
+  ({
+    item,
+    animationValue,
+    onPress,
+  }: {
+    item: MoviesCardType;
+    animationValue: SharedValue<number>;
+    onPress: (item: MoviesCardType) => void;
+  }) => {
+    const liftStyle = useAnimatedStyle(() => {
+      const progress = animationValue.value;
+      return {
+        transform: [
+          {
+            translateY: interpolate(
+              progress,
+              [-1, 0, 1],
+              [4, -10, 4],
+              Extrapolation.CLAMP,
+            ),
+          },
+        ],
+      };
     });
-  }, []);
 
-  const renderItem = useCallback(
-    ({ item }: { item: MoviesCardType }) => {
-      const title = resolveTitle(item);
-      const year = item?.release_date ? item.release_date.slice(0, 4) : "";
-      const rating = item?.vote_average
-        ? item.vote_average.toFixed(1)
-        : null;
+    const imageStyle = useAnimatedStyle(() => {
+      const progress = animationValue.value;
+      return {
+        transform: [
+          {
+            scale: interpolate(
+              progress,
+              [-1, 0, 1],
+              [1.06, 1.1, 1.06],
+              Extrapolation.CLAMP,
+            ),
+          },
+        ],
+      };
+    });
 
-      return (
-        <TouchableOpacity
-          activeOpacity={0.9}
-          onPress={() => handleNavigation(item?.id)}
-          style={styles.item}
-        >
-          <RemoteImage
-            source={
-              item?.poster_path
-                ? { uri: getImage(item.poster_path, "w500") }
-                : require("@/assets/images/placeholder.jpg")
-            }
-            placeholder={require("@/assets/images/placeholder.jpg")}
-            contentFit="cover"
-            style={styles.poster}
-          />
+    const metaStyle = useAnimatedStyle(() => {
+      const progress = animationValue.value;
+      return {
+        opacity: interpolate(
+          progress,
+          [-1, 0, 1],
+          [0.15, 1, 0.15],
+          Extrapolation.CLAMP,
+        ),
+      };
+    });
+
+    const badgeStyle = useAnimatedStyle(() => {
+      const progress = animationValue.value;
+      return {
+        opacity: interpolate(
+          progress,
+          [-1, 0, 1],
+          [0.25, 1, 0.25],
+          Extrapolation.CLAMP,
+        ),
+      };
+    });
+
+    const title = resolveTitle(item);
+    const year = resolveYear(item);
+    const rating = item?.vote_average ? item.vote_average.toFixed(1) : null;
+
+    return (
+      <TouchableOpacity
+        activeOpacity={0.95}
+        onPress={() => onPress(item)}
+        style={styles.item}
+      >
+        <Animated.View style={[styles.card, liftStyle]}>
+          <Animated.View style={[StyleSheet.absoluteFillObject, imageStyle]}>
+            <RemoteImage
+              source={
+                item?.poster_path
+                  ? { uri: getImage(item.poster_path, "w780") }
+                  : require("@/assets/images/placeholder.jpg")
+              }
+              placeholder={require("@/assets/images/placeholder.jpg")}
+              contentFit="cover"
+              recyclingKey={item?.id?.toString()}
+              style={StyleSheet.absoluteFillObject}
+            />
+          </Animated.View>
 
           <LinearGradient
             colors={["rgba(11,15,20,0)", "rgba(11,15,20,0.85)"]}
@@ -65,11 +134,12 @@ const MoviesCarousel = ({ moviePosters }: MoviesCarouselProps) => {
             style={styles.scrim}
           />
 
-          <View style={styles.badge}>
+          <Animated.View style={[styles.badge, badgeStyle]}>
+            <View style={styles.badgeDot} />
             <Text style={styles.badgeText}>TRENDING</Text>
-          </View>
+          </Animated.View>
 
-          <View style={styles.meta}>
+          <Animated.View style={[styles.meta, metaStyle]}>
             <Text style={styles.caption} numberOfLines={1}>
               {title}
             </Text>
@@ -82,14 +152,50 @@ const MoviesCarousel = ({ moviePosters }: MoviesCarouselProps) => {
               ) : null}
               {year ? <Text style={styles.year}>{year}</Text> : null}
             </View>
-          </View>
-        </TouchableOpacity>
-      );
+          </Animated.View>
+        </Animated.View>
+      </TouchableOpacity>
+    );
+  },
+);
+
+HeroCard.displayName = "HeroCard";
+
+const MoviesCarousel = ({ moviePosters }: MoviesCarouselProps) => {
+  const { width } = useWindowDimensions();
+  const [activeIndex, setActiveIndex] = useState(0);
+  const queryClient = useQueryClient();
+  const carouselRef = React.useRef<ICarouselInstance>(null);
+
+  const handleNavigation = useCallback(
+    (item: MoviesCardType) => {
+      if (!item?.id) return;
+      prefetchMovieDetail(queryClient, item.id, "movie");
+      router.push({
+        pathname: "/media-details/[id]",
+        params: { id: item.id, typeOfList: "movie" },
+      });
     },
-    [handleNavigation],
+    [queryClient],
   );
 
   const itemWidth = width - 32;
+
+  const renderItem = useCallback(
+    (
+      row: {
+        item: MoviesCardType;
+        animationValue: SharedValue<number>;
+      },
+    ) => (
+      <HeroCard
+        item={row.item}
+        animationValue={row.animationValue}
+        onPress={handleNavigation}
+      />
+    ),
+    [handleNavigation],
+  );
 
   return (
     <View style={styles.container}>
@@ -103,14 +209,21 @@ const MoviesCarousel = ({ moviePosters }: MoviesCarouselProps) => {
         </View>
       ) : (
         <Carousel
+          ref={carouselRef}
           loop
+          mode="parallax"
+          modeConfig={{
+            parallaxScrollingScale: 1,
+            parallaxAdjacentItemScale: 0.85,
+            parallaxScrollingOffset: 40,
+          }}
           width={itemWidth}
-          height={240}
+          height={HERO_HEIGHT}
           autoPlay={!!moviePosters?.length}
-          autoPlayInterval={4000}
+          autoPlayInterval={4200}
           data={moviePosters}
           pagingEnabled
-          scrollAnimationDuration={1200}
+          scrollAnimationDuration={900}
           onSnapToItem={(index) => setActiveIndex(index)}
           renderItem={renderItem}
           style={styles.carousel}
@@ -118,49 +231,69 @@ const MoviesCarousel = ({ moviePosters }: MoviesCarouselProps) => {
       )}
 
       {!!moviePosters?.length ? (
-        <View style={styles.dots}>
-          {moviePosters.map((_, index) => (
-            <View
-              key={index}
-              style={[
-                styles.dot,
-                index === activeIndex % moviePosters.length && styles.dotActive,
-              ]}
-            />
-          ))}
+        <View style={styles.footer}>
+          <View style={styles.dots}>
+            {moviePosters.map((_, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.dot,
+                  index === activeIndex % moviePosters.length && styles.dotActive,
+                ]}
+              />
+            ))}
+          </View>
+
+          <Text style={styles.counter}>
+            {String(activeIndex % moviePosters.length + 1).padStart(2, "0")}
+            <Text style={styles.counterDim}>
+              {" "}
+              / {String(moviePosters.length).padStart(2, "0")}
+            </Text>
+          </Text>
         </View>
       ) : null}
     </View>
   );
 };
 
+export default MoviesCarousel;
+
 const styles = StyleSheet.create({
   container: {
-    marginTop: 12,
+    marginTop: 14,
     alignItems: "center",
-    justifyContent: "center",
   },
   carousel: {
     alignItems: "center",
   },
   item: {
     width: "100%",
-    height: 240,
-    borderRadius: 16,
-    overflow: "hidden",
-    backgroundColor: Colors.card,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 8,
+    height: HERO_HEIGHT,
+    paddingVertical: 12,
   },
   empty: {
+    height: HERO_HEIGHT,
     width: "100%",
   },
   poster: {
     width: "100%",
     height: "100%",
+    borderRadius: 18,
+  },
+  card: {
+    flex: 1,
+    borderRadius: 18,
+    overflow: "hidden",
+    backgroundColor: Colors.card,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.05)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.45,
+    shadowRadius: 16,
+    elevation: 9,
+    backfaceVisibility: "hidden",
   },
   scrim: {
     position: "absolute",
@@ -171,18 +304,29 @@ const styles = StyleSheet.create({
   },
   badge: {
     position: "absolute",
-    top: 12,
-    left: 12,
-    backgroundColor: "rgba(215,237,47,0.16)",
-    paddingVertical: 4,
+    top: 14,
+    left: 14,
+    backgroundColor: "rgba(11,15,20,0.55)",
+    borderWidth: 1,
+    borderColor: "rgba(215,237,47,0.35)",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 20,
+  },
+  badgeDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: Colors.primary,
+    marginRight: 6,
   },
   badgeText: {
     color: Colors.primary,
     fontSize: 10,
     fontWeight: "800",
-    letterSpacing: 0.6,
+    letterSpacing: 0.8,
   },
   meta: {
     position: "absolute",
@@ -216,23 +360,39 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "600",
   },
+  footer: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 10,
+    marginTop: 12,
+  },
   dots: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
     gap: 6,
-    marginTop: 14,
   },
   dot: {
-    width: 7,
-    height: 7,
-    borderRadius: 4,
-    backgroundColor: "rgba(255,255,255,0.25)",
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "rgba(255,255,255,0.22)",
   },
   dotActive: {
-    width: 20,
+    width: 22,
+    borderRadius: 4,
     backgroundColor: Colors.primary,
   },
+  counter: {
+    color: Colors.text,
+    fontSize: 12,
+    fontWeight: "700",
+    fontVariant: ["tabular-nums"],
+    letterSpacing: 1,
+  },
+  counterDim: {
+    color: Colors.secondaryText,
+    fontWeight: "600",
+  },
 });
-
-export default MoviesCarousel;

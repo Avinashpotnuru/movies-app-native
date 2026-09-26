@@ -9,6 +9,7 @@ const useGetFavoriteMovies = () => {
     getNextPageParam: (lastPage) =>
       lastPage?.page < lastPage?.total_pages ? lastPage.page + 1 : undefined,
     ...DEFAULT_QUERY_OPTIONS,
+    cacheTime: 1000 * 60 * 30,
   });
 };
 

@@ -3,7 +3,6 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 import React from "react";
 import {
-  Dimensions,
   Linking,
   StyleSheet,
   TouchableOpacity,
@@ -11,8 +10,6 @@ import {
 } from "react-native";
 import { Colors } from "../theme";
 import { SocialMediaLinks } from "../types";
-
-const { width } = Dimensions.get("window");
 
 const SocialMediaSection = ({
   socialMediaLinks,
@@ -118,31 +115,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
-    width: width - 50,
-    marginVertical: 10,
   },
   icon: {
-    height: 40,
-    width: 40,
-    textAlign: "center",
+    height: 42,
+    width: 42,
     alignItems: "center",
     justifyContent: "center",
-    marginHorizontal: 20,
-    color: Colors.primary,
-    fontWeight: "bold",
-    fontSize: 28,
-    backgroundColor: "transparent",
-    borderRadius: 10,
-    padding: 5,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: Colors.primary,
+    marginHorizontal: 12,
+    backgroundColor: "rgba(255,255,255,0.08)",
+    borderRadius: 21,
   },
 });
