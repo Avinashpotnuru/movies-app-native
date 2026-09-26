@@ -331,8 +331,7 @@ https://www.themoviedb.org/documentation/api
 # 🚀 Live Demo
 
 Expo build Download apk file below link
-
-https://expo.dev/accounts/avinash343/projects/cinewave/builds/d72cd64c-11be-4d0f-8381-fbc3ef2fc451
+https://expo.dev/accounts/avinash343/projects/cinewave/builds/f5fbbed6-f022-4f45-b0ce-0a31472f6479
 ---
 
 # 👨‍💻 Author
