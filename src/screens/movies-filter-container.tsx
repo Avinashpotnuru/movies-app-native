@@ -6,10 +6,11 @@ import {
   NoDataFound,
   SearchBar,
 } from "@/src/components";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 
 import { sortOptions } from "@/data";
 import {
+  useDebounce,
   useGetGenres,
   useGetLanguages,
   useGetMovies,
@@ -17,26 +18,33 @@ import {
 } from "@/src/hooks";
 
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { useLocalSearchParams } from "expo-router";
 import {
-  Dimensions,
   FlatList,
+  ListRenderItem,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from "react-native";
 
 import { Colors } from "../theme";
 import { Movie, MoviesCardType } from "../types";
 
-const { width } = Dimensions.get("window");
-
 export default function MoviesFilterContainer() {
+  const { genre: genreParam } = useLocalSearchParams<{ genre?: string }>();
+
   const [language, setLanguage] = useState("");
-  const [genre, setGenre] = useState("");
+  const [genre, setGenre] = useState(
+    typeof genreParam === "string" && genreParam ? genreParam : "",
+  );
   const [sort, setSort] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+
+  const { width } = useWindowDimensions();
+  const debouncedQuery = useDebounce(searchQuery, 350);
 
   const { data: languages } = useGetLanguages();
   const { data: genreData } = useGetGenres();
@@ -60,7 +68,7 @@ export default function MoviesFilterContainer() {
     isLoading: searchLoading,
     error: searchError,
     refetch: refetchSearch,
-  } = useSearchMovies(searchQuery);
+  } = useSearchMovies(debouncedQuery);
 
   const listError = searchQuery ? searchError : error;
   const handleRetry = () => (searchQuery ? refetchSearch() : refetch());
@@ -72,6 +80,7 @@ export default function MoviesFilterContainer() {
           id: movie.id,
           title: movie.title,
           poster_path: movie.poster_path,
+          typeOfList: "movie",
         })) || []
       );
     }
@@ -82,6 +91,7 @@ export default function MoviesFilterContainer() {
           id: movie.id,
           title: movie.title,
           poster_path: movie.poster_path,
+          typeOfList: "movie",
         })),
       ) || []
     );
@@ -122,6 +132,16 @@ export default function MoviesFilterContainer() {
 
   const loadingState = searchQuery ? searchLoading : isLoading;
 
+  const renderItem: ListRenderItem<MoviesCardType> = useCallback(
+    ({ item }) => <MoviesCard moviesDetails={item} />,
+    [],
+  );
+
+  const keyExtractor = useCallback(
+    (item: MoviesCardType) => item.id.toString(),
+    [],
+  );
+
   return (
     <View style={styles.container}>
       <SearchBar
@@ -130,7 +150,7 @@ export default function MoviesFilterContainer() {
         placeholder="Search movies..."
       />
 
-      <View style={styles.filterView}>
+      <View style={[styles.filterView, { width: width - 50 }]}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View style={styles.filterContainer}>
             <CustomDropdown
@@ -172,15 +192,13 @@ export default function MoviesFilterContainer() {
           numColumns={3}
           contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
           data={movies}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={keyExtractor}
           initialNumToRender={12}
           maxToRenderPerBatch={12}
           windowSize={5}
           removeClippedSubviews
           updateCellsBatchingPeriod={100}
-          renderItem={({ item }) => (
-            <MoviesCard moviesDetails={{ ...item, typeOfList: "movie" }} />
-          )}
+          renderItem={renderItem}
           ListEmptyComponent={<NoDataFound />}
           showsVerticalScrollIndicator={false}
           onEndReached={() => {
@@ -222,7 +240,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
     marginVertical: 10,
-    width: width - 50,
     alignSelf: "center",
   },
   filterContainer: {

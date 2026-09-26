@@ -12,7 +12,7 @@ import {
   View,
   findNodeHandle,
 } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import { Colors } from "../theme";
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -120,7 +120,7 @@ export default function CustomDropdown({
           >
             <View style={styles.searchRow}>
               <AntDesign
-                name="search1"
+                name="search"
                 size={16}
                 color="#8a8a8a"
                 style={styles.searchIcon}

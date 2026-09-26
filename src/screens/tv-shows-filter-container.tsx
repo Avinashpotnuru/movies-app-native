@@ -6,10 +6,11 @@ import {
   NoDataFound,
   SearchBar,
 } from "@/src/components";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 
 import { sortTvOptions } from "@/data";
 import {
+  useDebounce,
   useGetGenres,
   useGetLanguages,
   useGetTvShowsInfinite,
@@ -18,25 +19,27 @@ import {
 
 import AntDesign from "@expo/vector-icons/AntDesign";
 import {
-  Dimensions,
   FlatList,
+  ListRenderItem,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from "react-native";
 
 import { Colors } from "../theme";
 import { Movie, MoviesCardType } from "../types";
 
-const { width } = Dimensions.get("window");
-
 export default function TvShowFilterContainer() {
   const [language, setLanguage] = useState("");
   const [genre, setGenre] = useState("");
   const [sort, setSort] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+
+  const { width } = useWindowDimensions();
+  const debouncedQuery = useDebounce(searchQuery, 350);
 
   const { data: languages } = useGetLanguages();
   const { data: genreData } = useGetGenres();
@@ -60,7 +63,7 @@ export default function TvShowFilterContainer() {
     isLoading: searchLoading,
     error: searchError,
     refetch: refetchSearch,
-  } = useSearchTvShows(searchQuery);
+  } = useSearchTvShows(debouncedQuery);
 
   const listError = searchQuery ? searchError : error;
   const handleRetry = () => (searchQuery ? refetchSearch() : refetch());
@@ -72,6 +75,7 @@ export default function TvShowFilterContainer() {
           id: tv.id,
           title: tv.name || tv.title,
           poster_path: tv.poster_path,
+          typeOfList: "tv",
         })) || []
       );
     }
@@ -82,6 +86,7 @@ export default function TvShowFilterContainer() {
           id: tv.id,
           title: tv.name || tv.title,
           poster_path: tv.poster_path,
+          typeOfList: "tv",
         })),
       ) || []
     );
@@ -110,6 +115,16 @@ export default function TvShowFilterContainer() {
 
   const loadingState = searchQuery ? searchLoading : isLoading;
 
+  const renderItem: ListRenderItem<MoviesCardType> = useCallback(
+    ({ item }) => <MoviesCard moviesDetails={item} />,
+    [],
+  );
+
+  const keyExtractor = useCallback(
+    (item: MoviesCardType) => item.id.toString(),
+    [],
+  );
+
   return (
     <View style={styles.container}>
       <SearchBar
@@ -118,7 +133,7 @@ export default function TvShowFilterContainer() {
         placeholder="Search Tv Shows..."
       />
 
-      <View style={styles.filterView}>
+      <View style={[styles.filterView, { width: width - 50 }]}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View style={styles.filterContainer}>
             <CustomDropdown
@@ -160,15 +175,13 @@ export default function TvShowFilterContainer() {
           numColumns={3}
         contentContainerStyle={{ paddingBottom: 24 }}
           data={tvShows}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={keyExtractor}
           initialNumToRender={12}
           maxToRenderPerBatch={12}
           windowSize={5}
           removeClippedSubviews
           updateCellsBatchingPeriod={100}
-          renderItem={({ item }) => (
-            <MoviesCard moviesDetails={{ ...item, typeOfList: "tv" }} />
-          )}
+          renderItem={renderItem}
           ListEmptyComponent={<NoDataFound />}
           showsVerticalScrollIndicator={false}
           onEndReached={() => {
@@ -209,7 +222,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
     marginVertical: 10,
-    width: width - 50,
     alignSelf: "center",
   },
   filterContainer: {

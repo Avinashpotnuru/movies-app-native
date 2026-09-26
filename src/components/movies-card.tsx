@@ -1,9 +1,11 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import React, { memo, useMemo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Colors } from "../theme";
 import { MoviesCardType } from "../types";
 import { getImage } from "../utils/getImage";
+import { prefetchMovieDetail } from "../hooks/useGetMovieDetail";
 import RemoteImage from "./remote-image";
 
 const POSTER_WIDTH = 108;
@@ -14,9 +16,12 @@ const MoviesCard = ({
 }: {
   moviesDetails: MoviesCardType | null;
 }) => {
+  const queryClient = useQueryClient();
+
   const handleNavigation = (id: number | null) => {
     if (!id) return;
     const listType = moviesDetails?.typeOfList === "movie" ? "movie" : "tv";
+    prefetchMovieDetail(queryClient, id, listType);
     router.push({
       pathname: "/media-details/[id]",
       params: { id, typeOfList: listType },
@@ -70,6 +75,7 @@ const MoviesCard = ({
           source={imageSource}
           placeholder={require("@/assets/images/placeholder.jpg")}
           contentFit="cover"
+          recyclingKey={moviesDetails?.id?.toString()}
           style={styles.poster}
         />
 

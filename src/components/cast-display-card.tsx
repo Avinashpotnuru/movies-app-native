@@ -43,6 +43,7 @@ const CastDisplayCard = ({ cast }: { cast: MovieCastProps }) => {
           source={imageUri ? { uri: imageUri } : placeHolderImage}
           placeholder={placeHolderImage}
           contentFit="cover"
+          recyclingKey={id?.toString()}
         />
         <Text style={styles.name} accessibilityLabel={name || "Cast member"}>
           {name || ""}

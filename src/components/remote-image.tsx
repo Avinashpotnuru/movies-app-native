@@ -8,6 +8,7 @@ type RemoteImageProps = {
   contentFit?: "cover" | "contain" | "fill" | "none" | "scale-down";
   style?: StyleProp<ImageStyle>;
   cachePolicy?: "memory" | "disk" | "memory-disk";
+  recyclingKey?: string;
 };
 
 const RemoteImage = ({
@@ -16,6 +17,7 @@ const RemoteImage = ({
   contentFit = "cover",
   style,
   cachePolicy = "memory-disk",
+  recyclingKey,
 }: RemoteImageProps) => {
   return (
     <ExpoImage
@@ -23,6 +25,7 @@ const RemoteImage = ({
       placeholder={placeholder}
       contentFit={contentFit}
       cachePolicy={cachePolicy}
+      recyclingKey={recyclingKey}
       transition={150}
       style={style}
     />

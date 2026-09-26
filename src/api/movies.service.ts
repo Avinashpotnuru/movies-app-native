@@ -51,6 +51,10 @@ export const getPopularMovies = () => {
   return fetchData(ENDPOINTS.POPULAR);
 };
 
+export const getTopRatedMovies = () => {
+  return fetchData(ENDPOINTS.TOP_RATED);
+};
+
 export const getTrendingMovies = () => {
   return fetchData(ENDPOINTS.TRENDING);
 };

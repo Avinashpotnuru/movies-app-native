@@ -1,25 +1,58 @@
 import { Colors } from "@/src/theme/colors";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { Tabs } from "expo-router";
-import React from "react";
-import { StyleSheet, View } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { Animated, StyleSheet, Text } from "react-native";
 
 type IconName = React.ComponentProps<typeof Ionicons>["name"];
 
 const TabIcon = ({
   name,
-  color,
+  outlineName,
   size,
   focused,
 }: {
   name: IconName;
-  color: string;
+  outlineName: IconName;
   size: number;
   focused: boolean;
-}) => (
-  <View style={[styles.iconWrap, focused && styles.iconWrapActive]}>
-    <Ionicons name={name} size={size} color={color} />
-  </View>
+}) => {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.spring(scale, {
+      toValue: focused ? 1.08 : 1,
+      damping: 14,
+      stiffness: 220,
+      mass: 0.6,
+      useNativeDriver: true,
+    }).start();
+  }, [focused, scale]);
+
+  return (
+    <Animated.View
+      style={[
+        styles.iconWrap,
+        focused && styles.iconWrapActive,
+        { transform: [{ scale }] },
+      ]}
+    >
+      <Ionicons
+        name={focused ? name : outlineName}
+        size={focused ? size + 1 : size}
+        color={focused ? Colors.primary : Colors.secondaryText}
+      />
+    </Animated.View>
+  );
+};
+
+const TabLabel = ({ title, focused }: { title: string; focused: boolean }) => (
+  <Text
+    allowFontScaling={false}
+    style={[styles.label, focused && styles.labelActive]}
+  >
+    {title}
+  </Text>
 );
 
 const TabsStackLayout = () => {
@@ -30,17 +63,24 @@ const TabsStackLayout = () => {
         headerShown: false,
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.secondaryText,
-        tabBarLabelStyle: styles.label,
-        tabBarItemStyle: styles.item,
         tabBarStyle: styles.bar,
+        tabBarItemStyle: styles.item,
+        tabBarLabelStyle: styles.label,
+        tabBarHideOnKeyboard: true,
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
           title: "Home",
-          tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon name="home" color={color} size={size} focused={focused} />
+          tabBarLabel: ({ focused }) => <TabLabel title="Home" focused={focused} />,
+          tabBarIcon: ({ size, focused }) => (
+            <TabIcon
+              name="home"
+              outlineName="home-outline"
+              size={size}
+              focused={focused}
+            />
           ),
         }}
       />
@@ -49,8 +89,16 @@ const TabsStackLayout = () => {
         name="movies"
         options={{
           title: "Movies",
-          tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon name="film" color={color} size={size} focused={focused} />
+          tabBarLabel: ({ focused }) => (
+            <TabLabel title="Movies" focused={focused} />
+          ),
+          tabBarIcon: ({ size, focused }) => (
+            <TabIcon
+              name="film"
+              outlineName="film-outline"
+              size={size}
+              focused={focused}
+            />
           ),
         }}
       />
@@ -59,8 +107,16 @@ const TabsStackLayout = () => {
         name="tvshows"
         options={{
           title: "TV Shows",
-          tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon name="tv" color={color} size={size} focused={focused} />
+          tabBarLabel: ({ focused }) => (
+            <TabLabel title="TV Shows" focused={focused} />
+          ),
+          tabBarIcon: ({ size, focused }) => (
+            <TabIcon
+              name="tv"
+              outlineName="tv-outline"
+              size={size}
+              focused={focused}
+            />
           ),
         }}
       />
@@ -69,8 +125,16 @@ const TabsStackLayout = () => {
         name="favorites"
         options={{
           title: "Favorites",
-          tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon name="heart" color={color} size={size} focused={focused} />
+          tabBarLabel: ({ focused }) => (
+            <TabLabel title="Favorites" focused={focused} />
+          ),
+          tabBarIcon: ({ size, focused }) => (
+            <TabIcon
+              name="heart"
+              outlineName="heart-outline"
+              size={size}
+              focused={focused}
+            />
           ),
         }}
       />
@@ -79,8 +143,16 @@ const TabsStackLayout = () => {
         name="profile"
         options={{
           title: "Profile",
-          tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon name="person" color={color} size={size} focused={focused} />
+          tabBarLabel: ({ focused }) => (
+            <TabLabel title="Profile" focused={focused} />
+          ),
+          tabBarIcon: ({ size, focused }) => (
+            <TabIcon
+              name="person"
+              outlineName="person-outline"
+              size={size}
+              focused={focused}
+            />
           ),
         }}
       />
@@ -93,40 +165,46 @@ export default TabsStackLayout;
 const styles = StyleSheet.create({
   bar: {
     position: "absolute",
-    bottom: 16,
-    left: 24,
-    right: 24,
-    height: 76,
-    backgroundColor: Colors.card,
+    bottom: 14,
+    left: 20,
+    right: 20,
+    height: 68,
+    backgroundColor: "rgba(20,26,34,0.97)",
     borderRadius: 24,
     borderTopWidth: 0,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)",
-    paddingTop: 10,
-    paddingBottom: 10,
-    elevation: 14,
+    borderColor: "rgba(255,255,255,0.09)",
+    paddingTop: 8,
+    paddingHorizontal: 6,
+    elevation: 18,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.45,
+    shadowRadius: 18,
   },
   item: {
     justifyContent: "center",
     alignItems: "center",
   },
-  label: {
-    fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 0.3,
-  },
   iconWrap: {
-    width: 48,
-    height: 32,
-    borderRadius: 16,
+    width: 44,
+    height: 34,
+    borderRadius: 17,
     justifyContent: "center",
     alignItems: "center",
   },
   iconWrapActive: {
-    backgroundColor: "rgba(215,237,47,0.15)",
+    backgroundColor: "rgba(215,237,47,0.16)",
+  },
+  label: {
+    marginTop: 3,
+    fontSize: 10,
+    fontWeight: "600",
+    letterSpacing: 0.4,
+    color: Colors.secondaryText,
+  },
+  labelActive: {
+    color: Colors.primary,
+    fontWeight: "800",
   },
 });
