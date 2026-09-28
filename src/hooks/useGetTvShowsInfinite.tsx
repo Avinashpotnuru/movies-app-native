@@ -11,15 +11,16 @@ const useGetTvShowsInfinite = ({
   genre?: string;
   sort?: string;
 }) => {
+  const normalizedSort = sort || "popularity.desc";
   return useInfiniteQuery({
-    queryKey: ["tv-shows", language, genre, sort],
+    queryKey: ["tv-shows", language || "", genre || "", normalizedSort],
 
     queryFn: ({ pageParam = 1 }) =>
       getTvShows({
         pageParam,
         language,
         genre,
-         sort,
+        sort: normalizedSort,
       }),
 
     getNextPageParam: (lastPage) => {

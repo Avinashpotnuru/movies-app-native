@@ -42,30 +42,10 @@ const BackdropImagesContainer = ({ data }: { data: MovieBackDropImage[] }) => {
               style={styles.image}
             />
           </TouchableOpacity>
-
-          {selectedImage === item.file_path && (
-            <DisplayModal
-              visible={selectedImage !== null}
-              onClose={() => setSelectedImage(null)}
-              onRequestClose={() => setSelectedImage(null)}
-              animationType="slide"
-              modalWidth={width}
-              modalHeight={250}
-            >
-              <View style={styles.imageContainer}>
-                <RemoteImage
-                  source={{ uri }}
-                  placeholder={require("@/assets/images/placeholder.jpg")}
-                  contentFit="cover"
-                  style={[styles.modalImage, { width: width - 10 }]}
-                />
-              </View>
-            </DisplayModal>
-          )}
         </View>
       );
     },
-    [selectedImage, width],
+    [],
   );
 
   const keyExtractor = useCallback(
@@ -95,6 +75,26 @@ const BackdropImagesContainer = ({ data }: { data: MovieBackDropImage[] }) => {
         removeClippedSubviews
         showsHorizontalScrollIndicator={false}
       />
+
+      {selectedImage ? (
+        <DisplayModal
+          visible={selectedImage !== null}
+          onClose={() => setSelectedImage(null)}
+          onRequestClose={() => setSelectedImage(null)}
+          animationType="slide"
+          modalWidth={width}
+          modalHeight={250}
+        >
+          <View style={styles.imageContainer}>
+            <RemoteImage
+              source={{ uri: getImage(selectedImage, "w500") }}
+              placeholder={require("@/assets/images/placeholder.jpg")}
+              contentFit="cover"
+              style={[styles.modalImage, { width: width - 10 }]}
+            />
+          </View>
+        </DisplayModal>
+      ) : null}
     </View>
   );
 };

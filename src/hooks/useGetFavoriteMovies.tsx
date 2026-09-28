@@ -2,12 +2,13 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { getFavorites } from "../api/movies.service";
 import { DEFAULT_QUERY_OPTIONS } from "../api/queryOptions";
 
-const useGetFavoriteMovies = () => {
+const useGetFavoriteMovies = (options?: { enabled?: boolean }) => {
   return useInfiniteQuery({
     queryKey: ["favorite-movies"],
     queryFn: ({ pageParam = 1 }) => getFavorites({ page: pageParam }),
     getNextPageParam: (lastPage) =>
       lastPage?.page < lastPage?.total_pages ? lastPage.page + 1 : undefined,
+    enabled: options?.enabled,
     ...DEFAULT_QUERY_OPTIONS,
     cacheTime: 1000 * 60 * 30,
   });

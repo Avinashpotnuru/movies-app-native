@@ -11,6 +11,26 @@ import RemoteImage from "./remote-image";
 const POSTER_WIDTH = 108;
 const POSTER_HEIGHT = 162;
 
+const areMoviesDetailsEqual = (
+  prev?: MoviesCardType | null,
+  next?: MoviesCardType | null,
+) => {
+  if (prev === next) return true;
+  if (!prev || !next) return false;
+  return (
+    prev.id === next.id &&
+    prev.title === next.title &&
+    prev.name === next.name &&
+    prev.original_title === next.original_title &&
+    prev.original_name === next.original_name &&
+    prev.poster_path === next.poster_path &&
+    prev.typeOfList === next.typeOfList &&
+    prev.vote_average === next.vote_average &&
+    prev.release_date === next.release_date &&
+    prev.enableTitle === next.enableTitle
+  );
+};
+
 const MoviesCard = ({
   moviesDetails,
 }: {
@@ -98,7 +118,9 @@ const MoviesCard = ({
   );
 };
 
-export default memo(MoviesCard);
+export default memo(MoviesCard, (prev, next) =>
+  areMoviesDetailsEqual(prev.moviesDetails, next.moviesDetails),
+);
 
 const styles = StyleSheet.create({
   container: {

@@ -4,8 +4,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { persistQueryClient } from "@tanstack/react-query-persist-client";
 import { Platform } from "react-native";
 import { AppStackLayout } from "@/src/layout";
+import { DEFAULT_QUERY_OPTIONS } from "@/src/api/queryOptions";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: DEFAULT_QUERY_OPTIONS,
+    mutations: { retry: 0 },
+  },
+});
 
 if (Platform.OS !== "web") {
   const asyncStoragePersister = createAsyncStoragePersister({
@@ -19,6 +25,7 @@ if (Platform.OS !== "web") {
     buster: "cinewave-v1",
     dehydrateOptions: {
       shouldDehydrateQuery: (query) => {
+        if (query.state.status !== "success") return false;
         const key = Array.isArray(query.queryKey)
           ? query.queryKey[0]
           : query.queryKey;

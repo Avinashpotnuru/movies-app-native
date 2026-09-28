@@ -19,7 +19,7 @@ const CastDisplayCard = ({ cast }: { cast: MovieCastProps }) => {
   );
 
   const imageUri = React.useMemo(
-    () => (profile_path ? getImage(profile_path, "w342") : null),
+    () => (profile_path ? getImage(profile_path, "w300") : null),
     [profile_path],
   );
 

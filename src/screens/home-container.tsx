@@ -186,6 +186,27 @@ export default function HomeScreenContainer() {
     refetchTopRated,
   ]);
 
+  const retryTrending = useCallback(() => refetch(), [refetch]);
+  const retryPopular = useCallback(() => refetchPopular(), [refetchPopular]);
+  const retryUpcoming = useCallback(() => refetchUpcoming(), [refetchUpcoming]);
+  const retryTv = useCallback(() => refetchTv(), [refetchTv]);
+  const retryNowPlaying = useCallback(
+    () => refetchNowPlaying(),
+    [refetchNowPlaying],
+  );
+  const retryTopRated = useCallback(() => refetchTopRated(), [refetchTopRated]);
+
+  const refreshControl = useMemo(
+    () => (
+      <RefreshControl
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        tintColor={Colors.primary}
+      />
+    ),
+    [refreshing, onRefresh],
+  );
+
   const displayMoviesList: HomeRow[] = useMemo(
     () => [
       {
@@ -194,7 +215,7 @@ export default function HomeScreenContainer() {
         typeOfList: "movie",
         isLoading: nowPlayingLoading,
         error: nowPlayingError,
-        onRetry: () => refetchNowPlaying(),
+        onRetry: retryNowPlaying,
       },
       {
         title: "Popular Movies",
@@ -202,7 +223,7 @@ export default function HomeScreenContainer() {
         typeOfList: "movie",
         isLoading: popularLoading,
         error: popularError,
-        onRetry: () => refetchPopular(),
+        onRetry: retryPopular,
       },
       {
         title: "Top Rated",
@@ -210,7 +231,7 @@ export default function HomeScreenContainer() {
         typeOfList: "movie",
         isLoading: topRatedLoading,
         error: topRatedError,
-        onRetry: () => refetchTopRated(),
+        onRetry: retryTopRated,
       },
       {
         title: "Popular Tv Shows",
@@ -218,7 +239,7 @@ export default function HomeScreenContainer() {
         typeOfList: "tvShows",
         isLoading: tvLoading,
         error: tvError,
-        onRetry: () => refetchTv(),
+        onRetry: retryTv,
       },
       {
         title: "Upcoming Movies",
@@ -226,30 +247,30 @@ export default function HomeScreenContainer() {
         typeOfList: "movie",
         isLoading: upcomingLoading,
         error: upcomingError,
-        onRetry: () => refetchUpcoming(),
+        onRetry: retryUpcoming,
       },
     ],
     [
       nowPlayingPosters,
       nowPlayingLoading,
       nowPlayingError,
-      refetchNowPlaying,
+      retryNowPlaying,
       popularMoviePosters,
       popularLoading,
       popularError,
-      refetchPopular,
+      retryPopular,
       topRatedPosters,
       topRatedLoading,
       topRatedError,
-      refetchTopRated,
+      retryTopRated,
       tvShowPosters,
       tvLoading,
       tvError,
-      refetchTv,
+      retryTv,
       upcomingMoviePosters,
       upcomingLoading,
       upcomingError,
-      refetchUpcoming,
+      retryUpcoming,
     ],
   );
 
@@ -258,13 +279,7 @@ export default function HomeScreenContainer() {
       style={styles.container}
       contentContainerStyle={styles.content}
       showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          tintColor={Colors.primary}
-        />
-      }
+      refreshControl={refreshControl}
     >
       <TouchableOpacity
         style={styles.searchPill}
@@ -301,7 +316,7 @@ export default function HomeScreenContainer() {
       <SectionHeading title="Trending Movies" />
 
       {error ? (
-        <ErrorState error={error} onRetry={() => refetch()} />
+        <ErrorState error={error} onRetry={retryTrending} />
       ) : (
         <Suspense
           fallback={<ActivityIndicator color={Colors.primary} size={"large"} />}

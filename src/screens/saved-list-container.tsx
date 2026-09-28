@@ -13,7 +13,7 @@ import {
 } from "@/src/hooks";
 import { Colors } from "../theme";
 import { router } from "expo-router";
-import React, { memo, useMemo, useState } from "react";
+import React, { memo, useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -33,6 +33,8 @@ interface SavedListContainerProps {
   showHeader?: boolean;
   title?: string;
 }
+
+const LIST_CONTENT_STYLE = { padding: 8, paddingBottom: 24 };
 
 const SavedCard = memo(function SavedCard({
   item,
@@ -66,28 +68,70 @@ const SavedListContainer = ({
 
   const isMovie = selectType === "movie";
   const query = isMovie ? moviesQuery : tvQuery;
+  const {
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+    refetch,
+    data,
+    isRefetching,
+    isLoading,
+    isError,
+    error: queryError,
+  } = query;
 
   const items = useMemo(
-    () => query.data?.pages.flatMap((page) => page.results) ?? [],
-    [query.data],
+    () => data?.pages.flatMap((page) => page.results) ?? [],
+    [data],
   );
 
-  const handleLoadMore = () => {
-    if (query.hasNextPage && !query.isFetchingNextPage) {
-      query.fetchNextPage();
+  const handleLoadMore = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
     }
-  };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const handleRefresh = () => {
-    query.refetch();
-  };
+  const handleRefresh = useCallback(() => {
+    refetch();
+  }, [refetch]);
 
-  if (query.isLoading && items.length === 0) {
+  const keyExtractor = useCallback(
+    (item: MoviesCardType) => item.id.toString(),
+    [],
+  );
+
+  const renderItem = useCallback(
+    ({ item }: { item: MoviesCardType }) => (
+      <SavedCard item={item} typeOfList={selectType} />
+    ),
+    [selectType],
+  );
+
+  const refreshControl = useMemo(
+    () => (
+      <RefreshControl
+        refreshing={isRefetching}
+        onRefresh={handleRefresh}
+        tintColor={Colors.primary}
+      />
+    ),
+    [isRefetching, handleRefresh],
+  );
+
+  const listFooter = useMemo(
+    () =>
+      isFetchingNextPage ? (
+        <ActivityIndicator color={Colors.primary} size="large" />
+      ) : null,
+    [isFetchingNextPage],
+  );
+
+  if (isLoading && items.length === 0) {
     return <Loading />;
   }
 
-  if (query.isError && items.length === 0) {
-    return <ErrorState error={query.error} onRetry={handleRefresh} />;
+  if (isError && items.length === 0) {
+    return <ErrorState error={queryError} onRetry={handleRefresh} />;
   }
 
   return (
@@ -110,39 +154,26 @@ const SavedListContainer = ({
 
       <FlatList
         numColumns={3}
-        contentContainerStyle={{ padding: 8, paddingBottom: 24 }}
+        contentContainerStyle={LIST_CONTENT_STYLE}
         data={items}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={keyExtractor}
         initialNumToRender={12}
         maxToRenderPerBatch={12}
         windowSize={5}
         removeClippedSubviews
-        updateCellsBatchingPeriod={100}
-        renderItem={({ item }) => (
-          <SavedCard item={item} typeOfList={selectType} />
-        )}
+        renderItem={renderItem}
         ListEmptyComponent={<NoDataFound />}
-        ListFooterComponent={
-          query.isFetchingNextPage ? (
-            <ActivityIndicator color={Colors.primary} size="large" />
-          ) : null
-        }
+        ListFooterComponent={listFooter}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}
-        refreshControl={
-          <RefreshControl
-            refreshing={query.isRefetching}
-            onRefresh={handleRefresh}
-            tintColor={Colors.primary}
-          />
-        }
+        refreshControl={refreshControl}
         showsVerticalScrollIndicator={false}
       />
     </View>
   );
 };
 
-export default SavedListContainer;
+export default memo(SavedListContainer);
 
 const styles = StyleSheet.create({
   container: {

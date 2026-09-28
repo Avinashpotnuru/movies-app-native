@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo, useCallback } from "react";
 import { FlatList } from "react-native";
 import { RecommendationCardType } from "../types";
 import RecommendationCard from "./recommendation-card";
@@ -9,23 +9,39 @@ interface RecommendationProps {
   typeOfList?: string;
 }
 
-const RecommendationSection = ({
+export default memo(function RecommendationSection({
   sectionHeading,
   moviePosters,
-}: RecommendationProps) => {
+}: RecommendationProps) {
+  const keyExtractor = useCallback(
+    (item: RecommendationCardType, index: number) =>
+      `${item?.media_type ?? "item"}-${item?.id ?? index}`,
+    [],
+  );
+
+  const renderItem = useCallback(
+    ({ item }: { item: RecommendationCardType }) => (
+      <RecommendationCard moviesDetails={item} />
+    ),
+    [],
+  );
+
   if (!moviePosters.length) return null;
+
   return (
     <>
       <SectionHeading title={sectionHeading} />
       <FlatList
         data={moviePosters}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={keyExtractor}
         horizontal
+        initialNumToRender={4}
+        maxToRenderPerBatch={4}
+        windowSize={5}
+        removeClippedSubviews
         showsHorizontalScrollIndicator={false}
-        renderItem={({ item }) => <RecommendationCard moviesDetails={item} />}
+        renderItem={renderItem}
       />
     </>
   );
-};
-
-export default RecommendationSection;
+});

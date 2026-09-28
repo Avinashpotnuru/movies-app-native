@@ -33,6 +33,8 @@ import {
 import { Colors } from "../theme";
 import { Movie, MoviesCardType } from "../types";
 
+const LIST_CONTENT_STYLE = { flexGrow: 1, paddingBottom: 24 };
+
 export default function MoviesFilterContainer() {
   const { genre: genreParam } = useLocalSearchParams<{ genre?: string }>();
 
@@ -71,7 +73,6 @@ export default function MoviesFilterContainer() {
   } = useSearchMovies(debouncedQuery);
 
   const listError = searchQuery ? searchError : error;
-  const handleRetry = () => (searchQuery ? refetchSearch() : refetch());
 
   const movies: MoviesCardType[] = useMemo(() => {
     if (searchQuery) {
@@ -111,24 +112,44 @@ export default function MoviesFilterContainer() {
     }));
   }, [genreData]);
 
-  const handleLanguage = (value: string) => {
-    setLanguage((prev) => (prev === value ? "" : value));
-  };
+  const handleLanguage = useCallback(
+    (value: string) => {
+      setLanguage((prev) => (prev === value ? "" : value));
+    },
+    [],
+  );
 
-  const handleGenre = (value: string) => {
-    setGenre(value);
-  };
+  const handleGenre = useCallback(
+    (value: string) => {
+      setGenre(value);
+    },
+    [],
+  );
 
-  const handleSort = (value: string) => {
-    setSort(value);
-  };
+  const handleSort = useCallback(
+    (value: string) => {
+      setSort(value);
+    },
+    [],
+  );
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setSearchQuery("");
     setLanguage("");
     setGenre("");
     setSort("");
-  };
+  }, []);
+
+  const handleRetry = useCallback(
+    () => (searchQuery ? refetchSearch() : refetch()),
+    [searchQuery, refetchSearch, refetch],
+  );
+
+  const handleEndReached = useCallback(() => {
+    if (!searchQuery && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [searchQuery, hasNextPage, fetchNextPage]);
 
   const loadingState = searchQuery ? searchLoading : isLoading;
 
@@ -190,22 +211,17 @@ export default function MoviesFilterContainer() {
       ) : (
         <FlatList
           numColumns={3}
-          contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
+          contentContainerStyle={LIST_CONTENT_STYLE}
           data={movies}
           keyExtractor={keyExtractor}
           initialNumToRender={12}
           maxToRenderPerBatch={12}
           windowSize={5}
           removeClippedSubviews
-          updateCellsBatchingPeriod={100}
           renderItem={renderItem}
           ListEmptyComponent={<NoDataFound />}
           showsVerticalScrollIndicator={false}
-          onEndReached={() => {
-            if (!searchQuery && hasNextPage) {
-              fetchNextPage();
-            }
-          }}
+          onEndReached={handleEndReached}
           onEndReachedThreshold={0.5}
           ListFooterComponent={isFetchingNextPage ? <Loading /> : null}
         />
