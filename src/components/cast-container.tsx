@@ -26,7 +26,7 @@ type MovieCredits = {
   crew?: { id?: number; job?: string; name?: string }[];
 };
 
-const CastTile = ({ cast }: { cast: MovieCastProps }) => {
+const CastTile = memo(function CastTile({ cast }: { cast: MovieCastProps }) {
   const { name, character, profile_path, gender, id } = cast;
 
   const placeholder = useMemo(
@@ -38,7 +38,7 @@ const CastTile = ({ cast }: { cast: MovieCastProps }) => {
   );
 
   const imageUri = useMemo(
-    () => (profile_path ? getImage(profile_path, "w185") : null),
+    () => (profile_path ? getImage(profile_path, "w300") : null),
     [profile_path],
   );
 
@@ -72,7 +72,7 @@ const CastTile = ({ cast }: { cast: MovieCastProps }) => {
       ) : null}
     </TouchableOpacity>
   );
-};
+});
 
 const CastContainer = ({
   id,
@@ -84,9 +84,12 @@ const CastContainer = ({
   initialData?: MovieCredits;
 }) => {
   const [expanded, setExpanded] = useState(false);
-  const { data, isLoading, error } = useGetMovieCredits(id, typeOfList, {
-    initialData,
-  });
+  const creditsOptions = useMemo(() => ({ initialData }), [initialData]);
+  const { data, isLoading, error } = useGetMovieCredits(
+    id,
+    typeOfList,
+    creditsOptions,
+  );
 
   const cast = useMemo<MovieCastProps[]>(() => {
     const list = (data as MovieCredits | undefined)?.cast;

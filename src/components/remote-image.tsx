@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { Image as ExpoImage, ImageSource } from "expo-image";
 import { StyleProp, ImageStyle } from "react-native";
 
@@ -32,4 +32,4 @@ const RemoteImage = ({
   );
 };
 
-export default RemoteImage;
+export default memo(RemoteImage);

@@ -1,6 +1,7 @@
 import AppAlert, { AlertAction } from "@/src/components/app-alert";
 import AuthInput from "@/src/components/auth-input";
 import RemoteImage from "@/src/components/remote-image";
+import { useQueryClient } from "@tanstack/react-query";
 import useGetFavoriteMovies from "@/src/hooks/useGetFavoriteMovies";
 import useGetFavoriteTvShows from "@/src/hooks/useGetFavoriteTvShows";
 import useGetWatchlistMovies from "@/src/hooks/useGetWatchlistMovies";
@@ -38,6 +39,22 @@ const getInitialName = () =>
   "CineWave User";
 
 const ProfileContainer = () => {
+  const queryClient = useQueryClient();
+
+  const confirmLogout = useCallback(() => {
+    queryClient.removeQueries({
+      predicate: (query) => {
+        const key = Array.isArray(query.queryKey)
+          ? query.queryKey[0]
+          : query.queryKey;
+        return (
+          typeof key === "string" &&
+          (key.startsWith("favorite") || key.startsWith("watchlist"))
+        );
+      },
+    });
+    return auth.signOut();
+  }, [queryClient]);
   const [alertVisible, setAlertVisible] = useState(false);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -74,7 +91,6 @@ const ProfileContainer = () => {
   }, [name, email]);
 
   const handleLogout = useCallback(() => setAlertVisible(true), []);
-  const confirmLogout = useCallback(() => auth.signOut(), []);
 
   const logoutActions: AlertAction[] = [
     { text: "Cancel", style: "cancel" },

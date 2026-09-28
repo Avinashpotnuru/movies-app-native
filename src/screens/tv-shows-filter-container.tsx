@@ -32,6 +32,8 @@ import {
 import { Colors } from "../theme";
 import { Movie, MoviesCardType } from "../types";
 
+const LIST_CONTENT_STYLE = { paddingBottom: 24 };
+
 export default function TvShowFilterContainer() {
   const [language, setLanguage] = useState("");
   const [genre, setGenre] = useState("");
@@ -66,7 +68,6 @@ export default function TvShowFilterContainer() {
   } = useSearchTvShows(debouncedQuery);
 
   const listError = searchQuery ? searchError : error;
-  const handleRetry = () => (searchQuery ? refetchSearch() : refetch());
 
   const tvShows: MoviesCardType[] = useMemo(() => {
     if (searchQuery) {
@@ -106,12 +107,23 @@ export default function TvShowFilterContainer() {
     }));
   }, [genreData]);
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setSearchQuery("");
     setLanguage("");
     setGenre("");
     setSort("");
-  };
+  }, []);
+
+  const handleRetry = useCallback(
+    () => (searchQuery ? refetchSearch() : refetch()),
+    [searchQuery, refetchSearch, refetch],
+  );
+
+  const handleEndReached = useCallback(() => {
+    if (!searchQuery && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [searchQuery, hasNextPage, fetchNextPage]);
 
   const loadingState = searchQuery ? searchLoading : isLoading;
 
@@ -173,22 +185,17 @@ export default function TvShowFilterContainer() {
       ) : (
         <FlatList
           numColumns={3}
-        contentContainerStyle={{ paddingBottom: 24 }}
+          contentContainerStyle={LIST_CONTENT_STYLE}
           data={tvShows}
           keyExtractor={keyExtractor}
           initialNumToRender={12}
           maxToRenderPerBatch={12}
           windowSize={5}
           removeClippedSubviews
-          updateCellsBatchingPeriod={100}
           renderItem={renderItem}
           ListEmptyComponent={<NoDataFound />}
           showsVerticalScrollIndicator={false}
-          onEndReached={() => {
-            if (!searchQuery && hasNextPage) {
-              fetchNextPage();
-            }
-          }}
+          onEndReached={handleEndReached}
           onEndReachedThreshold={0.5}
           ListFooterComponent={isFetchingNextPage ? <Loading /> : null}
         />

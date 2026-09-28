@@ -14,7 +14,7 @@ const RecommendationCard = ({
   const imageSource = useMemo(() => {
     return moviesDetails?.backdrop_path
       ? {
-          uri: getImage(moviesDetails?.backdrop_path, "w780"),
+          uri: getImage(moviesDetails?.backdrop_path, "w500"),
         }
       : require("@/assets/images/placeholder.jpg");
   }, [moviesDetails?.backdrop_path]);
@@ -43,9 +43,11 @@ const RecommendationCard = ({
         placeholder={require("@/assets/images/placeholder.jpg")}
         contentFit="cover"
       />
-      <Text style={styles.title}>
-        {moviesDetails?.original_title || moviesDetails?.original_name}
-      </Text>
+      {moviesDetails?.original_title || moviesDetails?.original_name ? (
+        <Text style={styles.title} numberOfLines={2}>
+          {moviesDetails?.original_title || moviesDetails?.original_name}
+        </Text>
+      ) : null}
     </TouchableOpacity>
   );
 };
@@ -54,9 +56,9 @@ export default memo(RecommendationCard);
 
 const styles = StyleSheet.create({
   container: {
+    width: 196,
     overflow: "hidden",
     marginHorizontal: 8,
-    margin: 10,
   },
   title: {
     marginTop: 10,

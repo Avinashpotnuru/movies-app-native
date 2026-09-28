@@ -11,15 +11,16 @@ const useGetMovies = ({
   genre?: string;
   sort?: string;
 }) => {
+  const normalizedSort = sort || "popularity.desc";
   return useInfiniteQuery({
-    queryKey: ["movies", language, genre, sort],
+    queryKey: ["movies", language || "", genre || "", normalizedSort],
 
     queryFn: ({ pageParam = 1 }) =>
       getMovies({
         pageParam,
         language,
         genre,
-        sort,
+        sort: normalizedSort,
       }),
 
     getNextPageParam: (lastPage) => {

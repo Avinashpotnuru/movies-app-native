@@ -2,6 +2,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { MoviesCardType } from "@/src/types";
 import { router } from "expo-router";
+import { useIsFocused } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import React, { memo, useCallback, useState } from "react";
 import {
@@ -26,6 +27,14 @@ import { Colors } from "../theme";
 import { prefetchMovieDetail } from "../hooks/useGetMovieDetail";
 
 const HERO_HEIGHT = 240;
+
+const PLACEHOLDER = require("@/assets/images/placeholder.jpg");
+
+const PARALLAX_CONFIG = {
+  parallaxScrollingScale: 1,
+  parallaxAdjacentItemScale: 0.85,
+  parallaxScrollingOffset: 40,
+};
 
 interface MoviesCarouselProps {
   moviePosters: MoviesCardType[];
@@ -119,9 +128,9 @@ const HeroCard = memo(
               source={
                 item?.poster_path
                   ? { uri: getImage(item.poster_path, "w780") }
-                  : require("@/assets/images/placeholder.jpg")
+                  : PLACEHOLDER
               }
-              placeholder={require("@/assets/images/placeholder.jpg")}
+              placeholder={PLACEHOLDER}
               contentFit="cover"
               recyclingKey={item?.id?.toString()}
               style={StyleSheet.absoluteFillObject}
@@ -161,8 +170,30 @@ const HeroCard = memo(
 
 HeroCard.displayName = "HeroCard";
 
+const PaginationDots = memo(function PaginationDots({
+  total,
+  active,
+}: {
+  total: number;
+  active: number;
+}) {
+  return (
+    <View style={styles.dots}>
+      {Array.from({ length: total }).map((_, index) => (
+        <View
+          key={index}
+          style={[styles.dot, index === active && styles.dotActive]}
+        />
+      ))}
+    </View>
+  );
+});
+
+PaginationDots.displayName = "PaginationDots";
+
 const MoviesCarousel = ({ moviePosters }: MoviesCarouselProps) => {
   const { width } = useWindowDimensions();
+  const isFocused = useIsFocused();
   const [activeIndex, setActiveIndex] = useState(0);
   const queryClient = useQueryClient();
   const carouselRef = React.useRef<ICarouselInstance>(null);
@@ -202,7 +233,7 @@ const MoviesCarousel = ({ moviePosters }: MoviesCarouselProps) => {
       {!moviePosters?.length ? (
         <View style={[styles.item, styles.empty]}>
           <RemoteImage
-            source={require("@/assets/images/placeholder.jpg")}
+            source={PLACEHOLDER}
             contentFit="cover"
             style={styles.poster}
           />
@@ -212,19 +243,16 @@ const MoviesCarousel = ({ moviePosters }: MoviesCarouselProps) => {
           ref={carouselRef}
           loop
           mode="parallax"
-          modeConfig={{
-            parallaxScrollingScale: 1,
-            parallaxAdjacentItemScale: 0.85,
-            parallaxScrollingOffset: 40,
-          }}
+          modeConfig={PARALLAX_CONFIG}
           width={itemWidth}
           height={HERO_HEIGHT}
-          autoPlay={!!moviePosters?.length}
+          autoPlay={isFocused && !!moviePosters?.length}
           autoPlayInterval={4200}
           data={moviePosters}
           pagingEnabled
           scrollAnimationDuration={900}
-          onSnapToItem={(index) => setActiveIndex(index)}
+          windowSize={5}
+          onSnapToItem={setActiveIndex}
           renderItem={renderItem}
           style={styles.carousel}
         />
@@ -232,17 +260,10 @@ const MoviesCarousel = ({ moviePosters }: MoviesCarouselProps) => {
 
       {!!moviePosters?.length ? (
         <View style={styles.footer}>
-          <View style={styles.dots}>
-            {moviePosters.map((_, index) => (
-              <View
-                key={index}
-                style={[
-                  styles.dot,
-                  index === activeIndex % moviePosters.length && styles.dotActive,
-                ]}
-              />
-            ))}
-          </View>
+          <PaginationDots
+            total={moviePosters.length}
+            active={activeIndex % moviePosters.length}
+          />
 
           <Text style={styles.counter}>
             {String(activeIndex % moviePosters.length + 1).padStart(2, "0")}
@@ -257,7 +278,7 @@ const MoviesCarousel = ({ moviePosters }: MoviesCarouselProps) => {
   );
 };
 
-export default MoviesCarousel;
+export default memo(MoviesCarousel);
 
 const styles = StyleSheet.create({
   container: {

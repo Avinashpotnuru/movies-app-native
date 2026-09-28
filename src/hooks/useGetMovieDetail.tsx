@@ -11,7 +11,6 @@ export const prefetchMovieDetail = (
   return queryClient.prefetchQuery({
     queryKey: ["movieDetail", { id, typeOfList }],
     queryFn: () => getMovieDetails(id, typeOfList),
-    staleTime: DEFAULT_QUERY_OPTIONS.staleTime,
   });
 };
 

@@ -128,10 +128,15 @@ const CastOverView = ({ castId }: { castId: number }) => {
   const crewWorks = useMemo(() => {
     const crew = data?.combined_credits?.crew ?? [];
     const byJob = new Map<string, MoviesCardType[]>();
+    const seenByJob = new Map<string, Set<number>>();
     for (const credit of crew) {
       if (!credit.job) continue;
+      const seen = seenByJob.get(credit.job);
+      if (seen?.has(credit.id)) continue;
       const existing = byJob.get(credit.job) ?? [];
-      if (existing.some((item) => item.id === credit.id)) continue;
+      const pushSeen = seenByJob.get(credit.job) ?? new Set<number>();
+      pushSeen.add(credit.id);
+      seenByJob.set(credit.job, pushSeen);
       byJob.set(credit.job, [
         ...existing,
         {

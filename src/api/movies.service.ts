@@ -35,7 +35,7 @@ export const getMovies = ({ pageParam = 1, language, genre, sort }: GetParams) =
     page: pageParam,
     with_original_language: language,
     with_genres: genre,
-    sort_by: sort ?? "popularity.desc",
+    sort_by: sort || "popularity.desc",
   });
 };
 
@@ -85,7 +85,7 @@ export const getTvShows = ({ pageParam = 1, language, genre, sort }: GetParams) 
     page: pageParam,
     with_original_language: language,
     with_genres: genre,
-    sort_by: sort ?? "popularity.desc",
+    sort_by: sort || "popularity.desc",
   });
 };
 

@@ -123,13 +123,22 @@ export default function MediaDetailsContainer({
     id,
     typeOfList,
   );
+  const isMovie = typeOfList === "movie";
   const { mutateAsync } = useAddFavorite();
-  const { data: favorites } = useGetFavoriteMovies();
-  const { data: favoritesTv } = useGetFavoriteTvShows();
+  const { data: favorites } = useGetFavoriteMovies({
+    enabled: isMovie,
+  });
+  const { data: favoritesTv } = useGetFavoriteTvShows({
+    enabled: !isMovie,
+  });
 
   const { mutateAsync: mutateWatchlist } = useAddWatchlist();
-  const { data: watchlist } = useGetWatchlistMovies();
-  const { data: watchlistTv } = useGetWatchlistTvShows();
+  const { data: watchlist } = useGetWatchlistMovies({
+    enabled: isMovie,
+  });
+  const { data: watchlistTv } = useGetWatchlistTvShows({
+    enabled: !isMovie,
+  });
 
   const isFavorite = useMemo(() => {
     const list =

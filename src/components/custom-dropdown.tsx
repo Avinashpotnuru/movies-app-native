@@ -1,9 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Dimensions,
+  FlatList,
   Modal,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -24,12 +31,12 @@ interface DropDownProps {
   value: string;
 }
 
-export default function CustomDropdown({
+const CustomDropdown = ({
   options = [],
   placeholder = "Select option",
   onValueChange,
   value,
-}: DropDownProps) {
+}: DropDownProps) => {
   const buttonRef = useRef<View>(null);
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -53,22 +60,81 @@ export default function CustomDropdown({
     measureTrigger();
   }, []);
 
-  const selectedLabel = options.find((item) => item.value === value)?.label;
+  const selectedLabel = useMemo(
+    () => options.find((item) => item.value === value)?.label,
+    [options, value],
+  );
 
-  const filteredOptions = search
-    ? options.filter((item) =>
-        item.label.toLowerCase().includes(search.toLowerCase()),
-      )
-    : options;
+  const filteredOptions = useMemo(
+    () =>
+      search
+        ? options.filter((item) =>
+            item.label.toLowerCase().includes(search.toLowerCase()),
+          )
+        : options,
+    [options, search],
+  );
 
-  const triggerTop = triggerLayout ? triggerLayout.y + triggerLayout.height + 8 : 120;
+  const triggerTop = triggerLayout
+    ? triggerLayout.y + triggerLayout.height + 8
+    : 120;
   const sheetMaxHeight = Math.max(160, SCREEN_HEIGHT - triggerTop - 24);
 
-  const handleSelect = (optionValue: string) => {
-    setOpen(false);
-    setSearch("");
-    onValueChange(optionValue);
-  };
+  const handleSelect = useCallback(
+    (optionValue: string) => {
+      setOpen(false);
+      setSearch("");
+      onValueChange(optionValue);
+    },
+    [onValueChange],
+  );
+
+  const toggleOpen = useCallback(() => {
+    const node = findNodeHandle(buttonRef.current);
+    if (node) {
+      UIManager.measure(node, (_x, _y, width, height, pageX, pageY) => {
+        setTriggerLayout({ x: pageX, y: pageY, width, height });
+        setOpen((prev) => !prev);
+      });
+    } else {
+      setOpen((prev) => !prev);
+    }
+  }, []);
+
+  const keyExtractor = useCallback(
+    (item: { label: string; value: string }) => item.value,
+    [],
+  );
+
+  const renderOption = useCallback(
+    ({ item }: { item: { label: string; value: string } }) => {
+      const isSelected = item.value === value;
+      return (
+        <TouchableOpacity
+          activeOpacity={0.7}
+          style={[
+            styles.option,
+            isSelected && styles.optionSelected,
+          ]}
+          onPress={() => handleSelect(item.value)}
+        >
+          <Text
+            style={[
+              styles.optionText,
+              isSelected && styles.optionTextSelected,
+            ]}
+            numberOfLines={1}
+          >
+            {item.label}
+          </Text>
+          {isSelected && (
+            <AntDesign name="check" size={16} color={Colors.primary} />
+          )}
+        </TouchableOpacity>
+      );
+    },
+    [value, handleSelect],
+  );
 
   return (
     <View>
@@ -76,17 +142,7 @@ export default function CustomDropdown({
         ref={buttonRef}
         style={[styles.button, open && styles.buttonActive]}
         activeOpacity={0.85}
-        onPress={() => {
-          const node = findNodeHandle(buttonRef.current);
-          if (node) {
-            UIManager.measure(node, (_x, _y, width, height, pageX, pageY) => {
-              setTriggerLayout({ x: pageX, y: pageY, width, height });
-              setOpen((prev) => !prev);
-            });
-          } else {
-            setOpen((prev) => !prev);
-          }
-        }}
+        onPress={toggleOpen}
       >
         <Text
           style={[styles.text, !selectedLabel && styles.placeholderText]}
@@ -142,54 +198,32 @@ export default function CustomDropdown({
 
             <View style={styles.divider} />
 
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled"
-            >
-              {filteredOptions.length === 0 ? (
-                <View style={styles.option}>
-                  <Text style={styles.optionText}>No options</Text>
-                </View>
-              ) : (
-                filteredOptions.map((item) => {
-                  const isSelected = item.value === value;
-                  return (
-                    <TouchableOpacity
-                      activeOpacity={0.7}
-                      key={item.value}
-                      style={[
-                        styles.option,
-                        isSelected && styles.optionSelected,
-                      ]}
-                      onPress={() => handleSelect(item.value)}
-                    >
-                      <Text
-                        style={[
-                          styles.optionText,
-                          isSelected && styles.optionTextSelected,
-                        ]}
-                        numberOfLines={1}
-                      >
-                        {item.label}
-                      </Text>
-                      {isSelected && (
-                        <AntDesign
-                          name="check"
-                          size={16}
-                          color={Colors.primary}
-                        />
-                      )}
-                    </TouchableOpacity>
-                  );
-                })
-              )}
-            </ScrollView>
+            {filteredOptions.length === 0 ? (
+              <View style={styles.option}>
+                <Text style={styles.optionText}>No options</Text>
+              </View>
+            ) : (
+              <FlatList
+                data={filteredOptions}
+                keyExtractor={keyExtractor}
+                renderItem={renderOption}
+                initialNumToRender={20}
+                maxToRenderPerBatch={24}
+                windowSize={7}
+                removeClippedSubviews
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+                style={{ maxHeight: sheetMaxHeight - 70 }}
+              />
+            )}
           </View>
         </View>
       </Modal>
     </View>
   );
-}
+};
+
+export default memo(CustomDropdown);
 
 const styles = StyleSheet.create({
   button: {
